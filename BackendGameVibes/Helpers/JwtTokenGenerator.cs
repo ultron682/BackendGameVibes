@@ -2,7 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace CodeShareBackend.Helpers
+namespace BackendGameVibes.Helpers
 {
     public static class JwtTokenGenerator
     {

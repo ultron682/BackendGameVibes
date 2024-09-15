@@ -1,10 +1,10 @@
-﻿using CodeShareBackend.IServices;
-using CodeShareBackend.Models;
+﻿using BackendGameVibes.IServices;
+using BackendGameVibes.Models;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
 
-namespace CodeShareBackend.Services
+namespace BackendGameVibes.Services
 {
     public class MailService : IMailService
     {

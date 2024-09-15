@@ -1,6 +1,6 @@
-﻿using CodeShareBackend.Models;
+﻿using BackendGameVibes.Models;
 
-namespace CodeShareBackend.IServices
+namespace BackendGameVibes.IServices
 {
     public interface IMailService
     {

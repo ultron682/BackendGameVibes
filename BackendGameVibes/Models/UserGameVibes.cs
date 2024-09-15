@@ -1,9 +1,38 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.Data;
 
-namespace CodeShareBackend.Models
+namespace BackendGameVibes.Models
 {
-    public class UserGameVibes: IdentityUser
+    public class UserGameVibes : IdentityUser
     {
-        public List<CodeSnippet> CodeSnippets { get; set; } = new List<CodeSnippet>();
+        public byte[] ProfilePicture
+        {
+            get; set;
+        }
+        public string Description
+        {
+            get; set;
+        }
+        public int ExperiencePoints
+        {
+            get; set;
+        }
+        public int RoleId
+        {
+            get; set;
+        }
+        public int ForumRoleId
+        {
+            get; set;
+        }
+
+        public ForumRole ForumRole
+        {
+            get; set;
+        }
+        public Role Role
+        {
+            get; set;
+        }
     }
 }

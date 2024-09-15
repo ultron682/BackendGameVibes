@@ -1,4 +1,4 @@
-﻿namespace CodeShareBackend.Models
+﻿namespace BackendGameVibes.Models
 {
     public class MailData
     {

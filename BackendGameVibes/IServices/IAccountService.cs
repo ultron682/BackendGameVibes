@@ -1,7 +1,7 @@
-﻿using CodeShareBackend.Models;
+﻿using BackendGameVibes.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace CodeShareBackend.IServices
+namespace BackendGameVibes.IServices
 {
     public interface IAccountService
     {

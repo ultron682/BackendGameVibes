@@ -1,4 +1,4 @@
-﻿namespace CodeShareBackend.Services
+﻿namespace BackendGameVibes.Services
 {
     public class HtmlTemplateService
     {

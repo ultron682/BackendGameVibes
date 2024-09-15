@@ -1,4 +1,4 @@
-﻿namespace CodeShareBackend;
+﻿namespace BackendGameVibes;
 
 public class LoginRequestCodeShare
 {

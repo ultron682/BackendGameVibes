@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using CodeShareBackend.Models;
+using BackendGameVibes.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using System.Diagnostics;
 
-namespace CodeShareBackend.Data
+namespace BackendGameVibes.Data
 {
     public class ApplicationDbContext : IdentityDbContext<UserGameVibes>
     {
@@ -13,8 +13,42 @@ namespace CodeShareBackend.Data
 
         }
 
-        //public DbSet<CodeSnippet> CodeSnippets { get; set; }
-        //public DbSet<ProgLanguage> ProgLanguages { get; set; }
+        public DbSet<UserGameVibes> Users
+        {
+            get; set;
+        }
+        public DbSet<ForumRole> ForumRoles
+        {
+            get; set;
+        }
+        public DbSet<Role> Roles
+        {
+            get; set;
+        }
+        public DbSet<Game> Games
+        {
+            get; set;
+        }
+        public DbSet<Platform> Platforms
+        {
+            get; set;
+        }
+        public DbSet<Genre> Genres
+        {
+            get; set;
+        }
+        public DbSet<GameImage> GameImages
+        {
+            get; set;
+        }
+        public DbSet<SystemRequirement> SystemRequirements
+        {
+            get; set;
+        }
+        public DbSet<Review> Reviews
+        {
+            get; set;
+        }
 
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{

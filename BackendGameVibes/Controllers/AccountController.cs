@@ -1,10 +1,10 @@
-﻿using CodeShareBackend.IServices;
+﻿using BackendGameVibes.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 
-namespace CodeShareBackend.Controllers
+namespace BackendGameVibes.Controllers
 {
     [ApiController]
     [Route("account")]

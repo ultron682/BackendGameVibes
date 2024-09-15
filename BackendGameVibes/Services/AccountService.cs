@@ -1,14 +1,14 @@
-﻿using CodeShareBackend.Data;
-using CodeShareBackend.Helpers;
-using CodeShareBackend.IServices;
-using CodeShareBackend.Models;
+﻿using BackendGameVibes.Data;
+using BackendGameVibes.Helpers;
+using BackendGameVibes.IServices;
+using BackendGameVibes.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 
-namespace CodeShareBackend.Services
+namespace BackendGameVibes.Services
 {
     public class AccountService : IAccountService
     {
@@ -59,11 +59,13 @@ namespace CodeShareBackend.Services
             return await _userManager.FindByIdAsync(userId);
         }
 
+
+
         public async Task<object> GetAccountInfoAsync(string userId)
         {
             var accountInfo = await _context.Users
                 .Where(u => u.Id == userId)
-                .Include(u => u.CodeSnippets)
+                //.Include(u => u.CodeSnippets)
                 .Select(u => new
                 {
                     u.Id,
