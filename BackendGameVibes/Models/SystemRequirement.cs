@@ -10,28 +10,28 @@
         {
             get; set;
         }
-        public string CpuRequirement
+        public required string CpuRequirement
         {
             get; set;
         }
-        public string GpuRequirement
+        public required string GpuRequirement
         {
             get; set;
         }
-        public string RamRequirement
+        public required string RamRequirement
         {
             get; set;
         }
-        public string DiskRequirement
+        public required string DiskRequirement
         {
             get; set;
         }
-        public string OperatingSystemRequirement
+        public required string OperatingSystemRequirement
         {
             get; set;
         }
 
-        public Game Game
+        public Game? Game
         {
             get; set;
         }
