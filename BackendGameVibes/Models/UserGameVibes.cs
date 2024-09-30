@@ -5,32 +5,32 @@ namespace BackendGameVibes.Models
 {
     public class UserGameVibes : IdentityUser
     {
-        public byte[] ProfilePicture
+        public byte[]? ProfilePicture
         {
             get; set;
         }
-        public string Description
+        public string? Description
         {
             get; set;
         }
-        public int ExperiencePoints
+        public int? ExperiencePoints
         {
             get; set;
         }
-        public int RoleId
+        public int? RoleId
         {
             get; set;
         }
-        public int ForumRoleId
+        public int? ForumRoleId
         {
             get; set;
         }
 
-        public ForumRole ForumRole
+        public ForumRole? ForumRole
         {
             get; set;
         }
-        public Role Role
+        public Role? Role
         {
             get; set;
         }

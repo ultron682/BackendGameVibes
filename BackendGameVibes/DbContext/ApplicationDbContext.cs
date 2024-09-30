@@ -56,53 +56,198 @@ namespace BackendGameVibes.Data
         //    optionsBuilder.LogTo(message => Debug.WriteLine(message));
         //}
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
+        protected override void OnModelCreating(ModelBuilder modelBuilder) {
             base.OnModelCreating(modelBuilder);
 
-            //modelBuilder.Entity<UserCodeShare>()
-            //    .HasMany(u => u.CodeSnippets)
-            //    .WithOne(c => c.User)
-            //    .HasForeignKey(c => c.UserId)
-            //    .OnDelete(DeleteBehavior.Cascade);
+            // UserGameVibes entity
+            modelBuilder.Entity<UserGameVibes>(entity =>
+            {
+                entity.HasOne(u => u.Role)
+                    .WithMany(r => r.Users)
+                    .HasForeignKey(u => u.RoleId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
-            //modelBuilder.Entity<CodeSnippet>(builder =>
-            //{
-            //    builder
-            //    .HasKey(p => p.Id);
+                entity.HasOne(u => u.ForumRole)
+                    .WithMany(fr => fr.Users)
+                    .HasForeignKey(u => u.ForumRoleId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
-            //    builder
-            //    .HasOne(p => p.SelectedLang)
-            //    .WithMany()
-            //    .HasForeignKey(c => c.SelectedLangId)
-            //    .OnDelete(DeleteBehavior.Restrict);
+                entity.Property(u => u.Description)
+                    .HasMaxLength(500);
 
-            //    builder
-            //    .Property(c => c.SelectedLangId)
-            //    .HasDefaultValue(1);
+                entity.Property(u => u.ExperiencePoints)
+                    .HasDefaultValue(0);
+            });
 
-            //    builder.Property(p => p.ExpiryDate)
-            //    .HasDefaultValue(DateTime.Now.AddDays(3));
-            //});
+            // Role entity
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.HasKey(r => r.Id);
 
-            //modelBuilder.Entity<ProgLanguage>(builder =>
-            //{
-            //    builder
-            //    .HasKey(p => p.Id);
+                entity.Property(r => r.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
 
-            //    builder.Property(p => p.Name)
-            //    .IsRequired();
+                entity.HasMany(r => r.Users)
+                    .WithOne(u => u.Role)
+                    .HasForeignKey(u => u.RoleId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
 
-            //    builder.HasData(
-            //        new ProgLanguage() { Id = 1, Name = "javascript" },
-            //        new ProgLanguage() { Id = 2, Name = "xml" },
-            //        new ProgLanguage() { Id = 3, Name = "css" },
-            //        new ProgLanguage() { Id = 4, Name = "go" },
-            //        new ProgLanguage() { Id = 5, Name = "php" },
-            //        new ProgLanguage() { Id = 6, Name = "python" },
-            //        new ProgLanguage() { Id = 7, Name = "sql" },
-            //        new ProgLanguage() { Id = 8, Name = "swift" });
-            //});
+            // ForumRole entity
+            modelBuilder.Entity<ForumRole>(entity =>
+            {
+                entity.HasKey(fr => fr.Id);
+
+                entity.Property(fr => fr.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(fr => fr.Threshold)
+                    .IsRequired();
+
+                entity.HasMany(fr => fr.Users)
+                    .WithOne(u => u.ForumRole)
+                    .HasForeignKey(u => u.ForumRoleId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Game entity
+            modelBuilder.Entity<Game>(entity =>
+            {
+                entity.HasKey(g => g.Id);
+
+                entity.Property(g => g.Title)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(g => g.Description)
+                    .HasMaxLength(1000);
+
+                entity.HasOne(g => g.Platform)
+                    .WithMany(p => p.Games)
+                    .HasForeignKey(g => g.PlatformId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasMany(g => g.Genres)
+                    .WithMany(gen => gen.Games)
+                    .UsingEntity(j => j.ToTable("GameGenres"));
+
+                entity.HasMany(g => g.GameImages)
+                    .WithOne(img => img.Game)
+                    .HasForeignKey(img => img.GameId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(g => g.SystemRequirements)
+                    .WithOne(sr => sr.Game)
+                    .HasForeignKey(sr => sr.GameId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Platform entity
+            modelBuilder.Entity<Platform>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+
+                entity.Property(p => p.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
+            });
+
+            // Genre entity
+            modelBuilder.Entity<Genre>(entity =>
+            {
+                entity.HasKey(g => g.Id);
+
+                entity.Property(g => g.Name)
+                    .IsRequired()
+                    .HasMaxLength(50);
+            });
+
+            // GameImage entity
+            modelBuilder.Entity<GameImage>(entity =>
+            {
+                entity.HasKey(gi => gi.Id);
+
+                entity.Property(gi => gi.ImagePath)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.HasOne(gi => gi.Game)
+                    .WithMany(g => g.GameImages)
+                    .HasForeignKey(gi => gi.GameId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // SystemRequirement entity
+            modelBuilder.Entity<SystemRequirement>(entity =>
+            {
+                entity.HasKey(sr => sr.Id);
+
+                entity.Property(sr => sr.CpuRequirement)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(sr => sr.GpuRequirement)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(sr => sr.RamRequirement)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(sr => sr.DiskRequirement)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(sr => sr.OperatingSystemRequirement)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.HasOne(sr => sr.Game)
+                    .WithMany(g => g.SystemRequirements)
+                    .HasForeignKey(sr => sr.GameId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Review entity
+            modelBuilder.Entity<Review>(entity =>
+            {
+                entity.HasKey(r => r.Id);
+
+                entity.Property(r => r.GeneralScore)
+                    .IsRequired()
+                    .HasPrecision(3, 2);
+
+                entity.Property(r => r.GraphicsScore)
+                    .IsRequired()
+                    .HasPrecision(3, 2);
+
+                entity.Property(r => r.AudioScore)
+                    .IsRequired()
+                    .HasPrecision(3, 2);
+
+                entity.Property(r => r.GameplayScore)
+                    .IsRequired()
+                    .HasPrecision(3, 2);
+
+                entity.Property(r => r.Comment)
+                    .HasMaxLength(1000);
+
+                entity.Property(r => r.CreatedAt)
+                    .IsRequired();
+
+                entity.HasOne(r => r.UserGameVibes)
+                    .WithMany()
+                    .HasForeignKey(r => r.UserGameVibesId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(r => r.Game)
+                    .WithMany()
+                    .HasForeignKey(r => r.GameId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
         }
+
     }
 }

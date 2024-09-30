@@ -6,16 +6,16 @@
         {
             get; set;
         }
-        public string ImagePath
+        public string? ImagePath
         {
             get; set;
         }
-        public int GameId
+        public int? GameId
         {
             get; set;
         }
 
-        public Game Game
+        public Game? Game
         {
             get; set;
         }

@@ -4,6 +4,7 @@ using BackendGameVibes.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackendGameVibes.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240930214129_optionals for Game")]
+    partial class optionalsforGame
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,11 +35,9 @@ namespace BackendGameVibes.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Threshold")
-                        .IsRequired()
+                    b.Property<int>("Threshold")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -53,19 +54,18 @@ namespace BackendGameVibes.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("PlatformId")
+                    b.Property<int>("PlatformId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("ReleaseDate")
+                    b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -82,13 +82,12 @@ namespace BackendGameVibes.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("GameId")
+                    b.Property<int>("GameId")
                         .HasColumnType("int");
 
                     b.Property<string>("ImagePath")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -107,8 +106,7 @@ namespace BackendGameVibes.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -125,8 +123,7 @@ namespace BackendGameVibes.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -142,40 +139,38 @@ namespace BackendGameVibes.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<double>("AudioScore")
-                        .HasPrecision(3, 2)
-                        .HasColumnType("float(3)");
+                        .HasColumnType("float");
 
                     b.Property<string>("Comment")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime?>("CreatedAt")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("GameId")
                         .HasColumnType("int");
 
                     b.Property<double>("GameplayScore")
-                        .HasPrecision(3, 2)
-                        .HasColumnType("float(3)");
+                        .HasColumnType("float");
 
                     b.Property<double>("GeneralScore")
-                        .HasPrecision(3, 2)
-                        .HasColumnType("float(3)");
+                        .HasColumnType("float");
 
                     b.Property<double>("GraphicsScore")
-                        .HasPrecision(3, 2)
-                        .HasColumnType("float(3)");
+                        .HasColumnType("float");
 
-                    b.Property<string>("UserGameVibesId")
+                    b.Property<int>("UserGameVibesId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserGameVibesId1")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("GameId");
 
-                    b.HasIndex("UserGameVibesId");
+                    b.HasIndex("UserGameVibesId1");
 
                     b.ToTable("Reviews");
                 });
@@ -190,8 +185,7 @@ namespace BackendGameVibes.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -208,31 +202,26 @@ namespace BackendGameVibes.Migrations
 
                     b.Property<string>("CpuRequirement")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DiskRequirement")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("GameId")
                         .HasColumnType("int");
 
                     b.Property<string>("GpuRequirement")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OperatingSystemRequirement")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RamRequirement")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -254,8 +243,8 @@ namespace BackendGameVibes.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -264,12 +253,10 @@ namespace BackendGameVibes.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("ExperiencePoints")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
+                    b.Property<int>("ExperiencePoints")
+                        .HasColumnType("int");
 
-                    b.Property<int?>("ForumRoleId")
+                    b.Property<int>("ForumRoleId")
                         .HasColumnType("int");
 
                     b.Property<bool>("LockoutEnabled")
@@ -296,9 +283,10 @@ namespace BackendGameVibes.Migrations
                         .HasColumnType("bit");
 
                     b.Property<byte[]>("ProfilePicture")
+                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<int?>("RoleId")
+                    b.Property<int>("RoleId")
                         .HasColumnType("int");
 
                     b.Property<string>("SecurityStamp")
@@ -340,7 +328,7 @@ namespace BackendGameVibes.Migrations
 
                     b.HasIndex("GenresId");
 
-                    b.ToTable("GameGenres", (string)null);
+                    b.ToTable("GameGenre");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -481,7 +469,8 @@ namespace BackendGameVibes.Migrations
                     b.HasOne("BackendGameVibes.Models.Platform", "Platform")
                         .WithMany("Games")
                         .HasForeignKey("PlatformId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Platform");
                 });
@@ -491,7 +480,8 @@ namespace BackendGameVibes.Migrations
                     b.HasOne("BackendGameVibes.Models.Game", "Game")
                         .WithMany("GameImages")
                         .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Game");
                 });
@@ -506,8 +496,7 @@ namespace BackendGameVibes.Migrations
 
                     b.HasOne("BackendGameVibes.Models.UserGameVibes", "UserGameVibes")
                         .WithMany()
-                        .HasForeignKey("UserGameVibesId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("UserGameVibesId1");
 
                     b.Navigation("Game");
 
@@ -530,12 +519,14 @@ namespace BackendGameVibes.Migrations
                     b.HasOne("BackendGameVibes.Models.ForumRole", "ForumRole")
                         .WithMany("Users")
                         .HasForeignKey("ForumRoleId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("BackendGameVibes.Models.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ForumRole");
 

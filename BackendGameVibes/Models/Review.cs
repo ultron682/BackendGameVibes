@@ -6,7 +6,7 @@
         {
             get; set;
         }
-        public int UserGameVibesId
+        public string? UserGameVibesId
         {
             get; set;
         }
@@ -30,20 +30,20 @@
         {
             get; set;
         }
-        public string Comment
+        public string? Comment
         {
             get; set;
         }
-        public DateTime CreatedAt
+        public DateTime? CreatedAt
         {
             get; set;
         }
 
-        public UserGameVibes UserGameVibes
+        public UserGameVibes? UserGameVibes
         {
             get; set;
         }
-        public Game Game
+        public Game? Game
         {
             get; set;
         }

@@ -6,12 +6,12 @@
         {
             get; set;
         }
-        public string Name
+        public string? Name
         {
             get; set;
         }
 
-        public ICollection<Game> Games
+        public ICollection<Game>? Games
         {
             get; set;
         }
