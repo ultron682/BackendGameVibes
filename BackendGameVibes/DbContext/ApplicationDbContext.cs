@@ -86,10 +86,10 @@ namespace BackendGameVibes.Data {
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasData(
-                    new Role() { Id = 1, Name = "Guest" },
-                    new Role() { Id = 2, Name = "User" },
-                    new Role() { Id = 3, Name = "Mod" },
-                    new Role() { Id = 4, Name = "Admin" });
+                    new Role() { Id = 1, Name = "guest" },
+                    new Role() { Id = 2, Name = "user" },
+                    new Role() { Id = 3, Name = "mod" },
+                    new Role() { Id = 4, Name = "admin" });
             });
 
             // ForumRole entity
