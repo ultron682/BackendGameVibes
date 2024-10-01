@@ -13,9 +13,29 @@ namespace BackendGameVibes.Controllers {
         private readonly SteamService _steamService;
 
 
+
+
         public GameController(ApplicationDbContext context, SteamService steamService) {
             _context = context;
             _steamService = steamService;
+        }
+
+        [HttpGet("steamIDs")]
+        public async Task<ActionResult<SteamApp[]>> GetAllSteamIdsGames() {
+            // ONLY EXAMPLE
+            if (_steamService.steamGames != null)
+                return Ok(_steamService.steamGames[29000..30000] ); // example only small range
+            else
+                return NotFound("GetAllSteamIdsGames unsuccessful");
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<SteamApp[]>> FindSteamAppByName(string searchingName) {
+            var steamApp = _steamService.FindSteamApp(searchingName);
+            if (steamApp != null)
+                return Ok(steamApp);
+            else
+                return BadRequest("steamApp == null");
         }
 
         // Get all games
