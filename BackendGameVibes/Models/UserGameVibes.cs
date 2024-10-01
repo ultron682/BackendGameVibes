@@ -26,12 +26,11 @@ namespace BackendGameVibes.Models
             get; set;
         }
 
-        public ForumRole? ForumRole
+        public Role? Role
         {
             get; set;
         }
-        public Role? Role
-        {
+        public ForumRole? ForumRole {
             get; set;
         }
     }

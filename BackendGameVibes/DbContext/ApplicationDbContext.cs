@@ -4,64 +4,49 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using System.Diagnostics;
 
-namespace BackendGameVibes.Data
-{
-    public class ApplicationDbContext : IdentityDbContext<UserGameVibes>
-    {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        {
-
+namespace BackendGameVibes.Data {
+    public class ApplicationDbContext : IdentityDbContext<UserGameVibes> {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {
         }
 
-        public DbSet<UserGameVibes> Users
-        {
+        public DbSet<UserGameVibes> Users {
             get; set;
         }
-        public DbSet<ForumRole> ForumRoles
-        {
+        public DbSet<ForumRole> ForumRoles {
             get; set;
         }
-        public DbSet<Role> Roles
-        {
+        public DbSet<Role> Roles {
             get; set;
         }
-        public DbSet<Game> Games
-        {
+        public DbSet<Game> Games {
             get; set;
         }
-        public DbSet<Platform> Platforms
-        {
+        public DbSet<Platform> Platforms {
             get; set;
         }
-        public DbSet<Genre> Genres
-        {
+        public DbSet<Genre> Genres {
             get; set;
         }
-        public DbSet<GameImage> GameImages
-        {
+        public DbSet<GameImage> GameImages {
             get; set;
         }
-        public DbSet<SystemRequirement> SystemRequirements
-        {
+        public DbSet<SystemRequirement> SystemRequirements {
             get; set;
         }
-        public DbSet<Review> Reviews
-        {
+        public DbSet<Review> Reviews {
             get; set;
         }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    //base.OnConfiguring(optionsBuilder);
-        //    optionsBuilder.LogTo(message => Debug.WriteLine(message));
-        //}
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+            //base.OnConfiguring(optionsBuilder);
+            optionsBuilder.LogTo(message => Debug.WriteLine(message));
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             base.OnModelCreating(modelBuilder);
 
             // UserGameVibes entity
-            modelBuilder.Entity<UserGameVibes>(entity =>
-            {
+            modelBuilder.Entity<UserGameVibes>(entity => {
                 entity.HasOne(u => u.Role)
                     .WithMany(r => r.Users)
                     .HasForeignKey(u => u.RoleId)
@@ -77,11 +62,18 @@ namespace BackendGameVibes.Data
 
                 entity.Property(u => u.ExperiencePoints)
                     .HasDefaultValue(0);
+
+                entity.Property(u => u.RoleId)
+                    .IsRequired(true)
+                    .HasDefaultValue(1);
+
+                entity.Property(u => u.ForumRoleId)
+                    .IsRequired(true)
+                    .HasDefaultValue(1);
             });
 
             // Role entity
-            modelBuilder.Entity<Role>(entity =>
-            {
+            modelBuilder.Entity<Role>(entity => {
                 entity.HasKey(r => r.Id);
 
                 entity.Property(r => r.Name)
@@ -92,11 +84,16 @@ namespace BackendGameVibes.Data
                     .WithOne(u => u.Role)
                     .HasForeignKey(u => u.RoleId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasData(
+                    new Role() { Id = 1, Name = "Guest" },
+                    new Role() { Id = 2, Name = "User" },
+                    new Role() { Id = 3, Name = "Mod" },
+                    new Role() { Id = 4, Name = "Admin" });
             });
 
             // ForumRole entity
-            modelBuilder.Entity<ForumRole>(entity =>
-            {
+            modelBuilder.Entity<ForumRole>(entity => {
                 entity.HasKey(fr => fr.Id);
 
                 entity.Property(fr => fr.Name)
@@ -110,11 +107,16 @@ namespace BackendGameVibes.Data
                     .WithOne(u => u.ForumRole)
                     .HasForeignKey(u => u.ForumRoleId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasData(
+                    new ForumRole() { Id = 1, Name = "beginner", Threshold = 0 },
+                    new ForumRole() { Id = 2, Name = "experienced", Threshold = 100 },
+                    new ForumRole() { Id = 3, Name = "powerful", Threshold = 1000 },
+                    new ForumRole() { Id = 4, Name = "superhero", Threshold = 10000 });
             });
 
             // Game entity
-            modelBuilder.Entity<Game>(entity =>
-            {
+            modelBuilder.Entity<Game>(entity => {
                 entity.HasKey(g => g.Id);
 
                 entity.Property(g => g.Title)
@@ -145,8 +147,7 @@ namespace BackendGameVibes.Data
             });
 
             // Platform entity
-            modelBuilder.Entity<Platform>(entity =>
-            {
+            modelBuilder.Entity<Platform>(entity => {
                 entity.HasKey(p => p.Id);
 
                 entity.Property(p => p.Name)
@@ -155,8 +156,7 @@ namespace BackendGameVibes.Data
             });
 
             // Genre entity
-            modelBuilder.Entity<Genre>(entity =>
-            {
+            modelBuilder.Entity<Genre>(entity => {
                 entity.HasKey(g => g.Id);
 
                 entity.Property(g => g.Name)
@@ -165,8 +165,7 @@ namespace BackendGameVibes.Data
             });
 
             // GameImage entity
-            modelBuilder.Entity<GameImage>(entity =>
-            {
+            modelBuilder.Entity<GameImage>(entity => {
                 entity.HasKey(gi => gi.Id);
 
                 entity.Property(gi => gi.ImagePath)
@@ -180,8 +179,7 @@ namespace BackendGameVibes.Data
             });
 
             // SystemRequirement entity
-            modelBuilder.Entity<SystemRequirement>(entity =>
-            {
+            modelBuilder.Entity<SystemRequirement>(entity => {
                 entity.HasKey(sr => sr.Id);
 
                 entity.Property(sr => sr.CpuRequirement)
@@ -211,8 +209,7 @@ namespace BackendGameVibes.Data
             });
 
             // Review entity
-            modelBuilder.Entity<Review>(entity =>
-            {
+            modelBuilder.Entity<Review>(entity => {
                 entity.HasKey(r => r.Id);
 
                 entity.Property(r => r.GeneralScore)
