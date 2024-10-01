@@ -155,7 +155,7 @@ namespace BackendGameVibes.Data {
                     .HasMaxLength(50);
 
                 entity.HasData(
-                    new Platform() {Id = 0, Name="Windows" },
+                    new Platform() { Id = 0, Name = "Windows" },
                     new Platform() { Id = 1, Name = "Linux" },
                     new Platform() { Id = 2, Name = "MacOS" });
             });
@@ -167,6 +167,29 @@ namespace BackendGameVibes.Data {
                 entity.Property(g => g.Name)
                     .IsRequired()
                     .HasMaxLength(50);
+
+                entity.HasData(
+                    new Genre { Id = 1, Name = "Action" },
+                    new Genre { Id = 2, Name = "Adventure" },
+                    new Genre { Id = 3, Name = "RPG" },
+                    new Genre { Id = 4, Name = "Shooter" },
+                    new Genre { Id = 5, Name = "Strategy" },
+                    new Genre { Id = 6, Name = "Sports" },
+                    new Genre { Id = 7, Name = "Puzzle" },
+                    new Genre { Id = 8, Name = "Simulation" },
+                    new Genre { Id = 9, Name = "Horror" },
+                    new Genre { Id = 10, Name = "Platformer" },
+                    new Genre { Id = 11, Name = "Racing" },
+                    new Genre { Id = 12, Name = "Fighting" },
+                    new Genre { Id = 13, Name = "MMO" },
+                    new Genre { Id = 14, Name = "Survival" },
+                    new Genre { Id = 15, Name = "Music" },
+                    new Genre { Id = 16, Name = "Stealth" },
+                    new Genre { Id = 17, Name = "Party" },
+                    new Genre { Id = 18, Name = "Arcade" },
+                    new Genre { Id = 19, Name = "Sandbox" },
+                    new Genre { Id = 20, Name = "Card Game" }
+                );
             });
 
             // GameImage entity
