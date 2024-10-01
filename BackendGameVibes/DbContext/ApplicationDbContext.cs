@@ -153,6 +153,11 @@ namespace BackendGameVibes.Data {
                 entity.Property(p => p.Name)
                     .IsRequired()
                     .HasMaxLength(50);
+
+                entity.HasData(
+                    new Platform() {Id = 0, Name="Windows" },
+                    new Platform() { Id = 1, Name = "Linux" },
+                    new Platform() { Id = 2, Name = "MacOS" });
             });
 
             // Genre entity
