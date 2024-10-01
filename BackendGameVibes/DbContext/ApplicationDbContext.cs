@@ -133,7 +133,7 @@ namespace BackendGameVibes.Data {
 
                 entity.HasMany(g => g.Genres)
                     .WithMany(gen => gen.Games)
-                    .UsingEntity(j => j.ToTable("GameGenres"));
+                    .UsingEntity(j => j.ToTable("GameGenres")); // many to many so we need 3 table to store the relationship
 
                 entity.HasMany(g => g.GameImages)
                     .WithOne(img => img.Game)
@@ -155,9 +155,9 @@ namespace BackendGameVibes.Data {
                     .HasMaxLength(50);
 
                 entity.HasData(
-                    new Platform() { Id = 0, Name = "Windows" },
-                    new Platform() { Id = 1, Name = "Linux" },
-                    new Platform() { Id = 2, Name = "MacOS" });
+                    new Platform() { Id = 1, Name = "Windows" },
+                    new Platform() { Id = 2, Name = "Linux" },
+                    new Platform() { Id = 3, Name = "MacOS" });
             });
 
             // Genre entity

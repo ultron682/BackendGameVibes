@@ -1,42 +1,35 @@
-﻿namespace BackendGameVibes.Models
-{
-    public class Game
-    {
-        public int Id
-        {
+﻿namespace BackendGameVibes.Models {
+    public class Game {
+        public int Id {
             get; set;
         }
-        public string? Title
-        {
+        public string? Title {
             get; set;
         }
-        public string? Description
-        {
+        public string? Description {
             get; set;
         }
-        public DateTime? ReleaseDate
-        {
+        public DateTime? ReleaseDate {
             get; set;
         }
-        public int? PlatformId
-        {
+        public int? PlatformId {
             get; set;
         }
 
-        public Platform? Platform
-        {
+        public int SteamId {
             get; set;
         }
-        public ICollection<Genre>? Genres
-        {
+
+        public Platform? Platform {
             get; set;
         }
-        public ICollection<GameImage>? GameImages
-        {
+        public ICollection<Genre>? Genres {
             get; set;
         }
-        public ICollection<SystemRequirement>? SystemRequirements
-        {
+        public ICollection<GameImage>? GameImages {
+            get; set;
+        }
+        public ICollection<SystemRequirement>? SystemRequirements {
             get; set;
         }
     }

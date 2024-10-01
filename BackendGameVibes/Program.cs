@@ -92,6 +92,8 @@ builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailS
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddTransient<IMailService, MailService>();
 builder.Services.AddSingleton<HtmlTemplateService>();
+builder.Services.AddSingleton<SteamService>();
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 

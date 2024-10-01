@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.Models;
 using BackendGameVibes.Data;
+using BackendGameVibes.Services;
 
 namespace BackendGameVibes.Controllers {
     //Game, Platform, and Genre
@@ -9,9 +10,12 @@ namespace BackendGameVibes.Controllers {
     [Route("api/[controller]")]
     public class GameController : ControllerBase {
         private readonly ApplicationDbContext _context;
+        private readonly SteamService _steamService;
 
-        public GameController(ApplicationDbContext context) {
+
+        public GameController(ApplicationDbContext context, SteamService steamService) {
             _context = context;
+            _steamService = steamService;
         }
 
         // Get all games
@@ -27,24 +31,69 @@ namespace BackendGameVibes.Controllers {
 
         // Get a single game by ID
         [HttpGet("{id}")]
-        public async Task<ActionResult<Game>> GetGame(int id) {
+        public async Task<ActionResult> GetGame(int id) {
             var game = await _context.Games
+                .Where(g => g.Id == id)
                 .Include(g => g.Platform)
                 .Include(g => g.Genres)
                 .Include(g => g.GameImages)
                 .Include(g => g.SystemRequirements)
-                .FirstOrDefaultAsync(g => g.Id == id);
+                .Select(g => new {
+                    g.Id,
+                    g.Title,
+                    g.Description,
+                    Platform = new { g.Platform.Id, g.Platform.Name },
+                    g.ReleaseDate,
+                    g.SteamId,
+                    Genres = g.Genres.Select(g => new { g.Id, g.Name }).ToArray(),
+                    GameImages = g.GameImages.Select(image => new { image.ImagePath }),
+                    //SystemRequirements = g.SystemRequirements.Select()
+                })
+                .FirstOrDefaultAsync();
+
+
 
             if (game == null) {
                 return NotFound();
             }
+            else {
+                var data = await _steamService.GetInfoGame(game.SteamId);
 
-            return game;
+                Console.WriteLine(data.ToString());
+                return Ok(game);
+            }
         }
+
+        /*
+{
+  "title": "My New Game",
+  "description": "An amazing new game description",
+  "releaseDate": "2024-10-01",
+  "platformId": 1,
+  "genres": [
+    { "id": 1 },
+    { "id": 2 }
+  ],
+  "steamid": 3111230,
+  "platform": {"id": 2},
+  "gameImages": [],
+  "systemRequirements": []
+}
+         */
 
         // Create a new game
         [HttpPost]
         public async Task<ActionResult<Game>> CreateGame(Game game) {
+            var genreIds = game.Genres.Select(g => g.Id).ToList();
+            var existingGenres = await _context.Genres.Where(g => genreIds.Contains(g.Id)).ToListAsync();
+
+            game.Genres = existingGenres;
+
+            var platformId = game.Platform.Id;
+            var existingPlatform = await _context.Platforms.Where(g => g.Id == platformId).FirstOrDefaultAsync();
+
+            game.Platform = existingPlatform;
+
             _context.Games.Add(game);
             await _context.SaveChangesAsync();
 
