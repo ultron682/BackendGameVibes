@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.Models;
 using BackendGameVibes.Data;
 using BackendGameVibes.Services;
+using BackendGameVibes.SteamApiModels;
 
 namespace BackendGameVibes.Controllers {
     //Game, Platform, and Genre
@@ -84,7 +85,7 @@ namespace BackendGameVibes.Controllers {
             }
         }
 
-        /*
+        /* swagger value for test
 {
   "title": "My New Game",
   "description": "An amazing new game description",
