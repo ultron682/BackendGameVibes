@@ -103,7 +103,7 @@ namespace BackendGameVibes.Controllers {
         [HttpPost]
         public async Task<ActionResult<Game>> CreateGame(Game game) {
             var steamGameData = await _steamService.GetInfoGame(game.SteamId);
-            Console.WriteLine(steamGameData.ToString());
+            Console.WriteLine(steamGameData);
 
             game.Title = steamGameData.Name;
             game.Description = steamGameData.DetailedDescription;
@@ -113,10 +113,9 @@ namespace BackendGameVibes.Controllers {
             //game.SystemRequirements = steamGameData.PcRequirements.Minimum.Select(r => new SystemRequirement { Requirement = r, RamRequirement= r. }).ToList();
             //game......
 
-            game.Genres = steamGameData.Genres.Select(g => new Models.Genre { Id = int.Parse(g.Id), Name = g.Description }).ToList();
-            //var genreIds = game.Genres.Select(g => g.Id).ToList();
-            //var existingGenres = await _context.Genres.Where(g => genreIds.Contains(g.Id)).ToListAsync();
-            //game.Genres = existingGenres;
+            var genreIds = game.Genres.Select(g => g.Id).ToList();
+            var existingGenres = await _context.Genres.Where(g => genreIds.Contains(g.Id)).ToListAsync();
+            game.Genres = existingGenres;
 
             var platformId = game.Platform.Id;
             var existingPlatform = await _context.Platforms.Where(g => g.Id == platformId).FirstOrDefaultAsync();

@@ -56,6 +56,12 @@ namespace BackendGameVibes.SteamApiModels {
         public Genre[] Genres { get; set; }
         public Screenshot[] Screenshots { get; set; }
         public Release_Date Release_Date { get; set; }
+
+
+
+        public override string ToString() {
+            return JsonSerializer.Serialize(this);
+        }
     }
 
     public class SystemRequirements {
