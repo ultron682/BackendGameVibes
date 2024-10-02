@@ -4,6 +4,7 @@ using BackendGameVibes.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackendGameVibes.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241002222656_datetime-to-string-for-release-date")]
+    partial class datetimetostringforreleasedate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -146,198 +149,103 @@ namespace BackendGameVibes.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 23304,
-                            Name = "Puzzle"
+                            Id = 1,
+                            Name = "Action"
                         },
                         new
                         {
-                            Id = 16702,
-                            Name = "Action-Adventure"
+                            Id = 2,
+                            Name = "Adventure"
                         },
                         new
                         {
-                            Id = 16413,
-                            Name = "Arcade"
+                            Id = 3,
+                            Name = "RPG"
                         },
                         new
                         {
-                            Id = 14558,
+                            Id = 4,
                             Name = "Shooter"
                         },
                         new
                         {
-                            Id = 12501,
+                            Id = 5,
+                            Name = "Strategy"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Sports"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Puzzle"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "Simulation"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "Horror"
+                        },
+                        new
+                        {
+                            Id = 10,
                             Name = "Platformer"
                         },
                         new
                         {
-                            Id = 11002,
-                            Name = "Visual Novel"
+                            Id = 11,
+                            Name = "Racing"
                         },
                         new
                         {
-                            Id = 8128,
+                            Id = 12,
+                            Name = "Fighting"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Name = "MMO"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Name = "Survival"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Name = "Music"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Name = "Stealth"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Name = "Party"
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Name = "Arcade"
+                        },
+                        new
+                        {
+                            Id = 19,
                             Name = "Sandbox"
                         },
                         new
                         {
-                            Id = 7914,
-                            Name = "Action RPG"
-                        },
-                        new
-                        {
-                            Id = 7766,
-                            Name = "Rogue-like"
-                        },
-                        new
-                        {
-                            Id = 7620,
-                            Name = "Point & Click"
-                        },
-                        new
-                        {
-                            Id = 6002,
-                            Name = "Action Roguelike"
-                        },
-                        new
-                        {
-                            Id = 5829,
-                            Name = "Turn-Based Strategy"
-                        },
-                        new
-                        {
-                            Id = 5786,
-                            Name = "Tabletop"
-                        },
-                        new
-                        {
-                            Id = 5785,
-                            Name = "Interactive Fiction"
-                        },
-                        new
-                        {
-                            Id = 4934,
-                            Name = "Education"
-                        },
-                        new
-                        {
-                            Id = 4921,
-                            Name = "JRPG"
-                        },
-                        new
-                        {
-                            Id = 4886,
-                            Name = "Dating Sim"
-                        },
-                        new
-                        {
-                            Id = 4868,
-                            Name = "Party-Based RPG"
-                        },
-                        new
-                        {
-                            Id = 4538,
-                            Name = "Walking Simulator"
-                        },
-                        new
-                        {
-                            Id = 4368,
+                            Id = 20,
                             Name = "Card Game"
-                        },
-                        new
-                        {
-                            Id = 3886,
-                            Name = "Life Sim"
-                        },
-                        new
-                        {
-                            Id = 3250,
-                            Name = "Strategy RPG"
-                        },
-                        new
-                        {
-                            Id = 3138,
-                            Name = "RTS"
-                        },
-                        new
-                        {
-                            Id = 3137,
-                            Name = "Board Game"
-                        },
-                        new
-                        {
-                            Id = 2914,
-                            Name = "Tower Defense"
-                        },
-                        new
-                        {
-                            Id = 2626,
-                            Name = "City Builder"
-                        },
-                        new
-                        {
-                            Id = 1473,
-                            Name = "Farming Sim"
-                        },
-                        new
-                        {
-                            Id = 1393,
-                            Name = "Grand Strategy"
-                        },
-                        new
-                        {
-                            Id = 1377,
-                            Name = "Space Sim"
-                        },
-                        new
-                        {
-                            Id = 1337,
-                            Name = "Colony Sim"
-                        },
-                        new
-                        {
-                            Id = 1290,
-                            Name = "eSports"
-                        },
-                        new
-                        {
-                            Id = 1254,
-                            Name = "MMORPG"
-                        },
-                        new
-                        {
-                            Id = 1245,
-                            Name = "Word Game"
-                        },
-                        new
-                        {
-                            Id = 1237,
-                            Name = "Battle Royale"
-                        },
-                        new
-                        {
-                            Id = 1186,
-                            Name = "Auto Battler"
-                        },
-                        new
-                        {
-                            Id = 893,
-                            Name = "God Game"
-                        },
-                        new
-                        {
-                            Id = 659,
-                            Name = "MOBA"
-                        },
-                        new
-                        {
-                            Id = 735,
-                            Name = "4X"
-                        },
-                        new
-                        {
-                            Id = 483,
-                            Name = "Trivia"
                         });
                 });
 

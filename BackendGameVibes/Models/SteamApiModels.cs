@@ -55,7 +55,7 @@ namespace BackendGameVibes.SteamApiModels {
         public Category[] Categories { get; set; }
         public Genre[] Genres { get; set; }
         public Screenshot[] Screenshots { get; set; }
-        public ReleaseDate ReleaseDate { get; set; }
+        public Release_Date Release_Date { get; set; }
     }
 
     public class SystemRequirements {
@@ -85,7 +85,7 @@ namespace BackendGameVibes.SteamApiModels {
         public string path_full { get; set; }
     }
 
-    public class ReleaseDate {
+    public class Release_Date {
         public bool ComingSoon { get; set; }
         public string Date { get; set; }
     }

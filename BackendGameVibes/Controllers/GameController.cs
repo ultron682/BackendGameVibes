@@ -72,30 +72,25 @@ namespace BackendGameVibes.Controllers {
                 })
                 .FirstOrDefaultAsync();
 
-
-
             if (game == null) {
                 return NotFound();
             }
             else {
-                var data = await _steamService.GetInfoGame(game.SteamId);
-
-                Console.WriteLine(data.ToString());
                 return Ok(game);
             }
         }
 
         /* swagger value for test
 {
-  "title": "My New Game",
-  "description": "An amazing new game description",
+  "title": "NIE WAZNE CO TU BEDZIE BO I TAK DANE Z STEAM TO NADPISZĄ",
+  "description": "NIE WAZNE CO TU BEDZIE BO I TAK DANE Z STEAM TO NADPISZĄ",
   "releaseDate": "2024-10-01",
   "platformId": 1,
   "genres": [
     { "id": 1 },
     { "id": 2 }
   ],
-  "steamid": 3111230,
+  "steamid": 292030,
   "platform": {"id": 2},
   "gameImages": [],
   "systemRequirements": []
@@ -103,16 +98,28 @@ namespace BackendGameVibes.Controllers {
          */
 
         // Create a new game
+        // PODCZAS WPROWADZANIA GRY ALE PRZED JESZCZE WYWOŁANIEM TEJ METODU NALEZY PODAC NAZWE A WTEDY WSKAZAĆ ZNALEZIONĄ GRĘ.
+        // W TEN SPOSÓB BĘDZIE UZYSKANY STEAMID I DZIĘKI TEMU POBIERZE SIE OPIS, RELEASEDATE I INNE DANE ZE STEAMA
         [HttpPost]
         public async Task<ActionResult<Game>> CreateGame(Game game) {
-            var genreIds = game.Genres.Select(g => g.Id).ToList();
-            var existingGenres = await _context.Genres.Where(g => genreIds.Contains(g.Id)).ToListAsync();
+            var steamGameData = await _steamService.GetInfoGame(game.SteamId);
+            Console.WriteLine(steamGameData.ToString());
 
-            game.Genres = existingGenres;
+            game.Title = steamGameData.Name;
+            game.Description = steamGameData.DetailedDescription;
+            game.ReleaseDate = steamGameData.Release_Date.Date;
+
+
+            //game.SystemRequirements = steamGameData.PcRequirements.Minimum.Select(r => new SystemRequirement { Requirement = r, RamRequirement= r. }).ToList();
+            //game......
+
+            game.Genres = steamGameData.Genres.Select(g => new Models.Genre { Id = int.Parse(g.Id), Name = g.Description }).ToList();
+            //var genreIds = game.Genres.Select(g => g.Id).ToList();
+            //var existingGenres = await _context.Genres.Where(g => genreIds.Contains(g.Id)).ToListAsync();
+            //game.Genres = existingGenres;
 
             var platformId = game.Platform.Id;
             var existingPlatform = await _context.Platforms.Where(g => g.Id == platformId).FirstOrDefaultAsync();
-
             game.Platform = existingPlatform;
 
             _context.Games.Add(game);

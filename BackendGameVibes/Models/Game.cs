@@ -9,13 +9,12 @@
         public string? Description {
             get; set;
         }
-        public DateTime? ReleaseDate {
+        public string? ReleaseDate {
             get; set;
         }
         public int? PlatformId {
             get; set;
         }
-
         public int SteamId {
             get; set;
         }

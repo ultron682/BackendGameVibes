@@ -1,7 +1,9 @@
 ﻿using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 
@@ -68,6 +70,16 @@ namespace BackendGameVibes.Controllers
                 if (loginResult != null)
                 {
                     var token = await _accountService.GenerateJwtToken(user);
+
+                    var userToken = new IdentityUserToken<string> {
+                        UserId = user.Id,
+                        LoginProvider = "Default",
+                        Name = "LoginToken",
+                        Value = token
+                    };
+
+                    _accountService.SaveTokenToDB(userToken);
+
                     return Ok(new { accessToken = token });
                 }
             }

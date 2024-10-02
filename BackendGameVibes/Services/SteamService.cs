@@ -46,7 +46,7 @@ namespace BackendGameVibes.Services {
             return null;
         }
 
-        public async Task<SteamAppData> GetInfoGame(int id) {
+        public async Task<GameData> GetInfoGame(int id) {
             var response = await _httpClient.GetAsync($"https://store.steampowered.com/api/appdetails?appids={id}");
 
             if (response.IsSuccessStatusCode) {
@@ -58,7 +58,10 @@ namespace BackendGameVibes.Services {
 
                 var result = JsonSerializer.Deserialize<Dictionary<string, SteamAppData>>(jsonString, options);
 
-                return result[id.ToString()];
+                if (result[id.ToString()].Success)
+                    return result[id.ToString()].Data;
+                else
+                    return null;
             }
 
             return null;

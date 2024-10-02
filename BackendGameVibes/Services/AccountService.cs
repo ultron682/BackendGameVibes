@@ -8,10 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 
-namespace BackendGameVibes.Services
-{
-    public class AccountService : IAccountService
-    {
+namespace BackendGameVibes.Services {
+    public class AccountService : IAccountService {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<UserGameVibes> _userManager;
         private readonly SignInManager<UserGameVibes> _signInManager;
@@ -21,8 +19,7 @@ namespace BackendGameVibes.Services
 
 
         public AccountService(ApplicationDbContext context, UserManager<UserGameVibes> userManager,
-            SignInManager<UserGameVibes> signInManager, IConfiguration configuration, IMailService mail_Service, HtmlTemplateService htmlTemplateService)
-        {
+            SignInManager<UserGameVibes> signInManager, IConfiguration configuration, IMailService mail_Service, HtmlTemplateService htmlTemplateService) {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
@@ -31,47 +28,48 @@ namespace BackendGameVibes.Services
             _htmlTemplateService = htmlTemplateService;
         }
 
-        public async Task<IdentityResult> RegisterUser(RegisterRequestGameVibes model)
-        {
+        public async Task<IdentityResult> RegisterUser(RegisterRequestGameVibes model) {
             var user = new UserGameVibes { UserName = model.UserName, Email = model.Email };
             return await _userManager.CreateAsync(user, model.Password);
         }
 
-        public async Task<UserGameVibes?> GetUserByEmailAsync(string email)
-        {
+        public async Task<UserGameVibes?> GetUserByEmailAsync(string email) {
             return await _userManager.FindByEmailAsync(email);
         }
 
-        public async Task<string> GenerateJwtToken(UserGameVibes user)
-        {
+        public async Task<string> GenerateJwtToken(UserGameVibes user) {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var token = JwtTokenGenerator.GenerateToken(user.Email!, user.UserName!, key, _configuration["Jwt:Issuer"]!, _configuration["Jwt:Audience"]!);
             return token;
         }
 
-        public async Task<SignInResult?> LoginUser(UserGameVibes user, string password)
-        {
+        public async Task<SignInResult?> LoginUser(UserGameVibes user, string password) {
             return await _signInManager.PasswordSignInAsync(user.UserName!, password, true, false);
         }
 
-        public async Task<UserGameVibes?> GetUserByIdAsync(string userId)
-        {
+        public async Task<UserGameVibes?> GetUserByIdAsync(string userId) {
             return await _userManager.FindByIdAsync(userId);
         }
 
+        public Task SaveTokenToDB(IdentityUserToken<string> identityUserToken) {
+            return new Task(() => {
+                _context.UserTokens.Add(identityUserToken);
+                _context.SaveChanges();
+            });
+        }
 
-
-        public async Task<object> GetAccountInfoAsync(string userId)
-        {
+        public async Task<object> GetAccountInfoAsync(string userId) {
             var accountInfo = await _context.Users
                 .Where(u => u.Id == userId)
-                //.Include(u => u.CodeSnippets)
-                .Select(u => new
-                {
+                .Include(u => u.Role)
+                .Include(u => u.ForumRole)
+                .Select(u => new {
                     u.Id,
                     u.Email,
                     u.UserName,
                     u.EmailConfirmed,
+                    ForumRole = new { u.ForumRole.Id, u.ForumRole.Name, u.ForumRole.Threshold },
+                    Role = new { u.Role.Id, u.Role.Name }
                     //CodeSnippets = u.CodeSnippets.Select(cs => new
                     //{
                     //    cs.UniqueId,
@@ -83,11 +81,9 @@ namespace BackendGameVibes.Services
             return accountInfo!;
         }
 
-        public async Task<bool> UpdateUserNameAsync(string userId, string newUsername)
-        {
+        public async Task<bool> UpdateUserNameAsync(string userId, string newUsername) {
             var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
+            if (user == null) {
                 return false;
             }
 
@@ -96,8 +92,7 @@ namespace BackendGameVibes.Services
             return true;
         }
 
-        public async Task<bool> SendConfirmationEmail(string email, UserGameVibes user)
-        {
+        public async Task<bool> SendConfirmationEmail(string email, UserGameVibes user) {
             if (user == null || email == null)
                 return false;
 
@@ -113,8 +108,7 @@ namespace BackendGameVibes.Services
                 { "UserName", user.UserName! }
             });
 
-            _mail_Service.SendMail(new MailData()
-            {
+            _mail_Service.SendMail(new MailData() {
                 EmailBody = emailBody,
                 EmailSubject = "Confirm your account",
                 EmailToId = email,
@@ -123,11 +117,9 @@ namespace BackendGameVibes.Services
             return true;
         }
 
-        public async Task<IdentityResult> ConfirmEmailAsync(string userId, string token)
-        {
+        public async Task<IdentityResult> ConfirmEmailAsync(string userId, string token) {
             var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
+            if (user == null) {
                 return IdentityResult.Failed(new IdentityError { Description = "User not found" });
             }
 

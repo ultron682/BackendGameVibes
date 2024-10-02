@@ -130,4 +130,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.Services.GetService<SteamService>(); // on start backend download steam games IDs
+
 app.Run();
