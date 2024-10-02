@@ -4,7 +4,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
-EXPOSE 5555
+EXPOSE 5556
 
 
 # Ten etap służy do kompilowania projektu usługi

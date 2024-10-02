@@ -11,7 +11,7 @@ namespace BackendGameVibes.IServices
         Task<UserGameVibes?> GetUserByEmailAsync(string email);
         Task<UserGameVibes?> GetUserByIdAsync(string userId);
         Task<SignInResult?> LoginUser(UserGameVibes user, string password);
-        Task<IdentityResult> RegisterUser(RegisterRequestCodeShare model);
+        Task<IdentityResult> RegisterUser(RegisterRequestGameVibes model);
         Task<bool> SendConfirmationEmail(string email, UserGameVibes user);
         Task<bool> UpdateUserNameAsync(string userId, string newUsername);
     }

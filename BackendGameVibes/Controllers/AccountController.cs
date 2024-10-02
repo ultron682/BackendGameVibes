@@ -20,7 +20,7 @@ namespace BackendGameVibes.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequestCodeShare model)
+        public async Task<IActionResult> Register([FromBody] RegisterRequestGameVibes model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -49,7 +49,7 @@ namespace BackendGameVibes.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequestCodeShare model)
+        public async Task<IActionResult> Login([FromBody] LoginRequestGameVibes model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

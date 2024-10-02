@@ -31,7 +31,7 @@ namespace BackendGameVibes.Services
             _htmlTemplateService = htmlTemplateService;
         }
 
-        public async Task<IdentityResult> RegisterUser(RegisterRequestCodeShare model)
+        public async Task<IdentityResult> RegisterUser(RegisterRequestGameVibes model)
         {
             var user = new UserGameVibes { UserName = model.UserName, Email = model.Email };
             return await _userManager.CreateAsync(user, model.Password);
@@ -103,7 +103,7 @@ namespace BackendGameVibes.Services
 
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             token = Uri.EscapeDataString(token);
-            var ConfirmationLink = $"http://localhost:5555/account/confirm?userId={user.Id}&token={token}";
+            var ConfirmationLink = $"http://localhost:5556/account/confirm?userId={user.Id}&token={token}";
 
             Console.WriteLine($"Please confirm your account by <a href='{ConfirmationLink!}'>clicking here</a>.");
 

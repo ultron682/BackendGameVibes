@@ -9,31 +9,27 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddCors(options =>
-{
+builder.Services.AddCors(options => {
     options.AddDefaultPolicy(
-        builder =>
-        {
+        builder => {
             builder.AllowAnyOrigin();
             builder.AllowAnyMethod();
             builder.AllowAnyHeader();
         });
 });
 
-// Add services to the container.
-
+// Services to the container
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 35));
 
 builder.Services
-    .AddDbContext<ApplicationDbContext>(options =>
-    {
+    .AddDbContext<ApplicationDbContext>(options => {
         options.UseMySql(builder.Configuration.GetConnectionString("GameVibesDbConnection"), serverVersion);
         options.EnableSensitiveDataLogging(false);
     }
@@ -43,16 +39,13 @@ builder.Services.AddIdentity<UserGameVibes, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-// Configure JWT authentication
-builder.Services.AddAuthentication(options =>
-{
+// JWT authentication
+builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
+.AddJwtBearer(options => {
+    options.TokenValidationParameters = new TokenValidationParameters {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
@@ -63,8 +56,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.Configure<IdentityOptions>(options =>
-{
+builder.Services.Configure<IdentityOptions>(options => {
     // Password settings.
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
@@ -99,15 +91,13 @@ builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+app.UseSwagger();
+app.UseSwaggerUI();
+//}
 
 app.UseCors();
-
 app.UseRouting();
 
 app.UseAuthentication();

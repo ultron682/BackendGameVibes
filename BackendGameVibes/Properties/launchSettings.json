@@ -5,22 +5,22 @@
       "dotnetRunMessages": true,
       "launchBrowser": false,
       "launchUrl": "",
-      "applicationUrl": "http://localhost:5555",
+      "applicationUrl": "http://localhost:5556",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "httpPort": 5555
+      "httpPort": 5556
     },
     "Container (Dockerfile)": {
       "commandName": "Docker",
       "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:5555/swagger",
+      "launchUrl": "{Scheme}://{ServiceHost}:5556/swagger",
       "environmentVariables": {
-        "ASPNETCORE_HTTP_PORTS": "5555"
+        "ASPNETCORE_HTTP_PORTS": "5556"
       },
       "publishAllPorts": true,
       "useSSL": false,
-      "httpPort": 5555
+      "httpPort": 5556
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json",
@@ -28,7 +28,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:5555",
+      "applicationUrl": "http://localhost:5556",
       "sslPort": 0
     }
   }
