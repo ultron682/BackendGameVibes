@@ -36,7 +36,7 @@ namespace BackendGameVibes.Controllers {
             if (steamApp != null)
                 return Ok(steamApp);
             else
-                return BadRequest("steamApp == null");
+                return BadRequest("steamApp == null. maybe json with 500k lines is downloading...");
         }
 
         // Get all games
