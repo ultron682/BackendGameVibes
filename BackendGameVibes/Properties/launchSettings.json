@@ -15,7 +15,7 @@
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "environmentVariables": {
-        "ASPNETCORE_HTTP_PORTS": "8080"
+        "ASPNETCORE_HTTP_PORTS": "5555"
       },
       "publishAllPorts": true,
       "useSSL": false
@@ -26,7 +26,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:29166",
+      "applicationUrl": "http://localhost:5555",
       "sslPort": 0
     }
   }
