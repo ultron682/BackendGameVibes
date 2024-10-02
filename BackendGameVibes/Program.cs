@@ -29,10 +29,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var serverVersion = new MySqlServerVersion(new Version(8, 0, 35));
+
 builder.Services
     .AddDbContext<ApplicationDbContext>(options =>
     {
-        options.UseSqlServer(builder.Configuration.GetConnectionString("GameVibesDbConnection"));
+        options.UseMySql(builder.Configuration.GetConnectionString("GameVibesDbConnection"), serverVersion);
         options.EnableSensitiveDataLogging(false);
     }
 );
