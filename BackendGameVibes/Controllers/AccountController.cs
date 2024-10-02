@@ -1,4 +1,5 @@
 ﻿using BackendGameVibes.IServices;
+using BackendGameVibes.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -31,7 +32,7 @@ namespace BackendGameVibes.Controllers
             {
                 var user = await _accountService.GetUserByEmailAsync(model.Email);
                 await _accountService.SendConfirmationEmail(model.Email, user);
-                return Ok("User registered successfully");
+                return Ok("UserRegisteredSuccessfully");
             }
 
             foreach (var error in result.Errors)

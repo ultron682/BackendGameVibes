@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -24,13 +25,34 @@ builder.Services.AddCors(options => {
 // Services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var serverVersion = new MySqlServerVersion(new Version(8, 0, 35));
+builder.Services.AddSwaggerGen(c => {
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
+        In = ParameterLocation.Header,
+        Description = "Please enter token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+});
 
 builder.Services
     .AddDbContext<ApplicationDbContext>(options => {
-        options.UseMySql(builder.Configuration.GetConnectionString("GameVibesDbConnection"), serverVersion);
+        options.UseMySql(builder.Configuration.GetConnectionString("GameVibesDbConnection"), new MySqlServerVersion(new Version(8, 0, 35)));
         options.EnableSensitiveDataLogging(false);
     }
 );
@@ -43,8 +65,12 @@ builder.Services.AddIdentity<UserGameVibes, IdentityRole>()
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options => {
+    options.SaveToken = true;
+    options.RequireHttpsMetadata = false;
+
     options.TokenValidationParameters = new TokenValidationParameters {
         ValidateIssuer = true,
         ValidateAudience = true,
@@ -55,6 +81,8 @@ builder.Services.AddAuthentication(options => {
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
+
+builder.Services.AddAuthorization();
 
 builder.Services.Configure<IdentityOptions>(options => {
     // Password settings.
@@ -74,9 +102,6 @@ builder.Services.Configure<IdentityOptions>(options => {
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._";
     options.User.RequireUniqueEmail = true;
 });
-
-builder.Services.AddAuthentication();
-builder.Services.AddAuthorization();
 
 builder.Services.AddControllers().AddJsonOptions(x =>
    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);

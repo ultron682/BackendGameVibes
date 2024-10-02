@@ -1,4 +1,4 @@
-﻿namespace BackendGameVibes;
+﻿namespace BackendGameVibes.Models;
 
 public class LoginRequestGameVibes
 {
