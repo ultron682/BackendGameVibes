@@ -6,7 +6,7 @@ using MimeKit;
 
 namespace BackendGameVibes.Services
 {
-    public class MailService : IMailService
+    public class MailService
     {
         MailSettings Mail_Settings;
         public MailService(IOptions<MailSettings> options)

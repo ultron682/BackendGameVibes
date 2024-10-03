@@ -17,19 +17,18 @@ namespace BackendGameVibes.Models
         {
             get; set;
         }
-        public int? RoleId
-        {
-            get; set;
-        }
+        //public string? RoleId
+        //{
+        //    get; set;
+        //}
         public int? ForumRoleId
         {
             get; set;
         }
 
-        public Role? Role
-        {
-            get; set;
-        }
+        //public IdentityRole? IdentityRole {
+        //    get; set;
+        //}
         public ForumRole? ForumRole {
             get; set;
         }

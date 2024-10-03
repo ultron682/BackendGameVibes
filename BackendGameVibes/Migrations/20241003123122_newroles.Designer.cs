@@ -4,6 +4,7 @@ using BackendGameVibes.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackendGameVibes.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241003123122_newroles")]
+    partial class newroles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -221,6 +224,22 @@ namespace BackendGameVibes.Migrations
                     b.ToTable("Reviews");
                 });
 
+            modelBuilder.Entity("BackendGameVibes.Models.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+                });
+
             modelBuilder.Entity("BackendGameVibes.Models.SystemRequirement", b =>
                 {
                     b.Property<int>("Id")
@@ -324,6 +343,12 @@ namespace BackendGameVibes.Migrations
                     b.Property<byte[]>("ProfilePicture")
                         .HasColumnType("longblob");
 
+                    b.Property<int?>("RoleId")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("longtext");
 
@@ -344,6 +369,8 @@ namespace BackendGameVibes.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -402,6 +429,28 @@ namespace BackendGameVibes.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "b7de4fa5-a145-457d-9079-5e5e14d2bacb",
+                            Name = "guest"
+                        },
+                        new
+                        {
+                            Id = "39adab77-4108-448e-bb00-0aba177a1fa5",
+                            Name = "user"
+                        },
+                        new
+                        {
+                            Id = "4dfde565-9bab-4697-b414-0a9d0e93cdfa",
+                            Name = "mod"
+                        },
+                        new
+                        {
+                            Id = "b9cfbff1-2b74-4096-b9e2-9fdd1abba52d",
+                            Name = "admin"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -557,7 +606,15 @@ namespace BackendGameVibes.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("BackendGameVibes.Models.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("ForumRole");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("GameGenre", b =>
@@ -651,6 +708,11 @@ namespace BackendGameVibes.Migrations
                     b.Navigation("GameImages");
 
                     b.Navigation("SystemRequirements");
+                });
+
+            modelBuilder.Entity("BackendGameVibes.Models.Role", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

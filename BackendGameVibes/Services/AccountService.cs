@@ -14,12 +14,12 @@ namespace BackendGameVibes.Services {
         private readonly UserManager<UserGameVibes> _userManager;
         private readonly SignInManager<UserGameVibes> _signInManager;
         private readonly IConfiguration _configuration;
-        private readonly IMailService _mail_Service;
+        private readonly MailService _mail_Service;
         private readonly HtmlTemplateService _htmlTemplateService;
 
 
         public AccountService(ApplicationDbContext context, UserManager<UserGameVibes> userManager,
-            SignInManager<UserGameVibes> signInManager, IConfiguration configuration, IMailService mail_Service, HtmlTemplateService htmlTemplateService) {
+            SignInManager<UserGameVibes> signInManager, IConfiguration configuration, MailService mail_Service, HtmlTemplateService htmlTemplateService) {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
@@ -61,7 +61,7 @@ namespace BackendGameVibes.Services {
         public async Task<object> GetAccountInfoAsync(string userId) {
             var accountInfo = await _context.Users
                 .Where(u => u.Id == userId)
-                .Include(u => u.Role)
+                //.Include(u => u.IdentityRole)
                 .Include(u => u.ForumRole)
                 .Select(u => new {
                     u.Id,
@@ -69,7 +69,7 @@ namespace BackendGameVibes.Services {
                     u.UserName,
                     u.EmailConfirmed,
                     ForumRole = new { u.ForumRole.Id, u.ForumRole.Name, u.ForumRole.Threshold },
-                    Role = new { u.Role.Id, u.Role.Name }
+                    //Role = new { u.IdentityRole.Id, u.IdentityRole.Name }
                     //CodeSnippets = u.CodeSnippets.Select(cs => new
                     //{
                     //    cs.UniqueId,

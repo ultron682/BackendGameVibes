@@ -1,3 +1,4 @@
+using BackendGameVibes.Controllers;
 using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
@@ -109,7 +110,7 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddTransient<IMailService, MailService>();
+builder.Services.AddTransient<MailService>();
 builder.Services.AddSingleton<HtmlTemplateService>();
 builder.Services.AddSingleton<SteamService>();
 builder.Services.AddHttpClient();

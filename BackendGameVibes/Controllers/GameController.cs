@@ -4,7 +4,6 @@ using BackendGameVibes.Models;
 using BackendGameVibes.Data;
 using BackendGameVibes.Services;
 using BackendGameVibes.SteamApiModels;
-using System.Linq;
 
 namespace BackendGameVibes.Controllers {
     //Game, Platform, and Genre

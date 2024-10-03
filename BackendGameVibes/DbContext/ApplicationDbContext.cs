@@ -15,9 +15,9 @@ namespace BackendGameVibes.Data {
         public DbSet<ForumRole> ForumRoles {
             get; set;
         }
-        public DbSet<Role> Roles {
-            get; set;
-        }
+        //public DbSet<Role> Roles {  // IdentityRole
+        //    get; set;
+        //}
         public DbSet<Game> Games {
             get; set;
         }
@@ -47,10 +47,10 @@ namespace BackendGameVibes.Data {
 
             // UserGameVibes entity
             modelBuilder.Entity<UserGameVibes>(entity => {
-                entity.HasOne(u => u.Role)
-                    .WithMany(r => r.Users)
-                    .HasForeignKey(u => u.RoleId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                //entity.HasOne(u => u.Role)
+                //    .WithMany(r => r.Users)
+                //    .HasForeignKey(u => u.RoleId)
+                //    .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(u => u.ForumRole)
                     .WithMany(fr => fr.Users)
@@ -63,34 +63,42 @@ namespace BackendGameVibes.Data {
                 entity.Property(u => u.ExperiencePoints)
                     .HasDefaultValue(0);
 
-                entity.Property(u => u.RoleId)
-                    .IsRequired(true)
-                    .HasDefaultValue(1);
+                //entity.Property(u => u.RoleId)
+                //    .IsRequired(true)
+                //    .HasDefaultValue(1);
 
                 entity.Property(u => u.ForumRoleId)
                     .IsRequired(true)
                     .HasDefaultValue(1);
             });
 
-            // Role entity
-            modelBuilder.Entity<Role>(entity => {
-                entity.HasKey(r => r.Id);
+            // Role entity todo: remove and use IdentityRole
+            //modelBuilder.Entity<Role>(entity => {
+            //    entity.HasKey(r => r.Id);
 
-                entity.Property(r => r.Name)
-                    .IsRequired()
-                    .HasMaxLength(50);
+            //    entity.Property(r => r.Name)
+            //        .IsRequired()
+            //        .HasMaxLength(50);
 
-                entity.HasMany(r => r.Users)
-                    .WithOne(u => u.Role)
-                    .HasForeignKey(u => u.RoleId)
-                    .OnDelete(DeleteBehavior.Restrict);
+            //    entity.HasMany(r => r.Users)
+            //        .WithOne(u => u.Role)
+            //        .HasForeignKey(u => u.RoleId)
+            //        .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasData(
-                    new Role() { Id = 1, Name = "guest" },
-                    new Role() { Id = 2, Name = "user" },
-                    new Role() { Id = 3, Name = "mod" },
-                    new Role() { Id = 4, Name = "admin" });
-            });
+            //    entity.HasData(
+            //        new Role() { Id = 1, Name = "guest" },
+            //        new Role() { Id = 2, Name = "user" },
+            //        new Role() { Id = 3, Name = "mod" },
+            //        new Role() { Id = 4, Name = "admin" });
+            //});
+
+            //modelBuilder.Entity<IdentityRole>(entity => {
+            //    entity.HasData(
+            //        new IdentityRole() { Name = "guest" },
+            //        new IdentityRole() { Name = "user" },
+            //        new IdentityRole() { Name = "mod" },
+            //        new IdentityRole() { Name = "admin" });
+            //});
 
             // ForumRole entity
             modelBuilder.Entity<ForumRole>(entity => {
