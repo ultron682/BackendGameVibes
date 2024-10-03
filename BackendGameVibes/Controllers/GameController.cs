@@ -186,5 +186,10 @@ namespace BackendGameVibes.Controllers {
 
             return NoContent();
         }
+
+        [HttpGet("genre")]
+        public async Task<IActionResult> GetAllGenres() {
+            return Ok(await _context.Genres.Select(g => new { g.Id, g.Name }).ToArrayAsync());
+        }
     }
 }
