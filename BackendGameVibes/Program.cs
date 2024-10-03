@@ -113,6 +113,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddTransient<MailService>();
 builder.Services.AddSingleton<HtmlTemplateService>();
 builder.Services.AddSingleton<SteamService>();
+builder.Services.AddScoped<RoleService>();
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
@@ -132,5 +133,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Services.GetService<SteamService>(); // on start backend download steam games IDs
-
 app.Run();

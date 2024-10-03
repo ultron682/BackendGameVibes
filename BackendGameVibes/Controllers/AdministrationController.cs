@@ -19,7 +19,7 @@ namespace BackendGameVibes.Controllers {
         }
 
 
-        // endpoint przetestowany i dziala tylko dla admina. dane konta w RoleController
+        // endpoint przetestowany i dziala tylko dla admina. dane logowania konta admina w RoleController
         [HttpGet()]
         public async Task<IActionResult> GetAllUsers() {
             return Ok(await _context.Users.ToArrayAsync());
