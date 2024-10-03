@@ -67,18 +67,18 @@ namespace BackendGameVibes.Controllers
                 }
 
                 var loginResult = await _accountService.LoginUser(user, model.Password);
-                if (loginResult != null)
+                if (loginResult != null && loginResult.Succeeded)
                 {
                     var token = await _accountService.GenerateJwtToken(user);
 
-                    var userToken = new IdentityUserToken<string> {
-                        UserId = user.Id,
-                        LoginProvider = "Default",
-                        Name = "LoginToken",
-                        Value = token
-                    };
+                    //var userToken = new IdentityUserToken<string> {
+                    //    UserId = user.Id,
+                    //    LoginProvider = "Default",
+                    //    Name = "LoginToken",
+                    //    Value = token
+                    //};
 
-                    _accountService.SaveTokenToDB(userToken);
+                    //await _accountService.SaveTokenToDB(userToken); // todo: ERROR
 
                     return Ok(new { accessToken = token });
                 }
@@ -99,7 +99,7 @@ namespace BackendGameVibes.Controllers
             if (user == null)
                 return NotFound("User not found");
 
-            var accountInfo = await _accountService.GetAccountInfoAsync(user.Id);
+            var accountInfo = await _accountService.GetAccountInfoAsync(user.Id, user);
             return Ok(accountInfo);
         }
 

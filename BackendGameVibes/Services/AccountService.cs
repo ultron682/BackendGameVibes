@@ -13,24 +13,31 @@ namespace BackendGameVibes.Services {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<UserGameVibes> _userManager;
         private readonly SignInManager<UserGameVibes> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly MailService _mail_Service;
         private readonly HtmlTemplateService _htmlTemplateService;
 
 
         public AccountService(ApplicationDbContext context, UserManager<UserGameVibes> userManager,
-            SignInManager<UserGameVibes> signInManager, IConfiguration configuration, MailService mail_Service, HtmlTemplateService htmlTemplateService) {
+            SignInManager<UserGameVibes> signInManager, IConfiguration configuration, MailService mail_Service, HtmlTemplateService htmlTemplateService, RoleManager<IdentityRole> roleManager) {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
             _mail_Service = mail_Service;
             _htmlTemplateService = htmlTemplateService;
+            _roleManager = roleManager;
         }
 
         public async Task<IdentityResult> RegisterUser(RegisterRequestGameVibes model) {
             var user = new UserGameVibes { UserName = model.UserName, Email = model.Email };
-            return await _userManager.CreateAsync(user, model.Password);
+            IdentityResult userResult = await _userManager.CreateAsync(user, model.Password);
+
+            if (userResult.Succeeded)
+                await _userManager.AddToRoleAsync(user, "user");
+
+            return userResult;
         }
 
         public async Task<UserGameVibes?> GetUserByEmailAsync(string email) {
@@ -51,14 +58,12 @@ namespace BackendGameVibes.Services {
             return await _userManager.FindByIdAsync(userId);
         }
 
-        public Task SaveTokenToDB(IdentityUserToken<string> identityUserToken) {
-            return new Task(() => {
-                _context.UserTokens.Add(identityUserToken);
-                _context.SaveChanges();
-            });
+        public async Task SaveTokenToDB(IdentityUserToken<string> identityUserToken) {
+            _context.UserTokens.Add(identityUserToken);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task<object> GetAccountInfoAsync(string userId) {
+        public async Task<object> GetAccountInfoAsync(string userId, UserGameVibes userGameVibes) {
             var accountInfo = await _context.Users
                 .Where(u => u.Id == userId)
                 //.Include(u => u.IdentityRole)
@@ -69,6 +74,7 @@ namespace BackendGameVibes.Services {
                     u.UserName,
                     u.EmailConfirmed,
                     ForumRole = new { u.ForumRole.Id, u.ForumRole.Name, u.ForumRole.Threshold },
+                    //Role = _userManager.GetRolesAsync(u).Result
                     //Role = new { u.IdentityRole.Id, u.IdentityRole.Name }
                     //CodeSnippets = u.CodeSnippets.Select(cs => new
                     //{
@@ -78,7 +84,18 @@ namespace BackendGameVibes.Services {
                 })
                 .FirstOrDefaultAsync();
 
-            return accountInfo!;
+            var roles = await _userManager.GetRolesAsync(userGameVibes);
+
+            var result = new {
+                accountInfo!.Id,
+                accountInfo.Email,
+                accountInfo.UserName,
+                accountInfo.EmailConfirmed,
+                accountInfo.ForumRole,
+                roles
+            };
+
+            return result!;
         }
 
         public async Task<bool> UpdateUserNameAsync(string userId, string newUsername) {

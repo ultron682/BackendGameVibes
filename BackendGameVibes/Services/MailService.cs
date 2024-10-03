@@ -17,6 +17,11 @@ namespace BackendGameVibes.Services
         {
             try
             {
+                if (Mail_Settings.UserName == string.Empty) {
+                    Console.WriteLine("Sending emails disabled due to Mail Settings not found in appsettings.json or  appsettings.Development.json ");
+                    return false;
+                }
+
                 MimeMessage email_Message = new MimeMessage();
                 MailboxAddress email_From = new MailboxAddress(Mail_Settings.Name, Mail_Settings.EmailId);
                 email_Message.From.Add(email_From);

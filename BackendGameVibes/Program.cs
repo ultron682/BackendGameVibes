@@ -83,7 +83,12 @@ builder.Services.AddAuthentication(options => {
     };
 });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options => {
+    options.AddPolicy("admin", policy => policy.RequireRole("admin"));
+    options.AddPolicy("mod", policy => policy.RequireRole("mod"));
+    options.AddPolicy("user", policy => policy.RequireRole("user"));
+    options.AddPolicy("guest", policy => policy.RequireRole("guest"));
+});
 
 builder.Services.Configure<IdentityOptions>(options => {
     // Password settings.
