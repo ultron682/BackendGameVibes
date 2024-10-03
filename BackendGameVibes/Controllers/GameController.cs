@@ -51,6 +51,7 @@ namespace BackendGameVibes.Controllers {
                     g.Id,
                     g.Title,
                     g.Description,
+                    g.HeaderImage,
                     g.ReleaseDate,
                     g.SteamId,
                 })
@@ -70,6 +71,7 @@ namespace BackendGameVibes.Controllers {
                     g.Id,
                     g.Title,
                     g.Description,
+                    g.HeaderImage,
                     Platforms = g.Platforms.Select(p => new { p.Id, p.Name }),
                     g.ReleaseDate,
                     g.SteamId,
@@ -88,29 +90,29 @@ namespace BackendGameVibes.Controllers {
         }
 
         /* swagger value for test
-{
-  "title": "NIE WAZNE CO TU BEDZIE BO I TAK DANE Z STEAM po steamid TO NADPISZĄ",
-  "description": "NIE WAZNE CO TU BEDZIE BO I TAK DANE Z STEAM TO NADPISZĄ",
-  "steamid": 3111230
-}
+            {
+              "title": "NIE WAZNE CO TU BEDZIE BO I TAK DANE Z STEAM po steamid TO NADPISZĄ",
+              "description": "NIE WAZNE CO TU BEDZIE BO I TAK DANE Z STEAM TO NADPISZĄ",
+              "steamid": 3111230
+            }
          */
 
         // PODCZAS WPROWADZANIA GRY ALE PRZED JESZCZE WYWOŁANIEM TEJ METODU NALEZY PODAC NAZWE A WTEDY WSKAZAĆ ZNALEZIONĄ GRĘ.
         // W TEN SPOSÓB BĘDZIE UZYSKANY STEAMID I DZIĘKI TEMU POBIERZE SIE OPIS, RELEASEDATE I INNE DANE ZE STEAMA
         [HttpPost]
-        public async Task<ActionResult<Game>> CreateGame(int steamGameId) {
+        public async Task<ActionResult<Game>> CreateGame(int steamGameId = 292030) {
             Game game = new Game() { SteamId = steamGameId };
 
             var steamGameData = await _steamService.GetInfoGame(game.SteamId);
             //Console.WriteLine(steamGameData);
+            if(steamGameData == null) 
+                return BadRequest("SteamGameData is null");
 
             game.Title = steamGameData.name;
             game.Description = steamGameData.detailed_description != null ? steamGameData.detailed_description : "Brak opisu";
             game.ReleaseDate = steamGameData.release_date.Date;
-
-
-            //game.SystemRequirements = steamGameData.PcRequirements.Minimum.Select(r => new SystemRequirement { Requirement = r, RamRequirement= r. }).ToList();
-            //game......
+            game.HeaderImage = steamGameData.header_image;
+            game.GameImages = steamGameData.screenshots.Select(s => new GameImage { ImagePath = s.path_full }).ToList();
 
             List<SteamApiModels.Genre> steamGenres = steamGameData.genres != null ? steamGameData.genres.ToList() : new List<SteamApiModels.Genre>();
             List<int> dbGenreIds = _context.Genres.Select(g => g.Id).ToList();

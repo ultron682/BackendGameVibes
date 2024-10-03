@@ -2,13 +2,15 @@
 using BackendGameVibes.Helpers;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
+using BackendGameVibes.Models.Requests;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 
-namespace BackendGameVibes.Services {
+namespace BackendGameVibes.Services
+{
     public class AccountService : IAccountService {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<UserGameVibes> _userManager;

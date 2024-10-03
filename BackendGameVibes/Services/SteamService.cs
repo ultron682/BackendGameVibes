@@ -19,8 +19,9 @@ namespace BackendGameVibes.Services {
         }
 
         public SteamApp[]? FindSteamApp(string name) {
+            name = name.ToLower();
             if (steamGames != null) {
-                return steamGames.Where(s => s.Name.Contains(name)).Select(s => s).ToArray();
+                return steamGames.Where(s => s.Name.ToLower().Contains(name)).Select(s => s).ToArray();
             }
             else {
                 Console.WriteLine("SteamGames empty!!!!");
@@ -35,7 +36,7 @@ namespace BackendGameVibes.Services {
                 var jsonString = await response.Content.ReadAsStringAsync();
 
                 var options = new JsonSerializerOptions {
-                    PropertyNameCaseInsensitive = true
+                    PropertyNameCaseInsensitive = true,
                 };
 
 

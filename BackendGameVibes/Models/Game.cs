@@ -15,6 +15,9 @@
         public int SteamId {
             get; set;
         }
+        public string? HeaderImage {
+            get; set;
+        }
 
         public ICollection<Platform>? Platforms {
             get; set;

@@ -1,4 +1,5 @@
 ﻿using BackendGameVibes.Models;
+using BackendGameVibes.Models.Requests;
 using Microsoft.AspNetCore.Identity;
 
 namespace BackendGameVibes.IServices
