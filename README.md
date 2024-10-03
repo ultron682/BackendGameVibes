@@ -1,7 +1,9 @@
 baza jest już na AWS RDS
 
 mozna sie do niej dostac np przez mysql workbench:
+
 (aktualizacja 03.10)
+
 gamevibes.cnqqeacigs8t.eu-central-1.rds.amazonaws.com
 
 port: 3306
