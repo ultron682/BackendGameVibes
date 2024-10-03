@@ -126,14 +126,13 @@ namespace BackendGameVibes.Data {
                 entity.Property(g => g.Description)
                     .HasMaxLength(1000);
 
-                entity.HasOne(g => g.Platform)
+                entity.HasMany(g => g.Platforms)
                     .WithMany(p => p.Games)
-                    .HasForeignKey(g => g.PlatformId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .UsingEntity(j => j.ToTable("GamesPlatforms")); // many to many so we need 3 table to store the relationship
 
                 entity.HasMany(g => g.Genres)
                     .WithMany(gen => gen.Games)
-                    .UsingEntity(j => j.ToTable("GameGenres")); // many to many so we need 3 table to store the relationship
+                    .UsingEntity(j => j.ToTable("GamesGenres")); // many to many so we need 3 table to store the relationship
 
                 entity.HasMany(g => g.GameImages)
                     .WithOne(img => img.Game)
@@ -168,48 +167,48 @@ namespace BackendGameVibes.Data {
                     .IsRequired()
                     .HasMaxLength(50);
 
-                // steam Ids with their corresponding name genres
-                entity.HasData(
-                    new Genre { Id = 23304, Name = "Puzzle" },
-                    new Genre { Id = 16702, Name = "Action-Adventure" },
-                    new Genre { Id = 16413, Name = "Arcade" },
-                    new Genre { Id = 14558, Name = "Shooter" },
-                    new Genre { Id = 12501, Name = "Platformer" },
-                    new Genre { Id = 11002, Name = "Visual Novel" },
-                    new Genre { Id = 8128, Name = "Sandbox" },
-                    new Genre { Id = 7914, Name = "Action RPG" },
-                    new Genre { Id = 7766, Name = "Rogue-like" },
-                    new Genre { Id = 7620, Name = "Point & Click" },
-                    new Genre { Id = 6002, Name = "Action Roguelike" },
-                    new Genre { Id = 5829, Name = "Turn-Based Strategy" },
-                    new Genre { Id = 5786, Name = "Tabletop" },
-                    new Genre { Id = 5785, Name = "Interactive Fiction" },
-                    new Genre { Id = 4934, Name = "Education" },
-                    new Genre { Id = 4921, Name = "JRPG" },
-                    new Genre { Id = 4886, Name = "Dating Sim" },
-                    new Genre { Id = 4868, Name = "Party-Based RPG" },
-                    new Genre { Id = 4538, Name = "Walking Simulator" },
-                    new Genre { Id = 4368, Name = "Card Game" },
-                    new Genre { Id = 3886, Name = "Life Sim" },
-                    new Genre { Id = 3250, Name = "Strategy RPG" },
-                    new Genre { Id = 3138, Name = "RTS" },
-                    new Genre { Id = 3137, Name = "Board Game" },
-                    new Genre { Id = 2914, Name = "Tower Defense" },
-                    new Genre { Id = 2626, Name = "City Builder" },
-                    new Genre { Id = 1473, Name = "Farming Sim" },
-                    new Genre { Id = 1393, Name = "Grand Strategy" },
-                    new Genre { Id = 1377, Name = "Space Sim" },
-                    new Genre { Id = 1337, Name = "Colony Sim" },
-                    new Genre { Id = 1290, Name = "eSports" },
-                    new Genre { Id = 1254, Name = "MMORPG" },
-                    new Genre { Id = 1245, Name = "Word Game" },
-                    new Genre { Id = 1237, Name = "Battle Royale" },
-                    new Genre { Id = 1186, Name = "Auto Battler" },
-                    new Genre { Id = 893, Name = "God Game" },
-                    new Genre { Id = 659, Name = "MOBA" },
-                    new Genre { Id = 735, Name = "4X" },
-                    new Genre { Id = 483, Name = "Trivia" }
-                );
+                // steam Ids with their corresponding name genres, jednak tego jest duzo wiecej więc z automatu będą się dodawać niewystępujące jeszcze w bazie
+                //entity.HasData(
+                //    new Genre { Id = 23304, Name = "Puzzle" },
+                //    new Genre { Id = 16702, Name = "Action-Adventure" },
+                //    new Genre { Id = 16413, Name = "Arcade" },
+                //    new Genre { Id = 14558, Name = "Shooter" },
+                //    new Genre { Id = 12501, Name = "Platformer" },
+                //    new Genre { Id = 11002, Name = "Visual Novel" },
+                //    new Genre { Id = 8128, Name = "Sandbox" },
+                //    new Genre { Id = 7914, Name = "Action RPG" },
+                //    new Genre { Id = 7766, Name = "Rogue-like" },
+                //    new Genre { Id = 7620, Name = "Point & Click" },
+                //    new Genre { Id = 6002, Name = "Action Roguelike" },
+                //    new Genre { Id = 5829, Name = "Turn-Based Strategy" },
+                //    new Genre { Id = 5786, Name = "Tabletop" },
+                //    new Genre { Id = 5785, Name = "Interactive Fiction" },
+                //    new Genre { Id = 4934, Name = "Education" },
+                //    new Genre { Id = 4921, Name = "JRPG" },
+                //    new Genre { Id = 4886, Name = "Dating Sim" },
+                //    new Genre { Id = 4868, Name = "Party-Based RPG" },
+                //    new Genre { Id = 4538, Name = "Walking Simulator" },
+                //    new Genre { Id = 4368, Name = "Card Game" },
+                //    new Genre { Id = 3886, Name = "Life Sim" },
+                //    new Genre { Id = 3250, Name = "Strategy RPG" },
+                //    new Genre { Id = 3138, Name = "RTS" },
+                //    new Genre { Id = 3137, Name = "Board Game" },
+                //    new Genre { Id = 2914, Name = "Tower Defense" },
+                //    new Genre { Id = 2626, Name = "City Builder" },
+                //    new Genre { Id = 1473, Name = "Farming Sim" },
+                //    new Genre { Id = 1393, Name = "Grand Strategy" },
+                //    new Genre { Id = 1377, Name = "Space Sim" },
+                //    new Genre { Id = 1337, Name = "Colony Sim" },
+                //    new Genre { Id = 1290, Name = "eSports" },
+                //    new Genre { Id = 1254, Name = "MMORPG" },
+                //    new Genre { Id = 1245, Name = "Word Game" },
+                //    new Genre { Id = 1237, Name = "Battle Royale" },
+                //    new Genre { Id = 1186, Name = "Auto Battler" },
+                //    new Genre { Id = 893, Name = "God Game" },
+                //    new Genre { Id = 659, Name = "MOBA" },
+                //    new Genre { Id = 735, Name = "4X" },
+                //    new Genre { Id = 483, Name = "Trivia" }
+                //);
             });
 
             // GameImage entity

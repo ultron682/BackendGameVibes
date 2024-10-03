@@ -4,6 +4,7 @@ using BackendGameVibes.Models;
 using BackendGameVibes.Data;
 using BackendGameVibes.Services;
 using BackendGameVibes.SteamApiModels;
+using System.Linq;
 
 namespace BackendGameVibes.Controllers {
     //Game, Platform, and Genre
@@ -25,7 +26,7 @@ namespace BackendGameVibes.Controllers {
         public async Task<ActionResult<SteamApp[]>> GetAllSteamIdsGames() {
             // ONLY EXAMPLE
             if (_steamService.steamGames != null)
-                return Ok(_steamService.steamGames[29000..30000] ); // example only small range
+                return Ok(_steamService.steamGames[29000..30000]); // example only small range
             else
                 return NotFound("GetAllSteamIdsGames unsuccessful");
         }
@@ -41,21 +42,9 @@ namespace BackendGameVibes.Controllers {
 
         // Get all games
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Game>>> GetGames() {
+        public async Task<ActionResult<object[]>> GetGames() {
             return await _context.Games
-                .Include(g => g.Platform)
-                .Include(g => g.Genres)
-                .Include(g => g.GameImages)
-                .Include(g => g.SystemRequirements)
-                .ToListAsync();
-        }
-
-        // Get a single game by ID
-        [HttpGet("{id}")]
-        public async Task<ActionResult> GetGame(int id) {
-            var game = await _context.Games
-                .Where(g => g.Id == id)
-                .Include(g => g.Platform)
+                .Include(g => g.Platforms)
                 .Include(g => g.Genres)
                 .Include(g => g.GameImages)
                 .Include(g => g.SystemRequirements)
@@ -63,7 +52,26 @@ namespace BackendGameVibes.Controllers {
                     g.Id,
                     g.Title,
                     g.Description,
-                    Platform = new { g.Platform.Id, g.Platform.Name },
+                    g.ReleaseDate,
+                    g.SteamId,
+                })
+                .ToArrayAsync();
+        }
+
+        // Get a single game by ID
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GetGame(int id) {
+            var game = await _context.Games
+                .Where(g => g.Id == id)
+                .Include(g => g.Platforms)
+                .Include(g => g.Genres)
+                .Include(g => g.GameImages)
+                .Include(g => g.SystemRequirements)
+                .Select(g => new {
+                    g.Id,
+                    g.Title,
+                    g.Description,
+                    Platforms = g.Platforms.Select(p => new { p.Id, p.Name }),
                     g.ReleaseDate,
                     g.SteamId,
                     Genres = g.Genres.Select(g => new { g.Id, g.Name }).ToArray(),
@@ -82,44 +90,58 @@ namespace BackendGameVibes.Controllers {
 
         /* swagger value for test
 {
-  "title": "NIE WAZNE CO TU BEDZIE BO I TAK DANE Z STEAM TO NADPISZĄ",
+  "title": "NIE WAZNE CO TU BEDZIE BO I TAK DANE Z STEAM po steamid TO NADPISZĄ",
   "description": "NIE WAZNE CO TU BEDZIE BO I TAK DANE Z STEAM TO NADPISZĄ",
-  "releaseDate": "2024-10-01",
-  "platformId": 1,
-  "genres": [
-    { "id": 1 },
-    { "id": 2 }
-  ],
-  "steamid": 292030,
-  "platform": {"id": 2},
-  "gameImages": [],
-  "systemRequirements": []
+  "steamid": 3111230
 }
          */
 
-        // Create a new game
         // PODCZAS WPROWADZANIA GRY ALE PRZED JESZCZE WYWOŁANIEM TEJ METODU NALEZY PODAC NAZWE A WTEDY WSKAZAĆ ZNALEZIONĄ GRĘ.
         // W TEN SPOSÓB BĘDZIE UZYSKANY STEAMID I DZIĘKI TEMU POBIERZE SIE OPIS, RELEASEDATE I INNE DANE ZE STEAMA
         [HttpPost]
-        public async Task<ActionResult<Game>> CreateGame(Game game) {
-            var steamGameData = await _steamService.GetInfoGame(game.SteamId);
-            Console.WriteLine(steamGameData);
+        public async Task<ActionResult<Game>> CreateGame(int steamGameId) {
+            Game game = new Game() { SteamId = steamGameId };
 
-            game.Title = steamGameData.Name;
-            game.Description = steamGameData.DetailedDescription;
-            game.ReleaseDate = steamGameData.Release_Date.Date;
+            var steamGameData = await _steamService.GetInfoGame(game.SteamId);
+            //Console.WriteLine(steamGameData);
+
+            game.Title = steamGameData.name;
+            game.Description = steamGameData.detailed_description != null ? steamGameData.detailed_description : "Brak opisu";
+            game.ReleaseDate = steamGameData.release_date.Date;
 
 
             //game.SystemRequirements = steamGameData.PcRequirements.Minimum.Select(r => new SystemRequirement { Requirement = r, RamRequirement= r. }).ToList();
             //game......
 
-            var genreIds = game.Genres.Select(g => g.Id).ToList();
-            var existingGenres = await _context.Genres.Where(g => genreIds.Contains(g.Id)).ToListAsync();
-            game.Genres = existingGenres;
+            List<SteamApiModels.Genre> steamGenres = steamGameData.genres != null ? steamGameData.genres.ToList() : new List<SteamApiModels.Genre>();
+            List<int> dbGenreIds = _context.Genres.Select(g => g.Id).ToList();
 
-            var platformId = game.Platform.Id;
-            var existingPlatform = await _context.Platforms.Where(g => g.Id == platformId).FirstOrDefaultAsync();
-            game.Platform = existingPlatform;
+
+            var existingGenresInDB = await _context.Genres.Where(g => steamGenres.Select(s => int.Parse(s.id)).Contains(g.Id)).ToListAsync();
+
+            foreach (var ele in existingGenresInDB)
+                game.Genres.Add(ele);
+
+            foreach (var steamGenre in steamGenres) {
+                if (dbGenreIds.Contains(int.Parse(steamGenre.id)) == false) {
+                    var newGenre = new Models.Genre { Id = int.Parse(steamGenre.id), Name = steamGenre.description };
+                    _context.Genres.Add(newGenre);
+                    if (game.Genres.Contains(newGenre) == false)
+                        game.Genres.Add(newGenre);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            List<int> platformsIds = new List<int>();
+            if (steamGameData.platforms.Windows)
+                platformsIds.Add(1);
+            else if (steamGameData.platforms.Windows)
+                platformsIds.Add(2);
+            else if (steamGameData.platforms.Mac)
+                platformsIds.Add(3);
+
+            game.Platforms = await _context.Platforms.Where(p => platformsIds.Contains(p.Id)).ToListAsync();
 
             _context.Games.Add(game);
             await _context.SaveChangesAsync();

@@ -12,19 +12,16 @@
         public string? ReleaseDate {
             get; set;
         }
-        public int? PlatformId {
-            get; set;
-        }
         public int SteamId {
             get; set;
         }
 
-        public Platform? Platform {
+        public ICollection<Platform>? Platforms {
             get; set;
-        }
+        } = new HashSet<Platform>();
         public ICollection<Genre>? Genres {
             get; set;
-        }
+        } = new HashSet<Genre>();
         public ICollection<GameImage>? GameImages {
             get; set;
         }

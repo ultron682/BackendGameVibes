@@ -32,30 +32,26 @@ namespace BackendGameVibes.SteamApiModels {
     }
 
     public class GameData {
-        public string Type { get; set; }
-        public string Name { get; set; }
-        public int SteamAppid { get; set; }
-        public int RequiredAge { get; set; }
-        public bool IsFree { get; set; }
-        public string ControllerSupport { get; set; }
-        public string DetailedDescription { get; set; }
-        public string AboutTheGame { get; set; }
-        public string ShortDescription { get; set; }
-        public string SupportedLanguages { get; set; }
-        public string HeaderImage { get; set; }
-        public string CapsuleImage { get; set; }
-        public string CapsuleImagev5 { get; set; }
-        public object Website { get; set; }
-        public SystemRequirements PcRequirements { get; set; }
-        public SystemRequirements MacRequirements { get; set; }
-        public object[] LinuxRequirements { get; set; }
-        public string[] Developers { get; set; }
-        public string[] Publishers { get; set; }
-        public Platforms Platforms { get; set; }
-        public Category[] Categories { get; set; }
-        public Genre[] Genres { get; set; }
-        public Screenshot[] Screenshots { get; set; }
-        public Release_Date Release_Date { get; set; }
+        public string type { get; set; }
+        public string name { get; set; }
+        public int steam_appid { get; set; }
+        public bool is_free { get; set; }
+        public string detailed_description { get; set; }
+        public string about_the_game { get; set; }
+        public string short_description { get; set; }
+        public string supported_languages { get; set; }
+        public string header_image { get; set; }
+        public object website { get; set; }
+        //public SystemRequirements? pc_requirements { get; set; }
+        //public SystemRequirements? mac_requirements { get; set; }
+        //public SystemRequirements? linux_requirements { get; set; }
+        public string[] developers { get; set; }
+        public string[] publishers { get; set; }
+        public Platforms platforms { get; set; }
+        public Category[] categories { get; set; }
+        public Genre[] genres { get; set; }
+        public Screenshot[] screenshots { get; set; }
+        public Release_Date release_date { get; set; }
 
 
 
@@ -81,8 +77,8 @@ namespace BackendGameVibes.SteamApiModels {
     }
 
     public class Genre {
-        public string Id { get; set; }
-        public string Description { get; set; }
+        public string id { get; set; }
+        public string description { get; set; }
     }
 
     public class Screenshot {
