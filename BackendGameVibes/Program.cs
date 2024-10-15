@@ -53,7 +53,8 @@ builder.Services.AddSwaggerGen(c => {
 
 builder.Services
     .AddDbContext<ApplicationDbContext>(options => {
-        options.UseMySql(builder.Configuration.GetConnectionString("GameVibesDbConnection"), new MySqlServerVersion(new Version(8, 0, 35)));
+        //options.UseMySql(builder.Configuration.GetConnectionString("GameVibesDbConnection"), new MySqlServerVersion(new Version(8, 0, 35)));
+        options.UseSqlite("Data Source=GameVibesDatabase.db;Cache=Shared");
         options.EnableSensitiveDataLogging(false);
     }
 );
@@ -138,4 +139,16 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Services.GetService<SteamService>(); // on start backend download steam games IDs
+
+using (var scope = app.Services.CreateScope()) {
+
+    using (var roleManager = scope.ServiceProvider.GetService<RoleManager<IdentityRole>>()) {
+        using (var userManager = scope.ServiceProvider.GetService<UserManager<UserGameVibes>>()) {
+            using (var roleService = scope.ServiceProvider.GetService<RoleService>()) {
+                await roleService!.CreateRolesAndUsers();
+            }
+        }
+    }
+}
+
 app.Run();

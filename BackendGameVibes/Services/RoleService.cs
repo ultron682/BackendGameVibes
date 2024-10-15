@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 
 namespace BackendGameVibes.Services {
-    public class RoleService {
+    public class RoleService : IDisposable {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<UserGameVibes> _userManager;
 
@@ -63,6 +63,10 @@ namespace BackendGameVibes.Services {
 
         public async Task<IdentityResult> CreateNewRole(string name) {
             return await _roleManager.CreateAsync(new IdentityRole(name));
+        }
+
+        public void Dispose() {
+
         }
     }
 }
