@@ -38,20 +38,13 @@ namespace BackendGameVibes.Data {
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-            //base.OnConfiguring(optionsBuilder);
             optionsBuilder.LogTo(message => Debug.WriteLine(message));
+            base.OnConfiguring(optionsBuilder);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
-            base.OnModelCreating(modelBuilder);
-
             // UserGameVibes entity
             modelBuilder.Entity<UserGameVibes>(entity => {
-                //entity.HasOne(u => u.Role)
-                //    .WithMany(r => r.Users)
-                //    .HasForeignKey(u => u.RoleId)
-                //    .OnDelete(DeleteBehavior.Restrict);
-
                 entity.HasOne(u => u.ForumRole)
                     .WithMany(fr => fr.Users)
                     .HasForeignKey(u => u.ForumRoleId)
@@ -61,44 +54,16 @@ namespace BackendGameVibes.Data {
                     .HasMaxLength(500);
 
                 entity.Property(u => u.ExperiencePoints)
-                    .HasDefaultValue(0);
-
-                //entity.Property(u => u.RoleId)
-                //    .IsRequired(true)
-                //    .HasDefaultValue(1);
+                    .HasDefaultValue(10);
 
                 entity.Property(u => u.ForumRoleId)
                     .IsRequired(true)
                     .HasDefaultValue(1);
+
+                entity
+                    .HasMany(u => u.UserReviews)
+                    .WithOne(r => r.UserGameVibes);
             });
-
-            // Role entity todo: remove and use IdentityRole
-            //modelBuilder.Entity<Role>(entity => {
-            //    entity.HasKey(r => r.Id);
-
-            //    entity.Property(r => r.Name)
-            //        .IsRequired()
-            //        .HasMaxLength(50);
-
-            //    entity.HasMany(r => r.Users)
-            //        .WithOne(u => u.Role)
-            //        .HasForeignKey(u => u.RoleId)
-            //        .OnDelete(DeleteBehavior.Restrict);
-
-            //    entity.HasData(
-            //        new Role() { Id = 1, Name = "guest" },
-            //        new Role() { Id = 2, Name = "user" },
-            //        new Role() { Id = 3, Name = "mod" },
-            //        new Role() { Id = 4, Name = "admin" });
-            //});
-
-            //modelBuilder.Entity<IdentityRole>(entity => {
-            //    entity.HasData(
-            //        new IdentityRole() { Name = "guest" },
-            //        new IdentityRole() { Name = "user" },
-            //        new IdentityRole() { Name = "mod" },
-            //        new IdentityRole() { Name = "admin" });
-            //});
 
             // ForumRole entity
             modelBuilder.Entity<ForumRole>(entity => {
@@ -176,47 +141,6 @@ namespace BackendGameVibes.Data {
                     .HasMaxLength(50);
 
                 // steam Ids with their corresponding name genres, jednak tego jest duzo wiecej więc z automatu będą się dodawać niewystępujące jeszcze w bazie
-                //entity.HasData(
-                //    new Genre { Id = 23304, Name = "Puzzle" },
-                //    new Genre { Id = 16702, Name = "Action-Adventure" },
-                //    new Genre { Id = 16413, Name = "Arcade" },
-                //    new Genre { Id = 14558, Name = "Shooter" },
-                //    new Genre { Id = 12501, Name = "Platformer" },
-                //    new Genre { Id = 11002, Name = "Visual Novel" },
-                //    new Genre { Id = 8128, Name = "Sandbox" },
-                //    new Genre { Id = 7914, Name = "Action RPG" },
-                //    new Genre { Id = 7766, Name = "Rogue-like" },
-                //    new Genre { Id = 7620, Name = "Point & Click" },
-                //    new Genre { Id = 6002, Name = "Action Roguelike" },
-                //    new Genre { Id = 5829, Name = "Turn-Based Strategy" },
-                //    new Genre { Id = 5786, Name = "Tabletop" },
-                //    new Genre { Id = 5785, Name = "Interactive Fiction" },
-                //    new Genre { Id = 4934, Name = "Education" },
-                //    new Genre { Id = 4921, Name = "JRPG" },
-                //    new Genre { Id = 4886, Name = "Dating Sim" },
-                //    new Genre { Id = 4868, Name = "Party-Based RPG" },
-                //    new Genre { Id = 4538, Name = "Walking Simulator" },
-                //    new Genre { Id = 4368, Name = "Card Game" },
-                //    new Genre { Id = 3886, Name = "Life Sim" },
-                //    new Genre { Id = 3250, Name = "Strategy RPG" },
-                //    new Genre { Id = 3138, Name = "RTS" },
-                //    new Genre { Id = 3137, Name = "Board Game" },
-                //    new Genre { Id = 2914, Name = "Tower Defense" },
-                //    new Genre { Id = 2626, Name = "City Builder" },
-                //    new Genre { Id = 1473, Name = "Farming Sim" },
-                //    new Genre { Id = 1393, Name = "Grand Strategy" },
-                //    new Genre { Id = 1377, Name = "Space Sim" },
-                //    new Genre { Id = 1337, Name = "Colony Sim" },
-                //    new Genre { Id = 1290, Name = "eSports" },
-                //    new Genre { Id = 1254, Name = "MMORPG" },
-                //    new Genre { Id = 1245, Name = "Word Game" },
-                //    new Genre { Id = 1237, Name = "Battle Royale" },
-                //    new Genre { Id = 1186, Name = "Auto Battler" },
-                //    new Genre { Id = 893, Name = "God Game" },
-                //    new Genre { Id = 659, Name = "MOBA" },
-                //    new Genre { Id = 735, Name = "4X" },
-                //    new Genre { Id = 483, Name = "Trivia" }
-                //);
             });
 
             // GameImage entity
@@ -287,18 +211,23 @@ namespace BackendGameVibes.Data {
                     .HasMaxLength(1000);
 
                 entity.Property(r => r.CreatedAt)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
                     .IsRequired();
 
                 entity.HasOne(r => r.UserGameVibes)
-                    .WithMany()
+                    .WithMany(u => u.UserReviews)
                     .HasForeignKey(r => r.UserGameVibesId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+
 
                 entity.HasOne(r => r.Game)
                     .WithMany()
                     .HasForeignKey(r => r.GameId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
+
+            base.OnModelCreating(modelBuilder);
         }
 
     }

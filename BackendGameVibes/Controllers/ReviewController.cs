@@ -2,85 +2,52 @@
 using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.Models;
 using BackendGameVibes.Data;
+using BackendGameVibes.IServices;
 
 namespace BackendGameVibes.Controllers {
     [ApiController]
     [Route("api/[controller]")]
     public class ReviewController : ControllerBase {
-        private readonly ApplicationDbContext _context;
+        private readonly IReviewService _reviewService;
 
-        public ReviewController(ApplicationDbContext context) {
-            _context = context;
+        public ReviewController(IReviewService reviewService) {
+            _reviewService = reviewService;
         }
 
-        // Get all reviews
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Review>>> GetReviews() {
-            return await _context.Reviews
-                .Include(r => r.UserGameVibes)
-                .Include(r => r.Game)
-                .ToListAsync();
+        public async Task<IActionResult> GetAllReviews() {
+            var reviews = await _reviewService.GetAllReviewsAsync();
+            return Ok(reviews);
         }
 
-        // Get a single review by ID
         [HttpGet("{id}")]
-        public async Task<ActionResult<Review>> GetReview(int id) {
-            var review = await _context.Reviews
-                .Include(r => r.UserGameVibes)
-                .Include(r => r.Game)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
+        public async Task<IActionResult> GetReviewById(int id) {
+            var review = await _reviewService.GetReviewByIdAsync(id);
             if (review == null) {
                 return NotFound();
             }
-
-            return review;
+            return Ok(review);
         }
 
-        // Create a new review
         [HttpPost]
-        public async Task<ActionResult<Review>> CreateReview(Review review) {
-            _context.Reviews.Add(review);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetReview), new { id = review.Id }, review);
+        public async Task<IActionResult> AddReview([FromBody] Review review) {
+            await _reviewService.AddReviewAsync(review);
+            return CreatedAtAction(nameof(GetReviewById), new { id = review.Id }, review);
         }
 
-        // Update a review
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateReview(int id, Review review) {
+        public async Task<IActionResult> UpdateReview(int id, [FromBody] Review review) {
             if (id != review.Id) {
                 return BadRequest();
             }
 
-            _context.Entry(review).State = EntityState.Modified;
-
-            try {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException) {
-                if (!_context.Reviews.Any(r => r.Id == id)) {
-                    return NotFound();
-                }
-                else {
-                    throw;
-                }
-            }
-
+            await _reviewService.UpdateReviewAsync(review);
             return NoContent();
         }
 
-        // Delete a review
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReview(int id) {
-            var review = await _context.Reviews.FindAsync(id);
-            if (review == null) {
-                return NotFound();
-            }
-
-            _context.Reviews.Remove(review);
-            await _context.SaveChangesAsync();
-
+            await _reviewService.DeleteReviewAsync(id);
             return NoContent();
         }
     }

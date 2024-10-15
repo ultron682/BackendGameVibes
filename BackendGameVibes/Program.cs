@@ -110,12 +110,14 @@ builder.Services.Configure<IdentityOptions>(options => {
     options.User.RequireUniqueEmail = true;
 });
 
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+
 builder.Services.AddControllers().AddJsonOptions(x =>
    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
-builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddTransient<MailService>();
 builder.Services.AddSingleton<HtmlTemplateService>();
 builder.Services.AddSingleton<SteamService>();
@@ -124,18 +126,6 @@ builder.Services.AddHttpClient();
 
 
 var app = builder.Build();
-
-using (var scope = app.Services.CreateAsyncScope()) {
-    using (var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>()) {
-        using (var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>()) {
-            using (var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserGameVibes>>()) {
-                using (var roleService = scope.ServiceProvider.GetRequiredService<RoleService>()) {
-                    await roleService!.CreateRolesAndUsers();
-                }
-            }
-        }
-    }
-}
 
 //if (app.Environment.IsDevelopment())
 //{
@@ -153,6 +143,56 @@ app.MapControllers();
 
 app.Services.GetService<SteamService>(); // on start backend download steam games IDs
 
+using (var scope = app.Services.CreateAsyncScope()) {
+    //var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.EnsureCreated();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserGameVibes>>();
+    var roleService = scope.ServiceProvider.GetRequiredService<RoleService>();
+    await roleService!.CreateRolesAndUsers();
 
+    //Default normal user      
+    var newUser = new UserGameVibes();
+    newUser.UserName = "test";
+    newUser.Email = "test@test.com";
+    newUser.EmailConfirmed = true;
+    string userPWD = "Test123.";
+
+    IdentityResult chkUser = await userManager.CreateAsync(newUser, userPWD);
+
+    if (chkUser.Succeeded) { // this is automatic in RegisterUser method
+        await userManager.AddToRoleAsync(newUser, "user");
+    }
+
+    UserGameVibes? user = await userManager.FindByEmailAsync(newUser.Email);
+
+    var reviewService = scope.ServiceProvider.GetRequiredService<IReviewService>();
+
+    var review = await reviewService.GetReviewByIdAsync(1);
+
+    var steamService = scope.ServiceProvider.GetRequiredService<SteamService>();
+    //await steamService.GetInfoGame(292030);
+
+    var gameService = scope.ServiceProvider.GetRequiredService<GameController>();
+    await gameService.CreateGame(292030);
+
+    await reviewService.AddReviewAsync(new Review {
+        GameId = 292030,
+        Comment = "Great game. Review #1 created automatic in Program.cs",
+        GeneralScore = 9.5,
+        GraphicsScore = 7.5,
+        AudioScore = 6.5,
+        GameplayScore = 8.9
+    });
+
+    await reviewService.AddReviewAsync(new Review {
+        GameId = 292030,
+        Comment = "Great game in my life. Review #2 created automatic in Program.cs",
+        GeneralScore = 9.5,
+        GraphicsScore = 7.5,
+        AudioScore = 6.5,
+        GameplayScore = 8.9
+    });
+
+}
 
 app.Run();

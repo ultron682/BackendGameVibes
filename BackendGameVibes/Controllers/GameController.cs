@@ -105,7 +105,7 @@ namespace BackendGameVibes.Controllers {
 
             var steamGameData = await _steamService.GetInfoGame(game.SteamId);
             //Console.WriteLine(steamGameData);
-            if(steamGameData == null) 
+            if (steamGameData == null)
                 return BadRequest("SteamGameData is null");
 
             game.Title = steamGameData.name;

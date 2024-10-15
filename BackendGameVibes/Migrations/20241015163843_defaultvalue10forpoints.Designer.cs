@@ -3,6 +3,7 @@ using System;
 using BackendGameVibes.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackendGameVibes.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241015163843_defaultvalue10forpoints")]
+    partial class defaultvalue10forpoints
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
@@ -178,9 +181,7 @@ namespace BackendGameVibes.Migrations
 
                     b.Property<DateTime?>("CreatedAt")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("GameId")
                         .HasColumnType("INTEGER");
@@ -511,7 +512,7 @@ namespace BackendGameVibes.Migrations
                         .IsRequired();
 
                     b.HasOne("BackendGameVibes.Models.UserGameVibes", "UserGameVibes")
-                        .WithMany("UserReviews")
+                        .WithMany()
                         .HasForeignKey("UserGameVibesId")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -633,11 +634,6 @@ namespace BackendGameVibes.Migrations
                     b.Navigation("GameImages");
 
                     b.Navigation("SystemRequirements");
-                });
-
-            modelBuilder.Entity("BackendGameVibes.Models.UserGameVibes", b =>
-                {
-                    b.Navigation("UserReviews");
                 });
 #pragma warning restore 612, 618
         }

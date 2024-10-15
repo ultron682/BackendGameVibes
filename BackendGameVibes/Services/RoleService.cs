@@ -1,5 +1,6 @@
 ﻿using BackendGameVibes.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackendGameVibes.Services {
     public class RoleService : IDisposable {
@@ -9,8 +10,6 @@ namespace BackendGameVibes.Services {
         public RoleService(RoleManager<IdentityRole> roleManager, UserManager<UserGameVibes> userManager) {
             _roleManager = roleManager;
             _userManager = userManager;
-
-            //Task.Run(CreateRolesAndUsers); // on start backend create roles and users
         }
 
         public async Task CreateRolesAndUsers() {
@@ -66,7 +65,7 @@ namespace BackendGameVibes.Services {
         }
 
         public void Dispose() {
-
+            _roleManager?.Dispose();
         }
     }
 }

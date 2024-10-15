@@ -6,12 +6,12 @@ using BackendGameVibes.Models.Requests;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Linq;
 using System.Text;
 
 
-namespace BackendGameVibes.Services
-{
-    public class AccountService : IAccountService {
+namespace BackendGameVibes.Services {
+    public class AccountService : IAccountService, IDisposable {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<UserGameVibes> _userManager;
         private readonly SignInManager<UserGameVibes> _signInManager;
@@ -66,6 +66,8 @@ namespace BackendGameVibes.Services
         }
 
         public async Task<object> GetAccountInfoAsync(string userId, UserGameVibes userGameVibes) {
+            var roles = await _userManager.GetRolesAsync(userGameVibes);
+
             var accountInfo = await _context.Users
                 .Where(u => u.Id == userId)
                 //.Include(u => u.IdentityRole)
@@ -76,8 +78,18 @@ namespace BackendGameVibes.Services
                     u.UserName,
                     u.EmailConfirmed,
                     ForumRole = new { u.ForumRole.Id, u.ForumRole.Name, u.ForumRole.Threshold },
-                    //Role = _userManager.GetRolesAsync(u).Result
-                    //Role = new { u.IdentityRole.Id, u.IdentityRole.Name }
+                    u.ExperiencePoints,
+                    Roles = roles.ToArray(),
+                    Reviews = u.UserReviews.Select(r => new {
+                        r.Id,
+                        r.GameId,
+                        r.GeneralScore,
+                        r.GameplayScore,
+                        r.GraphicsScore,
+                        r.AudioScore,
+                        r.Comment,
+                        r.CreatedAt
+                    }).ToArray(),
                     //CodeSnippets = u.CodeSnippets.Select(cs => new
                     //{
                     //    cs.UniqueId,
@@ -86,18 +98,7 @@ namespace BackendGameVibes.Services
                 })
                 .FirstOrDefaultAsync();
 
-            var roles = await _userManager.GetRolesAsync(userGameVibes);
-
-            var result = new {
-                accountInfo!.Id,
-                accountInfo.Email,
-                accountInfo.UserName,
-                accountInfo.EmailConfirmed,
-                accountInfo.ForumRole,
-                roles
-            };
-
-            return result!;
+            return accountInfo!;
         }
 
         public async Task<bool> UpdateUserNameAsync(string userId, string newUsername) {
@@ -145,6 +146,10 @@ namespace BackendGameVibes.Services
             token = Uri.UnescapeDataString(token);
 
             return await _userManager.ConfirmEmailAsync(user, token);
+        }
+
+        public void Dispose() {
+
         }
     }
 }

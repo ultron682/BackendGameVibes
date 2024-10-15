@@ -3,6 +3,7 @@ using System;
 using BackendGameVibes.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackendGameVibes.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241015213217_something")]
+    partial class something
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
@@ -178,9 +181,7 @@ namespace BackendGameVibes.Migrations
 
                     b.Property<DateTime?>("CreatedAt")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("GameId")
                         .HasColumnType("INTEGER");
@@ -200,11 +201,16 @@ namespace BackendGameVibes.Migrations
                     b.Property<string>("UserGameVibesId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("UserGameVibesId1")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.HasIndex("GameId");
 
                     b.HasIndex("UserGameVibesId");
+
+                    b.HasIndex("UserGameVibesId1");
 
                     b.ToTable("Reviews");
                 });
@@ -511,9 +517,13 @@ namespace BackendGameVibes.Migrations
                         .IsRequired();
 
                     b.HasOne("BackendGameVibes.Models.UserGameVibes", "UserGameVibes")
-                        .WithMany("UserReviews")
+                        .WithMany()
                         .HasForeignKey("UserGameVibesId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("BackendGameVibes.Models.UserGameVibes", null)
+                        .WithMany("UserReviews")
+                        .HasForeignKey("UserGameVibesId1");
 
                     b.Navigation("Game");
 
