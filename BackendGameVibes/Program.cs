@@ -122,7 +122,20 @@ builder.Services.AddSingleton<SteamService>();
 builder.Services.AddScoped<RoleService>();
 builder.Services.AddHttpClient();
 
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateAsyncScope()) {
+    using (var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>()) {
+        using (var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>()) {
+            using (var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserGameVibes>>()) {
+                using (var roleService = scope.ServiceProvider.GetRequiredService<RoleService>()) {
+                    await roleService!.CreateRolesAndUsers();
+                }
+            }
+        }
+    }
+}
 
 //if (app.Environment.IsDevelopment())
 //{
@@ -140,15 +153,6 @@ app.MapControllers();
 
 app.Services.GetService<SteamService>(); // on start backend download steam games IDs
 
-using (var scope = app.Services.CreateScope()) {
 
-    using (var roleManager = scope.ServiceProvider.GetService<RoleManager<IdentityRole>>()) {
-        using (var userManager = scope.ServiceProvider.GetService<UserManager<UserGameVibes>>()) {
-            using (var roleService = scope.ServiceProvider.GetService<RoleService>()) {
-                await roleService!.CreateRolesAndUsers();
-            }
-        }
-    }
-}
 
 app.Run();

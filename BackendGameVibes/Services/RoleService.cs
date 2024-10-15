@@ -10,7 +10,7 @@ namespace BackendGameVibes.Services {
             _roleManager = roleManager;
             _userManager = userManager;
 
-            Task.Run(CreateRolesAndUsers); // on start backend create roles and users
+            //Task.Run(CreateRolesAndUsers); // on start backend create roles and users
         }
 
         public async Task CreateRolesAndUsers() {
