@@ -1,50 +1,37 @@
-﻿namespace BackendGameVibes.Models
-{
-    public class Review
-    {
-        public int Id
-        {
+﻿namespace BackendGameVibes.Models {
+    public class Review {
+        public int Id {
             get; set;
         }
-        public string? UserGameVibesId
-        {
+        public string? UserGameVibesId {
             get; set;
         }
-        public int GameId
-        {
+        public int? GameId {
             get; set;
         }
-        public double GeneralScore
-        {
+        public double GeneralScore {
             get; set;
         }
-        public double GraphicsScore
-        {
+        public double GraphicsScore {
             get; set;
         }
-        public double AudioScore
-        {
+        public double AudioScore {
             get; set;
         }
-        public double GameplayScore
-        {
+        public double GameplayScore {
             get; set;
         }
-        public string? Comment
-        {
+        public string? Comment {
             get; set;
         }
-        public DateTime? CreatedAt
-        {
+        public DateTime? CreatedAt {
             get; set;
         }
 
-        public UserGameVibes? UserGameVibes
-        {
+        public UserGameVibes? UserGameVibes {
             get; set;
         }
-        public Game? Game
-        {
+        public Game? Game {
             get; set;
         }
     }

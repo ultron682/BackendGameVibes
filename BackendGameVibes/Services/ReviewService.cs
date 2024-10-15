@@ -11,14 +11,43 @@ namespace BackendGameVibes.Services {
             _context = context;
         }
 
-        public async Task<IEnumerable<Review>> GetAllReviewsAsync() {
+        public async Task<IEnumerable<object>> GetAllReviewsAsync() {
             return await _context.Reviews
                 .Include(r => r.UserGameVibes)
-                .ToListAsync();
+                .Select(r => new {
+                    r.Id,
+                    r.GeneralScore,
+                    r.GameplayScore,
+                    r.GraphicsScore,
+                    r.AudioScore,
+                    r.Comment,
+                    Username = r.UserGameVibes != null ? r.UserGameVibes.UserName : "NoUsername",
+                    GameTitle = r.Game != null ? r.Game.Title : "NoData",
+                    r.CreatedAt,
+                })
+                .ToArrayAsync();
         }
 
-        public async Task<Review?> GetReviewByIdAsync(int id) {
-            return await _context.Reviews.FindAsync(id);
+        public async Task<object?> GetReviewByIdAsync(int id) {
+            var review = await _context.Reviews
+                .Include(r => r.UserGameVibes)
+                .Include(r => r.Game)
+                .Where(r => r.Id == id)
+                .Select(r => new {
+                    r.Id,
+                    r.GeneralScore,
+                    r.GameplayScore,
+                    r.GraphicsScore,
+                    r.AudioScore,
+                    r.Comment,
+                    Username = r.UserGameVibes != null ? r.UserGameVibes.UserName : "NoUsername",
+                    GameTitle = r.Game != null ? r.Game.Title : "NoData",
+                    r.CreatedAt,
+                })
+                .FirstOrDefaultAsync();
+
+
+            return review;
         }
 
         public async Task AddReviewAsync(Review review) {

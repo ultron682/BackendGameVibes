@@ -31,5 +31,8 @@
         public ICollection<SystemRequirement>? SystemRequirements {
             get; set;
         }
+        public ICollection<Review>? Reviews {
+            get; set;
+        }
     }
 }

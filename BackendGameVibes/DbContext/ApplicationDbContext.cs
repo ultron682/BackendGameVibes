@@ -219,10 +219,8 @@ namespace BackendGameVibes.Data {
                     .HasForeignKey(r => r.UserGameVibesId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-
-
                 entity.HasOne(r => r.Game)
-                    .WithMany()
+                    .WithMany(g => g.Reviews)
                     .HasForeignKey(r => r.GameId)
                     .OnDelete(DeleteBehavior.Cascade);
             });

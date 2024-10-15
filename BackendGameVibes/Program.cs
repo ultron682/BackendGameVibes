@@ -118,6 +118,7 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddTransient<MailService>();
 builder.Services.AddSingleton<HtmlTemplateService>();
 builder.Services.AddSingleton<SteamService>();
@@ -172,27 +173,29 @@ using (var scope = app.Services.CreateAsyncScope()) {
     var steamService = scope.ServiceProvider.GetRequiredService<SteamService>();
     //await steamService.GetInfoGame(292030);
 
-    var gameService = scope.ServiceProvider.GetRequiredService<GameController>();
-    await gameService.CreateGame(292030);
+    var gameService = scope.ServiceProvider.GetRequiredService<IGameService>();
+    Game? createdGame = await gameService.CreateGame(292030);
+    if (createdGame != null) {
+        await reviewService.AddReviewAsync(new Review {
+            GameId = createdGame!.Id,
+            Comment = "Great game. Review #1 created automatic in Program.cs",
+            GeneralScore = 9.5,
+            GraphicsScore = 7.5,
+            AudioScore = 6.5,
+            GameplayScore = 8.9,
+            UserGameVibesId = user!.Id
+        });
 
-    await reviewService.AddReviewAsync(new Review {
-        GameId = 292030,
-        Comment = "Great game. Review #1 created automatic in Program.cs",
-        GeneralScore = 9.5,
-        GraphicsScore = 7.5,
-        AudioScore = 6.5,
-        GameplayScore = 8.9
-    });
-
-    await reviewService.AddReviewAsync(new Review {
-        GameId = 292030,
-        Comment = "Great game in my life. Review #2 created automatic in Program.cs",
-        GeneralScore = 9.5,
-        GraphicsScore = 7.5,
-        AudioScore = 6.5,
-        GameplayScore = 8.9
-    });
-
+        await reviewService.AddReviewAsync(new Review {
+            GameId = createdGame!.Id,
+            Comment = "Great game in my life. Review #2 created automatic in Program.cs",
+            GeneralScore = 9.5,
+            GraphicsScore = 7.5,
+            AudioScore = 6.5,
+            GameplayScore = 8.9,
+            UserGameVibesId = user!.Id
+        });
+    }
 }
 
 app.Run();
