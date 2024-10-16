@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/BackendGameVibes/GameVibesDatabase.db
+/BackendGameVibes/GameVibesDatabase.db-wal
+/BackendGameVibes/GameVibesDatabase.db-shm
