@@ -113,5 +113,9 @@ namespace BackendGameVibes.Services {
 
             return game;
         }
+
+        public void Dispose() {
+
+        }
     }
 }

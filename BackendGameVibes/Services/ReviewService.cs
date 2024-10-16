@@ -4,7 +4,7 @@ using BackendGameVibes.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendGameVibes.Services {
-    public class ReviewService : IReviewService, IDisposable {
+    public class ReviewService : IReviewService {
         private readonly ApplicationDbContext _context;
 
         public ReviewService(ApplicationDbContext context) {

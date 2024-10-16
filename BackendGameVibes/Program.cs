@@ -147,22 +147,18 @@ app.MapControllers();
 app.Services.GetService<SteamService>(); // on start backend download steam games IDs
 
 using (var scope = app.Services.CreateAsyncScope()) {
-    //var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.EnsureCreated();
-    //var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserGameVibes>>();
-    //var steamService = scope.ServiceProvider.GetRequiredService<SteamService>();
-    var roleService = scope.ServiceProvider.GetRequiredService<RoleService>();
+    using var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserGameVibes>>();
+    using var reviewService = scope.ServiceProvider.GetRequiredService<IReviewService>();
+    using var roleService = scope.ServiceProvider.GetRequiredService<RoleService>();
+    using var gameService = scope.ServiceProvider.GetRequiredService<IGameService>();
+
     await roleService!.InitRolesAndUsers();
 
     UserGameVibes? user = await userManager.FindByEmailAsync("test@test.com");
 
-    var reviewService = scope.ServiceProvider.GetRequiredService<IReviewService>();
-
-    var review = await reviewService.GetReviewByIdAsync(1);
 
 
 
-    var gameService = scope.ServiceProvider.GetRequiredService<IGameService>();
     Game? createdGame = await gameService.CreateGame(292030); // The Witcher 3
     await gameService.CreateGame(20900); // The Witcher 1
     await gameService.CreateGame(20920); // The Witcher 2

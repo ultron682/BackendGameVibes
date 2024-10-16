@@ -2,7 +2,7 @@
 using BackendGameVibes.SteamApiModels;
 
 namespace BackendGameVibes.IServices {
-    public interface IGameService {
+    public interface IGameService : IDisposable {
         Task<Game?> CreateGame(int steamGameId);
         SteamApp[] FindSteamAppByName(string searchingName);
         Task<SteamApp[]> GetAllSteamIdsGames();
