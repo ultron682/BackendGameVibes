@@ -15,6 +15,7 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Services to the container
 builder.Services.AddCors(options => {
     options.AddDefaultPolicy(
         builder => {
@@ -23,9 +24,8 @@ builder.Services.AddCors(options => {
             builder.AllowAnyHeader();
         });
 });
-
-// Services to the container
 builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => {
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
@@ -130,11 +130,9 @@ builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-//if (app.Environment.IsDevelopment())
-//{
+// Always available Swagger
 app.UseSwagger();
 app.UseSwaggerUI();
-//}
 
 app.UseCors();
 app.UseRouting();
@@ -147,43 +145,7 @@ app.MapControllers();
 app.Services.GetService<SteamService>(); // on start backend download steam games IDs
 
 using (var scope = app.Services.CreateAsyncScope()) {
-    using var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserGameVibes>>();
-    using var reviewService = scope.ServiceProvider.GetRequiredService<IReviewService>();
-    using var roleService = scope.ServiceProvider.GetRequiredService<RoleService>();
-    using var gameService = scope.ServiceProvider.GetRequiredService<IGameService>();
-
-    await roleService!.InitRolesAndUsers();
-
-    UserGameVibes? user = await userManager.FindByEmailAsync("test@test.com");
-
-
-
-
-    Game? createdGame = await gameService.CreateGame(292030); // The Witcher 3
-    await gameService.CreateGame(20900); // The Witcher 1
-    await gameService.CreateGame(20920); // The Witcher 2
-
-    if (createdGame != null) {
-        await reviewService.AddReviewAsync(new Review {
-            GameId = createdGame!.Id,
-            Comment = "Great game. Review #1 created automatic in Program.cs",
-            GeneralScore = 9.5,
-            GraphicsScore = 7.5,
-            AudioScore = 6.5,
-            GameplayScore = 8.9,
-            UserGameVibesId = user!.Id
-        });
-
-        await reviewService.AddReviewAsync(new Review {
-            GameId = createdGame!.Id,
-            Comment = "Great game in my life. Review #2 created automatic in Program.cs",
-            GeneralScore = 9.5,
-            GraphicsScore = 7.5,
-            AudioScore = 6.5,
-            GameplayScore = 8.9,
-            UserGameVibesId = user!.Id
-        });
-    }
+    await DbInitializer.InitializeAsync(scope);
 }
 
 app.Run();
