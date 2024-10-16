@@ -1,7 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
 
 namespace BackendGameVibes.Models.Requests {
-    /*
+    /* swagger
 {
   "userGameVibesId": "08f442f0-980e-4030-8241-23e2afdf83b3",
   "gameId": 3,
@@ -13,12 +13,18 @@ namespace BackendGameVibes.Models.Requests {
 }
     */
     public class ReviewRequest {
+        [DefaultValue("long required userID")]
         public string UserGameVibesId { get; set; }
+        [DefaultValue("20920")]
         public int GameId { get; set; }
         public double GeneralScore { get; set; }
+        [DefaultValue("9")]
         public double GraphicsScore { get; set; }
+        [DefaultValue("9")]
         public double AudioScore { get; set; }
+        [DefaultValue("9")]
         public double GameplayScore { get; set; }
+        [DefaultValue("Empty comment")]
         public string Comment { get; set; }
     }
 }

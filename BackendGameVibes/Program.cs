@@ -1,5 +1,6 @@
 using BackendGameVibes.Controllers;
 using BackendGameVibes.Data;
+using BackendGameVibes.Helpers;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
 using BackendGameVibes.Services;
@@ -115,6 +116,7 @@ builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailS
 builder.Services.AddControllers().AddJsonOptions(x =>
    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();

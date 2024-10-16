@@ -3,15 +3,19 @@ using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.Models;
 using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
+using BackendGameVibes.Models.Requests;
+using AutoMapper;
 
 namespace BackendGameVibes.Controllers {
     [ApiController]
     [Route("api/[controller]")]
     public class ReviewController : ControllerBase {
         private readonly IReviewService _reviewService;
+        private readonly IMapper _mapper;
 
-        public ReviewController(IReviewService reviewService) {
+        public ReviewController(IReviewService reviewService, IMapper mapper) {
             _reviewService = reviewService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -30,9 +34,11 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddReview([FromBody] Review review) {
-            await _reviewService.AddReviewAsync(review);
-            return CreatedAtAction(nameof(GetReviewById), new { id = review.Id }, review);
+        public async Task<IActionResult> AddReview([FromBody] ReviewRequest reviewRequest) {
+            Review newReview = _mapper.Map<Review>(reviewRequest);
+
+            await _reviewService.AddReviewAsync(newReview);
+            return CreatedAtAction(nameof(GetReviewById), new { id = newReview.Id }, newReview);
         }
 
         [HttpPut("{id}")]
