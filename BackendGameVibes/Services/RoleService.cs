@@ -12,7 +12,7 @@ namespace BackendGameVibes.Services {
             _userManager = userManager;
         }
 
-        public async Task CreateRolesAndUsers() {
+        public async Task InitRolesAndUsers() {
             // Creating admin role    
             bool x = await _roleManager.RoleExistsAsync("admin");
             if (!x) {
@@ -29,7 +29,6 @@ namespace BackendGameVibes.Services {
 
                 IdentityResult chkUser = await _userManager.CreateAsync(user, userPWD);
 
-                //Add default User to Role Admin    
                 if (chkUser.Succeeded) {
                     var result1 = await _userManager.AddToRoleAsync(user, "admin");
                 }
@@ -41,6 +40,19 @@ namespace BackendGameVibes.Services {
                 var role = new IdentityRole();
                 role.Name = "mod";
                 await _roleManager.CreateAsync(role);
+
+                //Mod         
+                var user = new UserGameVibes();
+                user.UserName = "mod";
+                user.Email = "mod@mod.com";
+                user.EmailConfirmed = true;
+                string userPWD = "Mod123.";
+
+                IdentityResult chkUser = await _userManager.CreateAsync(user, userPWD);
+
+                if (chkUser.Succeeded) {
+                    var result1 = await _userManager.AddToRoleAsync(user, "mod");
+                }
             }
 
             // Creating user role     
@@ -49,6 +61,19 @@ namespace BackendGameVibes.Services {
                 var role = new IdentityRole();
                 role.Name = "user";
                 await _roleManager.CreateAsync(role);
+
+                //Normal user      
+                var newUser = new UserGameVibes();
+                newUser.UserName = "test";
+                newUser.Email = "test@test.com";
+                newUser.EmailConfirmed = true;
+                string userPWD = "Test123.";
+
+                IdentityResult chkUser = await _userManager.CreateAsync(newUser, userPWD);
+
+                if (chkUser.Succeeded) {
+                    await _userManager.AddToRoleAsync(newUser, "user");
+                }
             }
 
             // Creating guest role     

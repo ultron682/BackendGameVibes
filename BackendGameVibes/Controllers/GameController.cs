@@ -3,14 +3,15 @@ using BackendGameVibes.Services;
 using BackendGameVibes.SteamApiModels;
 using System.Threading.Tasks;
 using BackendGameVibes.Models;
+using BackendGameVibes.IServices;
 
 namespace BackendGameVibes.Controllers {
     [ApiController]
     [Route("api/[controller]")]
     public class GameController : ControllerBase {
-        private readonly GameService _gameService;
+        private readonly IGameService _gameService;
 
-        public GameController(GameService gameService) {
+        public GameController(IGameService gameService) {
             _gameService = gameService;
         }
 

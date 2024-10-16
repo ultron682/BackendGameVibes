@@ -146,35 +146,25 @@ app.Services.GetService<SteamService>(); // on start backend download steam game
 
 using (var scope = app.Services.CreateAsyncScope()) {
     //var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.EnsureCreated();
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    //var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserGameVibes>>();
+    //var steamService = scope.ServiceProvider.GetRequiredService<SteamService>();
     var roleService = scope.ServiceProvider.GetRequiredService<RoleService>();
-    await roleService!.CreateRolesAndUsers();
+    await roleService!.InitRolesAndUsers();
 
-    //Default normal user      
-    var newUser = new UserGameVibes();
-    newUser.UserName = "test";
-    newUser.Email = "test@test.com";
-    newUser.EmailConfirmed = true;
-    string userPWD = "Test123.";
-
-    IdentityResult chkUser = await userManager.CreateAsync(newUser, userPWD);
-
-    if (chkUser.Succeeded) { // this is automatic in RegisterUser method
-        await userManager.AddToRoleAsync(newUser, "user");
-    }
-
-    UserGameVibes? user = await userManager.FindByEmailAsync(newUser.Email);
+    UserGameVibes? user = await userManager.FindByEmailAsync("test@test.com");
 
     var reviewService = scope.ServiceProvider.GetRequiredService<IReviewService>();
 
     var review = await reviewService.GetReviewByIdAsync(1);
 
-    var steamService = scope.ServiceProvider.GetRequiredService<SteamService>();
-    //await steamService.GetInfoGame(292030);
+
 
     var gameService = scope.ServiceProvider.GetRequiredService<IGameService>();
-    Game? createdGame = await gameService.CreateGame(292030);
+    Game? createdGame = await gameService.CreateGame(292030); // The Witcher 3
+    await gameService.CreateGame(20900); // The Witcher 1
+    await gameService.CreateGame(20920); // The Witcher 2
+
     if (createdGame != null) {
         await reviewService.AddReviewAsync(new Review {
             GameId = createdGame!.Id,

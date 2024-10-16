@@ -15,7 +15,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPost("init")]
         public async Task CreateRolesAndUsers() {
-            await _roleService.CreateRolesAndUsers();
+            await _roleService.InitRolesAndUsers();
         }
 
         [HttpPost]
