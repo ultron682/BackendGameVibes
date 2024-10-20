@@ -1,10 +1,11 @@
-﻿using BackendGameVibes.Models;
+﻿using BackendGameVibes.IServices;
+using BackendGameVibes.Models;
 using Microsoft.AspNetCore.Identity;
 
 
 namespace BackendGameVibes.Services;
 
-public class RoleService : IDisposable {
+public class RoleService : IRoleService {
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly UserManager<UserGameVibes> _userManager;
 

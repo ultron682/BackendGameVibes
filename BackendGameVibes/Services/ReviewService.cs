@@ -1,6 +1,8 @@
 ﻿using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendGameVibes.Services {
@@ -50,9 +52,20 @@ namespace BackendGameVibes.Services {
             return review;
         }
 
-        public async Task AddReviewAsync(Review review) {
-            _context.Reviews.Add(review);
-            await _context.SaveChangesAsync();
+        public async Task<Review?> AddReviewAsync(Review review) {
+            Game? foundGame = null;
+            if (review.GameId != null && review.GameId != 0)
+                foundGame = await _context.Games.Where(g => g.Id == review.GameId).FirstOrDefaultAsync();
+
+            if (foundGame != null) {
+                _context.Reviews.Add(review);
+                await _context.SaveChangesAsync();
+                return review;
+            }
+            else {
+                return null;
+            }
+
         }
 
         public async Task UpdateReviewAsync(Review review) {

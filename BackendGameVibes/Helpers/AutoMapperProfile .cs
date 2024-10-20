@@ -6,6 +6,7 @@ namespace BackendGameVibes.Helpers {
     public class AutoMapperProfile : Profile {
         public AutoMapperProfile() {
             CreateMap<ReviewRequest, Review>();
+            CreateMap<Review, ReviewRequest>();
         }
     }
 }

@@ -48,7 +48,7 @@ namespace BackendGameVibes.Services {
 
         public async Task<string> GenerateJwtToken(UserGameVibes user) {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-            var token = JwtTokenGenerator.GenerateToken(user.Email!, user.UserName!, key, _configuration["Jwt:Issuer"]!, _configuration["Jwt:Audience"]!);
+            var token = JwtTokenGenerator.GenerateToken(user.Email!, user.UserName!, user.Id, key, _configuration["Jwt:Issuer"]!, _configuration["Jwt:Audience"]!);
             return token;
         }
 
@@ -70,7 +70,7 @@ namespace BackendGameVibes.Services {
 
             var accountInfo = await _context.Users
                 .Where(u => u.Id == userId)
-                //.Include(u => u.IdentityRole)
+                .Include(u => u.UserReviews)
                 .Include(u => u.ForumRole)
                 .Select(u => new {
                     u.Id,
@@ -90,11 +90,6 @@ namespace BackendGameVibes.Services {
                         r.Comment,
                         r.CreatedAt
                     }).ToArray(),
-                    //CodeSnippets = u.CodeSnippets.Select(cs => new
-                    //{
-                    //    cs.UniqueId,
-                    //    Code = cs.Code.Length > 20 ? cs.Code.Substring(0, 20) : cs.Code
-                    //}).ToArray()
                 })
                 .FirstOrDefaultAsync();
 

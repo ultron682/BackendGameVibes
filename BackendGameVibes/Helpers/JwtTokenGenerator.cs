@@ -2,21 +2,18 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace BackendGameVibes.Helpers
-{
-    public static class JwtTokenGenerator
-    {
-        public static string GenerateToken(string email, string username, SymmetricSecurityKey key, string issuer, string audience)
-        {
+namespace BackendGameVibes.Helpers {
+    public static class JwtTokenGenerator {
+        public static string GenerateToken(string email, string username, string userId, SymmetricSecurityKey key, string issuer, string audience) {
             var claims = new[]
             {
                 new Claim(ClaimTypes.Email, email),
                 new Claim(ClaimTypes.Name, username),
-                new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
+                new Claim(ClaimTypes.NameIdentifier, userId)
              };
 
-            Console.WriteLine("email" + email);
-            Console.WriteLine("username" + username);
+            //Console.WriteLine("email" + email);
+            //Console.WriteLine("username" + username);
 
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 

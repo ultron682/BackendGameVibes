@@ -13,10 +13,10 @@ namespace BackendGameVibes.Models.Requests {
 }
     */
     public class ReviewRequest {
-        [DefaultValue("long required userID")]
-        public string UserGameVibesId { get; set; }
-        [DefaultValue("20920")]
-        public int GameId { get; set; }
+        //[DefaultValue("long required userID")]
+        //public string? UserGameVibesId { get; set; }
+        [DefaultValue("1")]
+        public int? GameId { get; set; }
         public double GeneralScore { get; set; }
         [DefaultValue("9")]
         public double GraphicsScore { get; set; }

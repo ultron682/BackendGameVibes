@@ -5,6 +5,8 @@ using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Requests;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace BackendGameVibes.Controllers {
     [ApiController]
@@ -34,11 +36,20 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> AddReview([FromBody] ReviewRequest reviewRequest) {
-            Review newReview = _mapper.Map<Review>(reviewRequest);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
 
-            await _reviewService.AddReviewAsync(newReview);
-            return CreatedAtAction(nameof(GetReviewById), new { id = newReview.Id }, newReview);
+            Review newReview = _mapper.Map<Review>(reviewRequest);
+            newReview.UserGameVibesId = userId;
+
+            Review? review = await _reviewService.AddReviewAsync(newReview);
+            if (review != null)
+                return CreatedAtAction(nameof(GetReviewById), new { id = newReview.Id }, review);
+            else
+                return BadRequest("No gameId in db");
         }
 
         [HttpPut("{id}")]
