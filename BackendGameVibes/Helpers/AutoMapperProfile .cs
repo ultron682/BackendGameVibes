@@ -5,10 +5,10 @@ using BackendGameVibes.Models.Requests;
 namespace BackendGameVibes.Helpers {
     public class AutoMapperProfile : Profile {
         public AutoMapperProfile() {
-            CreateMap<ReviewRequest, Review>();
-            CreateMap<Review, ReviewRequest>();
-            CreateMap<UserGameVibes, RegisterRequest>();
-            CreateMap<RegisterRequest, UserGameVibes>();
+            CreateMap<ReviewDTO, Review>();
+            CreateMap<Review, ReviewDTO>();
+            CreateMap<UserGameVibes, RegisterDTO>();
+            CreateMap<RegisterDTO, UserGameVibes>();
         }
     }
 }

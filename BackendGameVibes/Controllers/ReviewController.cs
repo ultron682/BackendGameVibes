@@ -37,7 +37,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> AddReview([FromBody] ReviewRequest reviewRequest) {
+        public async Task<IActionResult> AddReview([FromBody] ReviewDTO reviewRequest) {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
                 return Unauthorized("User not authenticated, claim not found");

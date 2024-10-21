@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace BackendGameVibes.Models.Requests {
-    public class ChangePasswordRequest {
+    public class ChangePasswordDTO {
         [Required]
         public string CurrentPassword { get; set; }
 

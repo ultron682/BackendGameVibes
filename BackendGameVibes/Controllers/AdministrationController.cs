@@ -35,7 +35,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPost("user")]
         [Authorize("admin")]
-        public async Task<IActionResult> AddUser(RegisterRequest newUserData) {
+        public async Task<IActionResult> AddUser(RegisterDTO newUserData) {
             if (newUserData == null) {
                 return BadRequest();
             }
@@ -60,7 +60,7 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpDelete("review")]
-        [Authorize(Policy ="modOrAdmin")]
+        [Authorize(Policy = "modOrAdmin")]
         public async Task<IActionResult> DeleteReview(int id) {
             var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == id);
             if (review == null) {

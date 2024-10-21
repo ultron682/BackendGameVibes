@@ -12,7 +12,7 @@ namespace BackendGameVibes.Models.Requests {
   "comment": "Bardzo fajna gierka. Polecam Magda Gessler"
 }
     */
-    public class ReviewRequest {
+    public class ReviewDTO {
         //[DefaultValue("long required userID")]
         //public string? UserGameVibesId { get; set; }
         [DefaultValue("1")]

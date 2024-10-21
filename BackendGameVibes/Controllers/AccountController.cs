@@ -21,7 +21,7 @@ namespace BackendGameVibes.Controllers {
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest model) {
+        public async Task<IActionResult> Register([FromBody] RegisterDTO model) {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -46,7 +46,7 @@ namespace BackendGameVibes.Controllers {
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest model) {
+        public async Task<IActionResult> Login([FromBody] LoginDTO model) {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -149,7 +149,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPost("ChangePassword")]
         [Authorize]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest model) {
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO model) {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 

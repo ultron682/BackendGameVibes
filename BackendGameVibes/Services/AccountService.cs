@@ -34,7 +34,7 @@ namespace BackendGameVibes.Services {
             _roleManager = roleManager;
         }
 
-        public async Task<IdentityResult> RegisterUserAsync(RegisterRequest model) {
+        public async Task<IdentityResult> RegisterUserAsync(RegisterDTO model) {
             var user = new UserGameVibes { UserName = model.UserName, Email = model.Email };
             IdentityResult userResult = await _userManager.CreateAsync(user, model.Password);
 
