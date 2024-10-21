@@ -1,7 +1,9 @@
 ﻿using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
+using BackendGameVibes.Models.Requests;
 using BackendGameVibes.SteamApiModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendGameVibes.Services {
@@ -41,11 +43,11 @@ namespace BackendGameVibes.Services {
 
         public async Task<object?> GetGame(int id) {
             return await _context.Games
-                .Where(g => g.Id == id)
                 .Include(g => g.Platforms)
                 .Include(g => g.Genres)
                 .Include(g => g.GameImages)
                 .Include(g => g.SystemRequirements)
+                .Where(g => g.Id == id)
                 .Select(g => new {
                     g.Id,
                     g.Title,
@@ -114,8 +116,37 @@ namespace BackendGameVibes.Services {
             return game;
         }
 
-        public void Dispose() {
-
+        // todo rating
+        public async Task<object[]> GetFilteredGames(FiltersGamesDTO filtersGamesDTO) {
+            return await _context.Games
+                .Include(g => g.Platforms)
+                .Include(g => g.Genres)
+                .Include(g => g.GameImages)
+                .Include(g => g.SystemRequirements)
+                .Where(g => filtersGamesDTO.GenresIds.Contains(g.Genres.Select(g => g.Id).FirstOrDefault()))
+                .Select(g => new {
+                    g.Id,
+                    g.Title,
+                    g.HeaderImage,
+                    g.ReleaseDate,
+                    g.SteamId
+                })
+                .ToArrayAsync();
         }
+
+        public async Task<object[]> GetGenres() {
+            return await _context.Genres
+                .Select(g => new {
+                    g.Id,
+                    g.Name
+                })
+                .ToArrayAsync();
+        }
+
+        public void Dispose() {
+            _context.Dispose();
+        }
+
+
     }
 }

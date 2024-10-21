@@ -4,6 +4,8 @@ using BackendGameVibes.SteamApiModels;
 using System.Threading.Tasks;
 using BackendGameVibes.Models;
 using BackendGameVibes.IServices;
+using BackendGameVibes.Models.Requests;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackendGameVibes.Controllers {
     [ApiController]
@@ -51,12 +53,33 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpPost]
+        [Authorize(Roles = "admin,mod")]
         public async Task<ActionResult<Game>> CreateGame(int steamGameId = 292030) {
             var game = await _gameService.CreateGame(steamGameId);
             if (game == null)
                 return BadRequest("SteamGameData is null");
 
             return Ok(game);
+        }
+
+        [HttpGet("genres")]
+        public async Task<ActionResult<object[]>> GetGenres() {
+            var genres = await _gameService.GetGenres();
+            if (genres == null || genres.Length == 0)
+                return NotFound("No Genres");
+
+            return Ok(genres);
+        }
+
+        [HttpGet("filter")]
+        public async Task<ActionResult<IEnumerable<object>>> GetFilteredGames([FromQuery] FiltersGamesDTO filtersGamesDTO) {
+            var filteredGames = await _gameService.GetFilteredGames(filtersGamesDTO);
+
+            if (filteredGames == null || !filteredGames.Any()) {
+                return NotFound("No games found with the given filters.");
+            }
+
+            return Ok(filteredGames);
         }
     }
 }

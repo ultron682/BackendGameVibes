@@ -1,4 +1,5 @@
 ﻿using BackendGameVibes.Models;
+using BackendGameVibes.Models.Requests;
 using BackendGameVibes.SteamApiModels;
 
 namespace BackendGameVibes.IServices {
@@ -8,5 +9,8 @@ namespace BackendGameVibes.IServices {
         Task<SteamApp[]> GetAllSteamIdsGames();
         Task<object?> GetGame(int id);
         Task<object[]> GetGames();
+        Task<object[]> GetFilteredGames(FiltersGamesDTO filtersGamesDTO);
+        Task<object[]> GetGenres();
+
     }
 }
