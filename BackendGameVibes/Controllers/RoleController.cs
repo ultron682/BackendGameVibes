@@ -13,6 +13,11 @@ namespace BackendGameVibes.Controllers {
             _roleService = roleService;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAllRoles() {
+            return Ok(await _roleService.GetAllRoles());
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateNewRole([Required] string name) {
             IdentityResult result = await _roleService.CreateNewRole(name);
