@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendGameVibes.Controllers {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class AdministrationController : ControllerBase {
@@ -26,14 +27,14 @@ namespace BackendGameVibes.Controllers {
 
 
         // dane logowania konta admina w DbInitializer.cs
-        [Authorize("admin")]
         [HttpGet("user")]
+        [Authorize("admin")]
         public async Task<IActionResult> GetAllUsers() {
             return Ok(await _context.Users.ToArrayAsync());
         }
 
-        [Authorize("admin")]
         [HttpPost("user")]
+        [Authorize("admin")]
         public async Task<IActionResult> AddUser(RegisterRequest newUserData) {
             if (newUserData == null) {
                 return BadRequest();
@@ -41,13 +42,13 @@ namespace BackendGameVibes.Controllers {
 
             IdentityResult identityResult = await _accountService.RegisterUserAsync(newUserData);
             if (identityResult.Succeeded)
-                return Ok();
+                return Ok(identityResult.Succeeded);
             else
-                return BadRequest();
+                return BadRequest("User exist");
         }
 
-        [Authorize("admin")]
         [HttpDelete("user")]
+        [Authorize("admin")]
         public async Task<IActionResult> DeleteUser(string userId) {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null) {
@@ -58,12 +59,18 @@ namespace BackendGameVibes.Controllers {
             return Ok();
         }
 
-        //[HttpDelete("review")]
-        //[Authorize("mod,admin")]
-        //public async Task<IActionResult> DeleteReview(int id) {
-        //    //todo
-        //    return Ok();
-        //}
+        [HttpDelete("review")]
+        [Authorize(Policy ="modOrAdmin")]
+        public async Task<IActionResult> DeleteReview(int id) {
+            var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == id);
+            if (review == null) {
+                return NotFound();
+            }
+
+            _context.Reviews.Remove(review);
+            await _context.SaveChangesAsync();
+            return Ok("removed");
+        }
 
     }
 }

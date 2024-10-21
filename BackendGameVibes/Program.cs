@@ -90,6 +90,7 @@ builder.Services.AddAuthorization(options => {
     options.AddPolicy("mod", policy => policy.RequireRole("mod"));
     options.AddPolicy("user", policy => policy.RequireRole("user"));
     options.AddPolicy("guest", policy => policy.RequireRole("guest"));
+    options.AddPolicy("modOrAdmin", policy => policy.RequireRole("mod", "admin"));
 });
 
 builder.Services.Configure<IdentityOptions>(options => {
