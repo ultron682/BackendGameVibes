@@ -3,6 +3,6 @@
 namespace BackendGameVibes.IServices {
     public interface IRoleService : IDisposable {
         Task<IdentityResult> CreateNewRole(string name);
-        Task InitRolesAndUsers();
+        Task<IEnumerable<object>> GetAllRoles();
     }
 }
