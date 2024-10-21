@@ -144,7 +144,10 @@ namespace BackendGameVibes.Services {
         }
 
         public void Dispose() {
-
+            _context.Dispose();
+            _userManager.Dispose();
+            _roleManager.Dispose();
+            Console.WriteLine("Account service dispose");
         }
     }
 }
