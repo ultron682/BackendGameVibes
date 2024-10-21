@@ -110,8 +110,8 @@ namespace BackendGameVibes.Controllers {
             return isUpdated ? Ok() : BadRequest("Failed to update username");
         }
 
-        [AllowAnonymous]
         [HttpPost("send-confirmation-email")]
+        [AllowAnonymous]
         public async Task<IActionResult> SendConfirmationEmail([FromForm] string email) {
             var user = await _accountService.GetUserByEmailAsync(email);
             if (user == null)
@@ -121,9 +121,8 @@ namespace BackendGameVibes.Controllers {
             return isSent ? Ok("Mail sent") : BadRequest("Failed to send confirmation email");
         }
 
-
-        [AllowAnonymous]
         [HttpGet("confirm")]
+        [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string userId, string token) {
             if (token == null) {
                 return BadRequest("token == null");
@@ -148,8 +147,8 @@ namespace BackendGameVibes.Controllers {
             }
         }
 
-        [Authorize]
         [HttpPost("ChangePassword")]
+        [Authorize]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest model) {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -170,6 +169,22 @@ namespace BackendGameVibes.Controllers {
             }
 
             return Ok("Password changed successfully");
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("reset-password")]
+        public async Task<IActionResult> StartResetPassword([FromBody] string email) {
+            var (success, message) = await _accountService.StartResetPasswordAsync(email);
+            return success ? Ok("Reset password email sent") : BadRequest(message);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("confirm-reset-password")]
+        public async Task<IActionResult> ConfirmResetPassword(string email, string token, string newPassword) {
+            var result = await _accountService.ConfirmResetPasswordAsync(email, token, newPassword);
+            return result.Succeeded ? Ok("Password reset successfully") : BadRequest("Failed to reset password");
         }
     }
 }

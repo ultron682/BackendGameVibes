@@ -6,8 +6,10 @@ using BackendGameVibes.Models.Requests;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.Text;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 
 namespace BackendGameVibes.Services {
@@ -60,6 +62,7 @@ namespace BackendGameVibes.Services {
             return await _userManager.FindByIdAsync(userId);
         }
 
+        // unused method todo
         public async Task SaveTokenToDB(IdentityUserToken<string> identityUserToken) {
             _context.UserTokens.Add(identityUserToken);
             await _context.SaveChangesAsync();
@@ -143,13 +146,6 @@ namespace BackendGameVibes.Services {
             return await _userManager.ConfirmEmailAsync(user, token);
         }
 
-        public void Dispose() {
-            _context.Dispose();
-            _userManager.Dispose();
-            _roleManager.Dispose();
-            Console.WriteLine("Account service dispose");
-        }
-
         public async Task<(bool Succeeded, IEnumerable<string> Errors)> ChangePasswordAsync(string userId, string currentPassword, string newPassword) {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) {
@@ -165,6 +161,57 @@ namespace BackendGameVibes.Services {
             await _signInManager.RefreshSignInAsync(user);
 
             return (true, Enumerable.Empty<string>());
+        }
+
+        public async Task<(bool, string)> StartResetPasswordAsync(string email) {
+            if (email == null || string.IsNullOrWhiteSpace(email))
+                return (false, "No email data");
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return (false, "No user found");
+
+            string resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            if (string.IsNullOrEmpty(resetToken))
+                return (false, "Error while generating reset token");
+
+            resetToken = Uri.EscapeDataString(resetToken);
+            var ConfirmationLink = $"http://localhost:3000/account/reset?userId={user.Id}&token={resetToken}";
+
+            Console.WriteLine($"Reset password link: <a href='{ConfirmationLink!}'>clicking here</a>.");
+
+            string emailBody = await _htmlTemplateService.GetEmailTemplateAsync("wwwroot/EmailTemplates/reset_password.html", new Dictionary<string, string>
+            {
+                { "ConfirmationLink", ConfirmationLink! },
+                { "UserName", user.UserName! }
+            });
+
+            _mail_Service.SendMail(new MailData() {
+                EmailBody = emailBody,
+                EmailSubject = "Reset password for account",
+                EmailToId = email,
+                EmailToName = user.UserName!
+            });
+
+            return (true, "Ok");
+        }
+
+        public async Task<IdentityResult> ConfirmResetPasswordAsync(string email, string resetToken, string newPassword) {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) {
+                return IdentityResult.Failed(new IdentityError { Description = "User not found" });
+            }
+
+            resetToken = Uri.UnescapeDataString(resetToken);
+
+            return await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
+        }
+
+        public void Dispose() {
+            _context.Dispose();
+            _userManager.Dispose();
+            _roleManager.Dispose();
+            Console.WriteLine("Account service dispose");
         }
     }
 }

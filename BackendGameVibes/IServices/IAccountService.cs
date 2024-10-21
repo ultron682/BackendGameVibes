@@ -15,5 +15,7 @@ namespace BackendGameVibes.IServices {
         Task<bool> SendConfirmationEmail(string email, UserGameVibes user);
         Task<bool> UpdateUserNameAsync(string userId, string newUsername);
         Task<(bool Succeeded, IEnumerable<string> Errors)> ChangePasswordAsync(string userId, string currentPassword, string newPassword);
+        Task<(bool, string)> StartResetPasswordAsync(string email);
+        Task<IdentityResult> ConfirmResetPasswordAsync(string email, string resetToken, string newPassword);
     }
 }
