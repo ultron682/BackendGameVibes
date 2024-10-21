@@ -31,7 +31,7 @@ namespace BackendGameVibes.Helpers {
             using var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             using var reviewService = scope.ServiceProvider.GetRequiredService<IReviewService>();
             using var gameService = scope.ServiceProvider.GetRequiredService<IGameService>();
-            Random random = new Random();
+            Random random = new();
 
 
             Console.WriteLine("Start Init DB");
@@ -52,9 +52,9 @@ namespace BackendGameVibes.Helpers {
 
                 IdentityResult chkUser = await userManager.CreateAsync(newUser, userPWD);
 
-                if (chkUser.Succeeded) {
-                    var result1 = await userManager.AddToRoleAsync(newUser, role.Name);
-                }
+                newUser = await userManager.FindByEmailAsync(newUser.Email);
+                var result1 = await userManager.AddToRoleAsync(newUser!, "admin");
+
             }
 
             // Creating mod role     
@@ -75,7 +75,7 @@ namespace BackendGameVibes.Helpers {
                 IdentityResult chkUser = await userManager.CreateAsync(newUser, userPWD);
 
                 if (chkUser.Succeeded) {
-                    var result1 = await userManager.AddToRoleAsync(newUser, role.Name);
+                    var result1 = await userManager.AddToRoleAsync(newUser, "mod");
                 }
             }
 
@@ -97,7 +97,7 @@ namespace BackendGameVibes.Helpers {
                 IdentityResult chkUser = await userManager.CreateAsync(newUser, userPWD);
 
                 if (chkUser.Succeeded) {
-                    await userManager.AddToRoleAsync(newUser, role.Name);
+                    await userManager.AddToRoleAsync(newUser, "user");
                 }
             }
 

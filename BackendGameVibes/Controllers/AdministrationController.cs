@@ -1,28 +1,69 @@
-﻿using BackendGameVibes.Data;
+﻿using AutoMapper;
+using BackendGameVibes.Data;
+using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
+using BackendGameVibes.Models.Requests;
 using BackendGameVibes.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendGameVibes.Controllers {
-    [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "admin")]
+    [Route("api/[controller]")]
     public class AdministrationController : ControllerBase {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
+        private readonly IAccountService _accountService;
 
-
-        public AdministrationController(ApplicationDbContext context) {
+        public AdministrationController(ApplicationDbContext context, IMapper mapper, IAccountService accountService) {
             _context = context;
+            _mapper = mapper;
+            _accountService = accountService;
         }
 
 
-        // endpoint przetestowany i dziala tylko dla admina. dane logowania konta admina w RoleController
-        [HttpGet()]
+        // dane logowania konta admina w DbInitializer.cs
+        [Authorize("admin")]
+        [HttpGet("user")]
         public async Task<IActionResult> GetAllUsers() {
             return Ok(await _context.Users.ToArrayAsync());
         }
+
+        [Authorize("admin")]
+        [HttpPost("user")]
+        public async Task<IActionResult> AddUser(RegisterRequest newUserData) {
+            if (newUserData == null) {
+                return BadRequest();
+            }
+
+            IdentityResult identityResult = await _accountService.RegisterUserAsync(newUserData);
+            if (identityResult.Succeeded)
+                return Ok();
+            else
+                return BadRequest();
+        }
+
+        [Authorize("admin")]
+        [HttpDelete("user")]
+        public async Task<IActionResult> DeleteUser(string userId) {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null) {
+                return NotFound();
+            }
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+        //[HttpDelete("review")]
+        //[Authorize("mod,admin")]
+        //public async Task<IActionResult> DeleteReview(int id) {
+        //    //todo
+        //    return Ok();
+        //}
+
     }
 }

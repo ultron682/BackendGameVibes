@@ -25,11 +25,11 @@ namespace BackendGameVibes.Controllers {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _accountService.RegisterUser(model);
+            var result = await _accountService.RegisterUserAsync(model);
 
             if (result.Succeeded) {
                 var user = await _accountService.GetUserByEmailAsync(model.Email);
-                await _accountService.SendConfirmationEmail(model.Email, user);
+                await _accountService.SendConfirmationEmailAsync(model.Email, user);
                 return Ok("UserRegisteredSuccessfully");
             }
 
@@ -57,9 +57,9 @@ namespace BackendGameVibes.Controllers {
                     return StatusCode(470, "Email unconfirmed");
                 }
 
-                var loginResult = await _accountService.LoginUser(user, model.Password);
+                var loginResult = await _accountService.LoginUserAsync(user, model.Password);
                 if (loginResult != null && loginResult.Succeeded) {
-                    var token = await _accountService.GenerateJwtToken(user);
+                    var token = await _accountService.GenerateJwtTokenAsync(user);
 
                     //var userToken = new IdentityUserToken<string> {
                     //    UserId = user.Id,
@@ -117,7 +117,7 @@ namespace BackendGameVibes.Controllers {
             if (user == null)
                 return NotFound("User not found");
 
-            var isSent = await _accountService.SendConfirmationEmail(email, user);
+            var isSent = await _accountService.SendConfirmationEmailAsync(email, user);
             return isSent ? Ok("Mail sent") : BadRequest("Failed to send confirmation email");
         }
 

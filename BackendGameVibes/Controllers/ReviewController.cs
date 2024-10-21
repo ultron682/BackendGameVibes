@@ -52,15 +52,15 @@ namespace BackendGameVibes.Controllers {
                 return BadRequest("No gameId in db");
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateReview(int id, [FromBody] Review review) {
-            if (id != review.Id) {
-                return BadRequest();
-            }
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> UpdateReview(int id, [FromBody] Review review) {
+        //    if (id != review.Id) {
+        //        return BadRequest();
+        //    }
 
-            await _reviewService.UpdateReviewAsync(review);
-            return NoContent();
-        }
+        //    await _reviewService.UpdateReviewAsync(review);
+        //    return NoContent();
+        //}
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReview(int id) {

@@ -34,7 +34,7 @@ namespace BackendGameVibes.Services {
             _roleManager = roleManager;
         }
 
-        public async Task<IdentityResult> RegisterUser(RegisterRequest model) {
+        public async Task<IdentityResult> RegisterUserAsync(RegisterRequest model) {
             var user = new UserGameVibes { UserName = model.UserName, Email = model.Email };
             IdentityResult userResult = await _userManager.CreateAsync(user, model.Password);
 
@@ -48,13 +48,15 @@ namespace BackendGameVibes.Services {
             return await _userManager.FindByEmailAsync(email);
         }
 
-        public async Task<string> GenerateJwtToken(UserGameVibes user) {
+        public async Task<string> GenerateJwtTokenAsync(UserGameVibes user) {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-            var token = await JwtTokenGenerator.GenerateToken(user.Email!, user.UserName!, user.Id, key, _configuration["Jwt:Issuer"]!, _configuration["Jwt:Audience"]!);
+            var roles = await _userManager.GetRolesAsync(user);
+            var rolesString = string.Join(",", roles);
+            var token = await JwtTokenGenerator.GenerateToken(user.Email!, user.UserName!, user.Id, rolesString, key, _configuration["Jwt:Issuer"]!, _configuration["Jwt:Audience"]!);
             return token;
         }
 
-        public async Task<SignInResult?> LoginUser(UserGameVibes user, string password) {
+        public async Task<SignInResult?> LoginUserAsync(UserGameVibes user, string password) {
             return await _signInManager.PasswordSignInAsync(user.UserName!, password, true, false);
         }
 
@@ -62,8 +64,8 @@ namespace BackendGameVibes.Services {
             return await _userManager.FindByIdAsync(userId);
         }
 
-        // unused method todo
-        public async Task SaveTokenToDB(IdentityUserToken<string> identityUserToken) {
+        // unused method todo: remove?
+        public async Task SaveTokenToDbAsync(IdentityUserToken<string> identityUserToken) {
             _context.UserTokens.Add(identityUserToken);
             await _context.SaveChangesAsync();
         }
@@ -110,7 +112,7 @@ namespace BackendGameVibes.Services {
             return true;
         }
 
-        public async Task<bool> SendConfirmationEmail(string email, UserGameVibes user) {
+        public async Task<bool> SendConfirmationEmailAsync(string email, UserGameVibes user) {
             if (user == null || email == null)
                 return false;
 

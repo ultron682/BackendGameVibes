@@ -17,27 +17,26 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Services to the container
 builder.Services.AddCors(options => {
-        options.AddDefaultPolicy(
-            builder => {
-                builder.AllowAnyOrigin();
-                builder.AllowAnyMethod();
-                builder.AllowAnyHeader();
-            });
-    });
+    options.AddDefaultPolicy(
+        builder => {
+            builder.AllowAnyOrigin();
+            builder.AllowAnyMethod();
+            builder.AllowAnyHeader();
+        });
+});
 
 builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddSwaggerGen(c => {
-        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
-            In = ParameterLocation.Header,
-            Description = "Please enter token",
-            Name = "Authorization",
-            Type = SecuritySchemeType.Http,
-            BearerFormat = "JWT",
-            Scheme = "bearer"
-        });
-        c.AddSecurityRequirement(new OpenApiSecurityRequirement
-        {
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
+        In = ParameterLocation.Header,
+        Description = "Please enter token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
         {
             new OpenApiSecurityScheme
             {
@@ -50,13 +49,13 @@ builder.Services.AddSwaggerGen(c => {
             new string[]{}
         }
     });
-    });
+});
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => {
-        //options.UseMySql(builder.Configuration.GetConnectionString("GameVibesDbConnection"), new MySqlServerVersion(new Version(8, 0, 35)));
-        options.UseSqlite("Data Source=GameVibesDatabase.db;Cache=Shared");
-        options.EnableSensitiveDataLogging(false);
-    }
+    //options.UseMySql(builder.Configuration.GetConnectionString("GameVibesDbConnection"), new MySqlServerVersion(new Version(8, 0, 35)));
+    options.UseSqlite("Data Source=GameVibesDatabase.db;Cache=Shared");
+    options.EnableSensitiveDataLogging(false);
+}
 );
 
 builder.Services
