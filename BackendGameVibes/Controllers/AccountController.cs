@@ -7,40 +7,33 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 
-namespace BackendGameVibes.Controllers
-{
+namespace BackendGameVibes.Controllers {
     [ApiController]
     [Route("account")]
     [Authorize]
-    public class AccountController : ControllerBase
-    {
+    public class AccountController : ControllerBase {
         private readonly IAccountService _accountService;
 
-        public AccountController(IAccountService accountService)
-        {
+        public AccountController(IAccountService accountService) {
             _accountService = accountService;
         }
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequestGameVibes model)
-        {
+        public async Task<IActionResult> Register([FromBody] RegisterRequest model) {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var result = await _accountService.RegisterUser(model);
 
-            if (result.Succeeded)
-            {
+            if (result.Succeeded) {
                 var user = await _accountService.GetUserByEmailAsync(model.Email);
                 await _accountService.SendConfirmationEmail(model.Email, user);
                 return Ok("UserRegisteredSuccessfully");
             }
 
-            foreach (var error in result.Errors)
-            {
-                return error.Code switch
-                {
+            foreach (var error in result.Errors) {
+                return error.Code switch {
                     "DuplicateUserName" => StatusCode(450, "Username already taken"),
                     "DuplicateEmail" => StatusCode(452, "Email already taken"),
                     _ => StatusCode(454, error.Code)
@@ -52,23 +45,19 @@ namespace BackendGameVibes.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequestGameVibes model)
-        {
+        public async Task<IActionResult> Login([FromBody] LoginRequest model) {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var user = await _accountService.GetUserByEmailAsync(model.Email);
 
-            if (user != null)
-            {
-                if (!user.EmailConfirmed)
-                {
+            if (user != null) {
+                if (!user.EmailConfirmed) {
                     return StatusCode(470, "Email unconfirmed");
                 }
 
                 var loginResult = await _accountService.LoginUser(user, model.Password);
-                if (loginResult != null && loginResult.Succeeded)
-                {
+                if (loginResult != null && loginResult.Succeeded) {
                     var token = await _accountService.GenerateJwtToken(user);
 
                     //var userToken = new IdentityUserToken<string> {
@@ -89,8 +78,7 @@ namespace BackendGameVibes.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetAccountInfo()
-        {
+        public async Task<IActionResult> GetAccountInfo() {
             var email = User.FindFirstValue(ClaimTypes.Email);
             if (email == null)
                 return Unauthorized("User not authenticated");
@@ -105,8 +93,7 @@ namespace BackendGameVibes.Controllers
 
         [HttpPatch("nickname")]
         [Authorize]
-        public async Task<IActionResult> ChangeNickname([FromForm] string newUsername)
-        {
+        public async Task<IActionResult> ChangeNickname([FromForm] string newUsername) {
             if (string.IsNullOrWhiteSpace(newUsername))
                 return BadRequest("Invalid username");
 
@@ -124,8 +111,7 @@ namespace BackendGameVibes.Controllers
 
         [AllowAnonymous]
         [HttpPost("send-confirmation-email")]
-        public async Task<IActionResult> SendConfirmationEmail([FromForm] string email)
-        {
+        public async Task<IActionResult> SendConfirmationEmail([FromForm] string email) {
             var user = await _accountService.GetUserByEmailAsync(email);
             if (user == null)
                 return NotFound("User not found");
@@ -137,29 +123,23 @@ namespace BackendGameVibes.Controllers
 
         [AllowAnonymous]
         [HttpGet("confirm")]
-        public async Task<IActionResult> ConfirmEmail(string userId, string token)
-        {
-            if (token == null)
-            {
+        public async Task<IActionResult> ConfirmEmail(string userId, string token) {
+            if (token == null) {
                 return BadRequest("token == null");
             }
 
             var user = await _accountService.GetUserByIdAsync(userId);
-            if (user == null)
-            {
+            if (user == null) {
                 return NotFound("Not found user");
             }
 
             var result = await _accountService.ConfirmEmailAsync(userId, token);
 
-            if (result.Succeeded)
-            {
+            if (result.Succeeded) {
                 return Redirect("http://localhost:3000/account/confirmedEmail/");
             }
-            else
-            {
-                foreach (var error in result.Errors)
-                {
+            else {
+                foreach (var error in result.Errors) {
                     Console.WriteLine(error.Description);
                 }
 

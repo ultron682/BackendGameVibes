@@ -32,7 +32,7 @@ namespace BackendGameVibes.Services {
             _roleManager = roleManager;
         }
 
-        public async Task<IdentityResult> RegisterUser(RegisterRequestGameVibes model) {
+        public async Task<IdentityResult> RegisterUser(RegisterRequest model) {
             var user = new UserGameVibes { UserName = model.UserName, Email = model.Email };
             IdentityResult userResult = await _userManager.CreateAsync(user, model.Password);
 
@@ -48,7 +48,7 @@ namespace BackendGameVibes.Services {
 
         public async Task<string> GenerateJwtToken(UserGameVibes user) {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-            var token = JwtTokenGenerator.GenerateToken(user.Email!, user.UserName!, user.Id, key, _configuration["Jwt:Issuer"]!, _configuration["Jwt:Audience"]!);
+            var token = await JwtTokenGenerator.GenerateToken(user.Email!, user.UserName!, user.Id, key, _configuration["Jwt:Issuer"]!, _configuration["Jwt:Audience"]!);
             return token;
         }
 
