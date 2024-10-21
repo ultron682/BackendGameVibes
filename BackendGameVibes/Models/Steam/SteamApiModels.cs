@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace BackendGameVibes.SteamApiModels {
+namespace BackendGameVibes.Models.Steam {
     //for many games
     public class SteamApp { // dla pobierania wszystkich mozliwych gier ze steama
         public int Appid { get; set; }

@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BackendGameVibes.Services;
-using BackendGameVibes.SteamApiModels;
 using System.Threading.Tasks;
 using BackendGameVibes.Models;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Requests;
 using Microsoft.AspNetCore.Authorization;
+using BackendGameVibes.Models.Steam;
 
 namespace BackendGameVibes.Controllers {
     [ApiController]

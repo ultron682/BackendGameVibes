@@ -1,7 +1,8 @@
-﻿using BackendGameVibes.SteamApiModels;
+﻿using BackendGameVibes.Models.Steam;
 using System.Text.Json;
 
-namespace BackendGameVibes.Services {
+namespace BackendGameVibes.Services
+{
     public class SteamService {
         public SteamApp[] steamGames = null; // only steamID and name!!!
         private readonly HttpClient _httpClient;

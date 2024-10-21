@@ -1,8 +1,9 @@
 ﻿using BackendGameVibes.Models;
 using BackendGameVibes.Models.Requests;
-using BackendGameVibes.SteamApiModels;
+using BackendGameVibes.Models.Steam;
 
-namespace BackendGameVibes.IServices {
+namespace BackendGameVibes.IServices
+{
     public interface IGameService : IDisposable {
         Task<Game?> CreateGame(int steamGameId);
         SteamApp[] FindSteamAppByName(string searchingName);

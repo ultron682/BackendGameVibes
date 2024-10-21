@@ -2,11 +2,12 @@
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
 using BackendGameVibes.Models.Requests;
-using BackendGameVibes.SteamApiModels;
+using BackendGameVibes.Models.Steam;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackendGameVibes.Services {
+namespace BackendGameVibes.Services
+{
     public class GameService : IGameService {
         private readonly ApplicationDbContext _context;
         private readonly SteamService _steamService;
@@ -80,7 +81,7 @@ namespace BackendGameVibes.Services {
             game.HeaderImage = steamGameData.header_image;
             game.GameImages = steamGameData.screenshots.Select(s => new GameImage { ImagePath = s.path_full }).ToList();
 
-            List<SteamApiModels.Genre> steamGenres = steamGameData.genres != null ? steamGameData.genres.ToList() : new List<SteamApiModels.Genre>();
+            List<Models.Steam.Genre> steamGenres = steamGameData.genres != null ? steamGameData.genres.ToList() : new List<Models.Steam.Genre>();
             List<int> dbGenreIds = _context.Genres.Select(g => g.Id).ToList();
 
 
