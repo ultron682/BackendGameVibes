@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Text.Json;
 
 
 namespace BackendGameVibes.Controllers {
@@ -145,6 +146,30 @@ namespace BackendGameVibes.Controllers {
 
                 return BadRequest("Error");
             }
+        }
+
+        [Authorize]
+        [HttpPost("ChangePassword")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest model) {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (model.NewPassword != model.ConfirmNewPassword)
+                return BadRequest("New password and confirmation do not match");
+
+            //Console.WriteLine(JsonDocument.Parse(User).ToString());
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return NotFound("User not found");
+
+            var (succeeded, errors) = await _accountService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
+
+            if (!succeeded) {
+                return BadRequest(new { Errors = errors });
+            }
+
+            return Ok("Password changed successfully");
         }
     }
 }

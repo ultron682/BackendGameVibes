@@ -149,5 +149,22 @@ namespace BackendGameVibes.Services {
             _roleManager.Dispose();
             Console.WriteLine("Account service dispose");
         }
+
+        public async Task<(bool Succeeded, IEnumerable<string> Errors)> ChangePasswordAsync(string userId, string currentPassword, string newPassword) {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) {
+                return (false, new[] { "User not found" });
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+
+            if (!result.Succeeded) {
+                return (false, result.Errors.Select(e => e.Description));
+            }
+
+            await _signInManager.RefreshSignInAsync(user);
+
+            return (true, Enumerable.Empty<string>());
+        }
     }
 }
