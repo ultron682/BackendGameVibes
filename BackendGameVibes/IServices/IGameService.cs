@@ -12,6 +12,6 @@ namespace BackendGameVibes.IServices
         Task<object[]> GetGames();
         Task<object[]> GetFilteredGames(FiltersGamesDTO filtersGamesDTO);
         Task<object[]> GetGenres();
-
+        Task<object[]> GetLandingGames();
     }
 }
