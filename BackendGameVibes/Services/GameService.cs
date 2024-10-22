@@ -16,12 +16,12 @@ namespace BackendGameVibes.Services {
             _steamService = steamService;
         }
 
-        public async Task<SteamApp[]> GetAllSteamIdsGames() {
-            return _steamService.steamGames?[29000..30000];
+        public SteamApp[] GetAllSteamIdsGames() {
+            return _steamService.steamGames[29000..30000];
         }
 
         public SteamApp[] FindSteamAppByName(string searchingName) {
-            return _steamService.FindSteamApp(searchingName);
+            return _steamService.FindSteamApp(searchingName) ?? [];
         }
 
         public async Task<object[]> GetGames() {
@@ -55,11 +55,11 @@ namespace BackendGameVibes.Services {
                     g.Title,
                     g.Description,
                     g.HeaderImage,
-                    Platforms = g.Platforms.Select(p => new { p.Id, p.Name }),
+                    Platforms = g.Platforms!.Select(p => new { p.Id, p.Name }),
                     g.ReleaseDate,
                     g.SteamId,
-                    Genres = g.Genres.Select(g => new { g.Id, g.Name }).ToArray(),
-                    GameImages = g.GameImages.Select(image => new { image.ImagePath }),
+                    Genres = g.Genres!.Select(g => new { g.Id, g.Name }).ToArray(),
+                    GameImages = g.GameImages!.Select(image => new { image.ImagePath }),
                     Rating = g.Reviews!.Where(c => c.GameId == g.Id).Select(c => c.GameplayScore).Average().ToString("0.0")
                 })
                 .FirstOrDefaultAsync();
@@ -70,7 +70,7 @@ namespace BackendGameVibes.Services {
             if (foundGame != null)
                 return null;
 
-            Game game = new Game() { SteamId = steamGameId };
+            Game game = new() { SteamId = steamGameId };
 
             var steamGameData = await _steamService.GetInfoGame(game.SteamId);
             //Console.WriteLine(steamGameData);
@@ -83,27 +83,27 @@ namespace BackendGameVibes.Services {
             game.HeaderImage = steamGameData.header_image;
             game.GameImages = steamGameData.screenshots.Select(s => new GameImage { ImagePath = s.path_full }).ToList();
 
-            List<Models.Steam.Genre> steamGenres = steamGameData.genres != null ? steamGameData.genres.ToList() : new List<Models.Steam.Genre>();
+            List<Models.Steam.Genre> steamGenres = steamGameData.genres != null ? steamGameData.genres.ToList() : [];
             List<int> dbGenreIds = _context.Genres.Select(g => g.Id).ToList();
 
 
             var existingGenresInDB = await _context.Genres.Where(g => steamGenres.Select(s => int.Parse(s.id)).Contains(g.Id)).ToListAsync();
 
             foreach (var ele in existingGenresInDB)
-                game.Genres.Add(ele);
+                game.Genres!.Add(ele);
 
             foreach (var steamGenre in steamGenres) {
                 if (dbGenreIds.Contains(int.Parse(steamGenre.id)) == false) {
                     var newGenre = new Models.Genre { Id = int.Parse(steamGenre.id), Name = steamGenre.description };
                     _context.Genres.Add(newGenre);
-                    if (game.Genres.Contains(newGenre) == false)
+                    if (game.Genres!.Contains(newGenre) == false)
                         game.Genres.Add(newGenre);
                 }
             }
 
             await _context.SaveChangesAsync();
 
-            List<int> platformsIds = new List<int>();
+            List<int> platformsIds = [];
             if (steamGameData.platforms.Windows)
                 platformsIds.Add(1);
             else if (steamGameData.platforms.Windows)
@@ -126,7 +126,7 @@ namespace BackendGameVibes.Services {
                 .Include(g => g.Genres)
                 .Include(g => g.GameImages)
                 .Include(g => g.SystemRequirements)
-                .Where(g => filtersGamesDTO.GenresIds.Contains(g.Genres.Select(g => g.Id).FirstOrDefault()))
+                .Where(g => filtersGamesDTO.GenresIds!.Contains(g.Genres!.Select(g => g.Id).FirstOrDefault()))
                 .Select(g => new {
                     g.Id,
                     g.Title,

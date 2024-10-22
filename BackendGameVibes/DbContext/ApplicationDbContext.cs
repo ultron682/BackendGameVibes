@@ -10,15 +10,9 @@ namespace BackendGameVibes.Data {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {
         }
 
-        public DbSet<UserGameVibes> Users {
-            get; set;
-        }
         public DbSet<ForumRole> ForumRoles {
             get; set;
         }
-        //public DbSet<Role> Roles {  // IdentityRole
-        //    get; set;
-        //}
         public DbSet<Game> Games {
             get; set;
         }

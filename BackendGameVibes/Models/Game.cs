@@ -21,10 +21,10 @@
 
         public ICollection<Platform>? Platforms {
             get; set;
-        } = new HashSet<Platform>();
+        } = [];
         public ICollection<Genre>? Genres {
             get; set;
-        } = new HashSet<Genre>();
+        } = [];
         public ICollection<GameImage>? GameImages {
             get; set;
         }

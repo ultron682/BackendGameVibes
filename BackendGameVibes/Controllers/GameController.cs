@@ -18,8 +18,8 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpGet("steamIDs")]
-        public async Task<ActionResult<SteamApp[]>> GetAllSteamIdsGames() {
-            var steamGames = await _gameService.GetAllSteamIdsGames();
+        public ActionResult<SteamApp[]> GetAllSteamIdsGames() {
+            var steamGames = _gameService.GetAllSteamIdsGames();
             if (steamGames != null)
                 return Ok(steamGames);
             else
