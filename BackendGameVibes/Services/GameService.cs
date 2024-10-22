@@ -149,20 +149,14 @@ namespace BackendGameVibes.Services {
 
         public async Task<object[]> GetLandingGames() {
             return await _context.Games
-                            .Include(g => g.Platforms)
-                            .Include(g => g.Genres)
-                            .Include(g => g.GameImages)
-                            .Include(g => g.SystemRequirements)
                             .Include(g => g.Reviews)
                             .Select(g => new {
                                 g.Id,
                                 g.Title,
-                                g.Description,
                                 g.HeaderImage,
-                                g.ReleaseDate,
-                                g.SteamId,
                                 Rating = g.Reviews!.Where(c => c.GameId == g.Id).Select(c => c.GameplayScore).Average().ToString("0.0")
                             })
+                            .Take(5)
                             .ToArrayAsync();
 
         }
