@@ -79,7 +79,7 @@ namespace BackendGameVibes.Services {
 
             game.Title = steamGameData.name;
             game.Description = steamGameData.detailed_description != null ? steamGameData.detailed_description : "Brak opisu";
-            game.ReleaseDate = steamGameData.release_date.Date;
+            game.ReleaseDate = DateOnly.ParseExact(steamGameData.release_date.Date, "dd MMM, yyyy", System.Globalization.CultureInfo.InvariantCulture);
             game.HeaderImage = steamGameData.header_image;
             game.GameImages = steamGameData.screenshots.Select(s => new GameImage { ImagePath = s.path_full }).ToList();
 
@@ -164,6 +164,18 @@ namespace BackendGameVibes.Services {
             _context.Dispose();
         }
 
-
+        public async Task<object[]> GetUpcomingGames() {
+            return await _context.Games
+                 .Include(g => g.Reviews)
+                 .Where(g => g.ReleaseDate > DateOnly.FromDateTime(DateTime.Now))
+                 .Select(g => new {
+                     g.Id,
+                     g.Title,
+                     g.HeaderImage,
+                     Rating = g.Reviews!.Where(c => c.GameId == g.Id).Select(c => c.GameplayScore).Average().ToString("0.0")
+                 })
+                 .Take(5)
+                 .ToArrayAsync();
+        }
     }
 }

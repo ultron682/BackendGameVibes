@@ -2,8 +2,7 @@
 using BackendGameVibes.Models.Requests;
 using BackendGameVibes.Models.Steam;
 
-namespace BackendGameVibes.IServices
-{
+namespace BackendGameVibes.IServices {
     public interface IGameService : IDisposable {
         Task<Game?> CreateGame(int steamGameId);
         SteamApp[] FindSteamAppByName(string searchingName);
@@ -13,5 +12,6 @@ namespace BackendGameVibes.IServices
         Task<object[]> GetFilteredGames(FiltersGamesDTO filtersGamesDTO);
         Task<object[]> GetGenres();
         Task<object[]> GetLandingGames();
+        Task<object[]> GetUpcomingGames();
     }
 }

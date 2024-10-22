@@ -9,7 +9,7 @@
         public string? Description {
             get; set;
         }
-        public string? ReleaseDate {
+        public DateOnly? ReleaseDate {
             get; set;
         }
         public int SteamId {

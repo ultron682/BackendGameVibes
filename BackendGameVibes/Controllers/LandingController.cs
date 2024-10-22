@@ -22,7 +22,8 @@ namespace BackendGameVibes.Controllers {
         public async Task<ActionResult<object>> Get() {
             var landingPage = new {
                 games = await _gameService.GetLandingGames(),
-                reviews = await _reviewService.GetLandingReviews()
+                reviews = await _reviewService.GetLandingReviews(),
+                upcomingGames = await _gameService.GetUpcomingGames()
             };
 
             return landingPage;
