@@ -52,7 +52,7 @@ namespace BackendGameVibes.Services {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var roles = await _userManager.GetRolesAsync(user);
             var rolesString = string.Join(",", roles);
-            var token = await JwtTokenGenerator.GenerateToken(user.Email!, user.UserName!, user.Id, rolesString, key, _configuration["Jwt:Issuer"]!, _configuration["Jwt:Audience"]!);
+            var token = JwtTokenGenerator.GenerateToken(user.Email!, user.UserName!, user.Id, rolesString, key, _configuration["Jwt:Issuer"]!, _configuration["Jwt:Audience"]!);
             return token;
         }
 
@@ -82,7 +82,7 @@ namespace BackendGameVibes.Services {
                     u.Email,
                     u.UserName,
                     u.EmailConfirmed,
-                    ForumRole = new { u.ForumRole.Id, u.ForumRole.Name, u.ForumRole.Threshold },
+                    ForumRole = new { u.ForumRole!.Id, u.ForumRole.Name, u.ForumRole.Threshold },
                     u.ExperiencePoints,
                     Roles = roles.ToArray(),
                     Reviews = u.UserReviews.Select(r => new {

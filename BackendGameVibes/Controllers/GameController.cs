@@ -53,13 +53,16 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpPost]
-        [Authorize(Roles = "admin,mod")]
+        [Authorize(Roles = "admin,mod,user")]
         public async Task<ActionResult<Game>> CreateGame(int steamGameId = 292030) {
-            var game = await _gameService.CreateGame(steamGameId);
-            if (game == null)
+            (Game? game, bool isSuccess) = await _gameService.CreateGame(steamGameId);
+            if (game == null && !isSuccess)
                 return BadRequest("SteamGameData is null");
+            else if (game != null && !isSuccess)
+                return Conflict(game);
 
-            return Ok(game);
+            else
+                return Ok(game);
         }
 
         [HttpGet("genres")]

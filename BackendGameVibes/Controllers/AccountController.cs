@@ -29,8 +29,13 @@ namespace BackendGameVibes.Controllers {
 
             if (result.Succeeded) {
                 var user = await _accountService.GetUserByEmailAsync(model.Email);
-                await _accountService.SendConfirmationEmailAsync(model.Email, user);
-                return Ok("UserRegisteredSuccessfully");
+                if (user != null) {
+                    await _accountService.SendConfirmationEmailAsync(model.Email, user!);
+                    return Ok("UserRegisteredSuccessfully");
+                }
+                else {
+                    return Ok("UserRegisteredFailed user not created");
+                }
             }
 
             foreach (var error in result.Errors) {

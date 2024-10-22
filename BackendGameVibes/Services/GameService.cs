@@ -65,21 +65,21 @@ namespace BackendGameVibes.Services {
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<Game?> CreateGame(int steamGameId) {
+        public async Task<(Game?, bool)> CreateGame(int steamGameId) {
             Game? foundGame = await _context.Games.Where(g => g.SteamId == steamGameId).FirstOrDefaultAsync();
             if (foundGame != null)
-                return null;
+                return (foundGame, false);
 
             Game game = new() { SteamId = steamGameId };
 
             var steamGameData = await _steamService.GetInfoGame(game.SteamId);
             //Console.WriteLine(steamGameData);
             if (steamGameData == null)
-                return null;
+                return (null, false);
 
             game.Title = steamGameData.name;
             game.Description = steamGameData.detailed_description != null ? steamGameData.detailed_description : "Brak opisu";
-            game.ReleaseDate = DateOnly.ParseExact(steamGameData.release_date.Date, "dd MMM, yyyy", System.Globalization.CultureInfo.InvariantCulture);
+            game.ReleaseDate = DateOnly.ParseExact(steamGameData.release_date.Date, "d MMM, yyyy", System.Globalization.CultureInfo.InvariantCulture);
             game.HeaderImage = steamGameData.header_image;
             game.GameImages = steamGameData.screenshots.Select(s => new GameImage { ImagePath = s.path_full }).ToList();
 
@@ -116,7 +116,9 @@ namespace BackendGameVibes.Services {
             _context.Games.Add(game);
             await _context.SaveChangesAsync();
 
-            return game;
+            Console.WriteLine("Added game: " + game.Title);
+
+            return (game, true);
         }
 
         // todo rating
@@ -171,8 +173,7 @@ namespace BackendGameVibes.Services {
                  .Select(g => new {
                      g.Id,
                      g.Title,
-                     g.HeaderImage,
-                     Rating = g.Reviews!.Where(c => c.GameId == g.Id).Select(c => c.GameplayScore).Average().ToString("0.0")
+                     g.HeaderImage
                  })
                  .Take(5)
                  .ToArrayAsync();

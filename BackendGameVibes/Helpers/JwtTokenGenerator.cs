@@ -4,7 +4,7 @@ using System.Security.Claims;
 
 namespace BackendGameVibes.Helpers {
     public static class JwtTokenGenerator {
-        public static async Task<string> GenerateToken(string email, string username, string userId, string role, SymmetricSecurityKey key, string issuer, string audience) {
+        public static string GenerateToken(string email, string username, string userId, string role, SymmetricSecurityKey key, string issuer, string audience) {
             var claims = new[]
             {
                 new Claim(ClaimTypes.Email, email),

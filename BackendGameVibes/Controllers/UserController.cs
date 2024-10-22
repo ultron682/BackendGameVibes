@@ -23,8 +23,5 @@ namespace BackendGameVibes.Controllers {
                 return Ok(accountInfo);
             }
         }
-
-
-
     }
 }
