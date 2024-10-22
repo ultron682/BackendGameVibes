@@ -6,8 +6,7 @@ using BackendGameVibes.Models.Steam;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackendGameVibes.Services
-{
+namespace BackendGameVibes.Services {
     public class GameService : IGameService {
         private readonly ApplicationDbContext _context;
         private readonly SteamService _steamService;
@@ -31,6 +30,7 @@ namespace BackendGameVibes.Services
                 .Include(g => g.Genres)
                 .Include(g => g.GameImages)
                 .Include(g => g.SystemRequirements)
+                .Include(g => g.Reviews)
                 .Select(g => new {
                     g.Id,
                     g.Title,
@@ -38,6 +38,7 @@ namespace BackendGameVibes.Services
                     g.HeaderImage,
                     g.ReleaseDate,
                     g.SteamId,
+                    Rating = g.Reviews!.Where(c => c.GameId == g.Id).Select(c => c.GameplayScore).Average().ToString("0.0")
                 })
                 .ToArrayAsync();
         }
@@ -59,6 +60,7 @@ namespace BackendGameVibes.Services
                     g.SteamId,
                     Genres = g.Genres.Select(g => new { g.Id, g.Name }).ToArray(),
                     GameImages = g.GameImages.Select(image => new { image.ImagePath }),
+                    Rating = g.Reviews!.Where(c => c.GameId == g.Id).Select(c => c.GameplayScore).Average().ToString("0.0")
                 })
                 .FirstOrDefaultAsync();
         }
@@ -130,7 +132,8 @@ namespace BackendGameVibes.Services
                     g.Title,
                     g.HeaderImage,
                     g.ReleaseDate,
-                    g.SteamId
+                    g.SteamId,
+                    Rating = g.Reviews!.Where(c => c.GameId == g.Id).Select(c => c.GameplayScore).Average().ToString("0.0")
                 })
                 .ToArrayAsync();
         }
