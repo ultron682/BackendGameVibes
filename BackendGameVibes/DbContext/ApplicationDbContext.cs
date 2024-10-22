@@ -3,6 +3,7 @@ using BackendGameVibes.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using System.Diagnostics;
+using BackendGameVibes.Models.Forum;
 
 namespace BackendGameVibes.Data {
     public class ApplicationDbContext : IdentityDbContext<UserGameVibes> {
@@ -63,6 +64,11 @@ namespace BackendGameVibes.Data {
                 entity
                     .HasMany(u => u.UserReviews)
                     .WithOne(r => r.UserGameVibes);
+
+                entity
+                    .HasMany(u => u.FollowedGames)
+                    .WithMany(g => g.PlayersFollowing)
+                    .UsingEntity(j => j.ToTable("UsersGamesFollow"));
             });
 
             // ForumRole entity

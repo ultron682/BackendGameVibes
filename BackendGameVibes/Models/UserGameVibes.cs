@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using BackendGameVibes.Models.Forum;
+using Microsoft.AspNetCore.Identity;
 using System.Data;
 
 namespace BackendGameVibes.Models {
@@ -19,6 +20,9 @@ namespace BackendGameVibes.Models {
             get; set;
         }
         public ForumRole? ForumRole {
+            get; set;
+        }
+        public ICollection<Game>? FollowedGames {
             get; set;
         }
     }

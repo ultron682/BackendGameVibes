@@ -146,7 +146,7 @@ namespace BackendGameVibes.Helpers {
                     UserGameVibesId = userTest!.Id
                 });
 
-                for (int i = 0; i < 50; i++) {
+                for (int i = 0; i < 100; i++) {
                     await reviewService.AddReviewAsync(new Review {
                         GameId = createdGames[random.Next(0, createdGames.Count)]!.Id,
                         Comment = GenerateRandomComment(random.Next(10, 30)),

@@ -34,5 +34,8 @@
         public ICollection<Review>? Reviews {
             get; set;
         }
+        public ICollection<UserGameVibes>? PlayersFollowing {
+            get; set;
+        }
     }
 }

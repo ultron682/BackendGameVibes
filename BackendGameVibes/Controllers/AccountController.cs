@@ -92,9 +92,10 @@ namespace BackendGameVibes.Controllers {
             return Ok(accountInfo);
         }
 
-        [HttpPatch("nickname")]
+        [HttpPatch("change-username")]
         [Authorize]
-        public async Task<IActionResult> ChangeNickname([FromForm] string newUsername) {
+        public async Task<IActionResult> ChangeNickname([FromBody] ValueModel valueModel) {
+            string newUsername = valueModel.Value!;
             if (string.IsNullOrWhiteSpace(newUsername))
                 return BadRequest("Invalid username");
 
@@ -147,7 +148,7 @@ namespace BackendGameVibes.Controllers {
             }
         }
 
-        [HttpPost("ChangePassword")]
+        [HttpPost("change-password")]
         [Authorize]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO model) {
             if (!ModelState.IsValid)
@@ -174,7 +175,8 @@ namespace BackendGameVibes.Controllers {
         [HttpPost]
         [AllowAnonymous]
         [Route("reset-password")]
-        public async Task<IActionResult> StartResetPassword([FromBody] string email) {
+        public async Task<IActionResult> StartResetPassword([FromBody] ValueModel valueModel) {
+            var email = valueModel.Value!;
             var (success, message) = await _accountService.StartResetPasswordAsync(email);
             return success ? Ok("Reset password email sent") : BadRequest(message);
         }

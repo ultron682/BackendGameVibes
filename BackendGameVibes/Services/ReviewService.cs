@@ -81,6 +81,15 @@ namespace BackendGameVibes.Services {
             }
         }
 
+        public async Task<object[]> GetLandingReviews() {
+            return await _context.Reviews
+                .Include(r => r.Game)
+                .Include(r => r.UserGameVibes)
+                .Select(r => new { r.UserGameVibesId, r.GameId, r.Game!.Title, r.UserGameVibes!.UserName, r.Comment })
+                .OrderBy(r => EF.Functions.Random()).Take(5).ToArrayAsync();
+
+        }
+
         public void Dispose() {
             //_context?.Dispose();
         }
