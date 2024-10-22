@@ -6,6 +6,7 @@ using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Requests;
 using Microsoft.AspNetCore.Authorization;
 using BackendGameVibes.Models.Steam;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace BackendGameVibes.Controllers {
     [ApiController]
@@ -53,7 +54,8 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpPost]
-        [Authorize(Roles = "admin,mod,user")]
+        [Authorize(Roles = "admin,mod")]
+        [SwaggerOperation("Require authorization admin or mod")]
         public async Task<ActionResult<Game>> CreateGame(int steamGameId = 292030) {
             (Game? game, bool isSuccess) = await _gameService.CreateGame(steamGameId);
             if (game == null && !isSuccess)

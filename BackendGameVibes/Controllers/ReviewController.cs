@@ -7,6 +7,7 @@ using BackendGameVibes.Models.Requests;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace BackendGameVibes.Controllers {
     [ApiController]
@@ -37,6 +38,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPost]
         [Authorize]
+        [SwaggerOperation("Require authorization")]
         public async Task<IActionResult> AddReview([FromBody] ReviewDTO reviewRequest) {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)

@@ -79,7 +79,12 @@ namespace BackendGameVibes.Services {
 
             game.Title = steamGameData.name;
             game.Description = steamGameData.detailed_description != null ? steamGameData.detailed_description : "Brak opisu";
-            game.ReleaseDate = DateOnly.ParseExact(steamGameData.release_date.Date, "d MMM, yyyy", System.Globalization.CultureInfo.InvariantCulture);
+            try {
+                game.ReleaseDate = DateOnly.ParseExact(steamGameData.release_date.Date, "d MMM, yyyy", System.Globalization.CultureInfo.InvariantCulture);
+            }
+            catch {
+                game.ReleaseDate = DateOnly.FromDateTime(DateTime.Now);
+            }
             game.HeaderImage = steamGameData.header_image;
             game.GameImages = steamGameData.screenshots.Select(s => new GameImage { ImagePath = s.path_full }).ToList();
 

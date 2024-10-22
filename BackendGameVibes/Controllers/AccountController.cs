@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -84,6 +85,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpGet]
         [Authorize]
+        [SwaggerOperation("Require authorization")]
         public async Task<IActionResult> GetAccountInfo() {
             var email = User.FindFirstValue(ClaimTypes.Email);
             if (email == null)
@@ -99,6 +101,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPatch("change-username")]
         [Authorize]
+        [SwaggerOperation("Require authorization")]
         public async Task<IActionResult> ChangeNickname([FromBody] ValueModel valueModel) {
             string newUsername = valueModel.Value!;
             if (string.IsNullOrWhiteSpace(newUsername))
@@ -155,6 +158,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPost("change-password")]
         [Authorize]
+        [SwaggerOperation("Require authorization")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO model) {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

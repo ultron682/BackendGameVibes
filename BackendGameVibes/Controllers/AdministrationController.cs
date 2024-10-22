@@ -9,11 +9,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace BackendGameVibes.Controllers {
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
+    [SwaggerTag("Require authorization admin")]
     public class AdministrationController : ControllerBase {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
