@@ -1,5 +1,7 @@
 ﻿using BackendGameVibes.Data;
+using BackendGameVibes.Models.Forum;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BackendGameVibes.Services {
     public class PostService {
@@ -9,8 +11,10 @@ namespace BackendGameVibes.Services {
             _context = context;
         }
 
-        //public async Task<ActionResult<IEnumerable<Post>>> GetAllPosts(int idThread) {
-        //    //return await _context.Posts.ToListAsync();
-        //}
+        public async Task<ActionResult<IEnumerable<ForumPost>>> GetAllPosts(int idThread) {
+            return await _context.ForumPosts
+                .Where(p => p.ThreadId == idThread)
+                .ToListAsync();
+        }
     }
 }

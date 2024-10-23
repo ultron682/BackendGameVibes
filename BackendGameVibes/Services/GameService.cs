@@ -35,7 +35,7 @@ namespace BackendGameVibes.Services {
                     g.Id,
                     g.Title,
                     g.Description,
-                    g.HeaderImage,
+                    g.CoverImage,
                     g.ReleaseDate,
                     g.SteamId,
                     Rating = g.Reviews!.Where(c => c.GameId == g.Id).Select(c => c.GameplayScore).Average().ToString("0.0")
@@ -54,7 +54,7 @@ namespace BackendGameVibes.Services {
                     g.Id,
                     g.Title,
                     g.Description,
-                    g.HeaderImage,
+                    g.CoverImage,
                     Platforms = g.Platforms!.Select(p => new { p.Id, p.Name }),
                     g.ReleaseDate,
                     g.SteamId,
@@ -85,7 +85,8 @@ namespace BackendGameVibes.Services {
             catch {
                 game.ReleaseDate = DateOnly.FromDateTime(DateTime.Now);
             }
-            game.HeaderImage = steamGameData.header_image;
+            //game.CoverImage = steamGameData.header_image;
+            game.CoverImage = @$"https://steamcdn-a.akamaihd.net/steam/apps/{game.SteamId}/library_600x900_2x.jpg";
             game.GameImages = steamGameData.screenshots.Select(s => new GameImage { ImagePath = s.path_full }).ToList();
 
             List<Models.Steam.Genre> steamGenres = steamGameData.genres != null ? steamGameData.genres.ToList() : [];
@@ -137,7 +138,7 @@ namespace BackendGameVibes.Services {
                 .Select(g => new {
                     g.Id,
                     g.Title,
-                    g.HeaderImage,
+                    g.CoverImage,
                     g.ReleaseDate,
                     g.SteamId,
                     Rating = g.Reviews!.Where(c => c.GameId == g.Id).Select(c => c.GameplayScore).Average().ToString("0.0")
@@ -160,7 +161,7 @@ namespace BackendGameVibes.Services {
                             .Select(g => new {
                                 g.Id,
                                 g.Title,
-                                g.HeaderImage,
+                                g.CoverImage,
                                 Rating = g.Reviews!.Where(c => c.GameId == g.Id).Select(c => c.GameplayScore).Average().ToString("0.0")
                             })
                             .Take(5)
@@ -178,7 +179,7 @@ namespace BackendGameVibes.Services {
                  .Select(g => new {
                      g.Id,
                      g.Title,
-                     g.HeaderImage
+                     g.CoverImage
                  })
                  .Take(5)
                  .ToArrayAsync();

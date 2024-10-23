@@ -15,7 +15,7 @@
         public int SteamId {
             get; set;
         }
-        public string? HeaderImage {
+        public string? CoverImage {
             get; set;
         }
 

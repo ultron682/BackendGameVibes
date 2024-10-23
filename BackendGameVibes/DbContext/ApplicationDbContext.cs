@@ -1,18 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using System.Diagnostics;
 using BackendGameVibes.Models.Forum;
+using System;
 
 namespace BackendGameVibes.Data {
     public class ApplicationDbContext : IdentityDbContext<UserGameVibes> {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {
         }
 
-        public DbSet<ForumRole> ForumRoles {
-            get; set;
-        }
         public DbSet<Game> Games {
             get; set;
         }
@@ -29,6 +26,18 @@ namespace BackendGameVibes.Data {
             get; set;
         }
         public DbSet<Review> Reviews {
+            get; set;
+        }
+        public DbSet<ForumThread> ForumThreads {
+            get; set;
+        }
+        public DbSet<ForumPost> ForumPosts {
+            get; set;
+        }
+        public DbSet<ForumSection> ForumSections {
+            get; set;
+        }
+        public DbSet<ForumRole> ForumRoles {
             get; set;
         }
 
@@ -223,6 +232,62 @@ namespace BackendGameVibes.Data {
                     .WithMany(g => g.Reviews)
                     .HasForeignKey(r => r.GameId)
                     .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<ForumSection>(entity => {
+                entity.HasData(
+                    new ForumSection() { Id = 1, Name = "general" },
+                    new ForumSection() { Id = 2, Name = "technologies" },
+                    new ForumSection() { Id = 3, Name = "offtopic" },
+                    new ForumSection() { Id = 4, Name = "advices" });
+            });
+
+            modelBuilder.Entity<ForumThread>(entity => {
+                entity.HasKey(t => t.Id);
+
+                entity.Property(t => t.CreatedDateTime)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .IsRequired()
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(t => t.LastUpdatedDateTime)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .IsRequired()
+                    .ValueGeneratedOnAddOrUpdate();
+
+                entity.HasOne(t => t.UserOwner)
+                    .WithMany(u => u.ForumThreads)
+                    .HasForeignKey(t => t.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(t => t.Section)
+                    .WithMany(s => s.Threads)
+                    .HasForeignKey(t => t.SectionId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasMany(t => t.Posts)
+                .WithOne(p => p.Thread)
+                .HasForeignKey(p => p.ThreadId);
+            });
+
+            modelBuilder.Entity<ForumPost>(entity => {
+                entity.HasKey(p => p.Id);
+
+                entity.Property(p => p.CreatedDateTime)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .IsRequired()
+                    .ValueGeneratedOnAdd();
+
+                entity.Property(p => p.LastUpdatedDateTime)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .IsRequired()
+                    .ValueGeneratedOnAddOrUpdate();
+
+                entity.Property(p => p.Likes)
+                    .HasDefaultValue(0);
+
+                entity.Property(p => p.DisLikes)
+                    .HasDefaultValue(0);
             });
 
             base.OnModelCreating(modelBuilder);
