@@ -179,7 +179,8 @@ namespace BackendGameVibes.Services {
                  .Select(g => new {
                      g.Id,
                      g.Title,
-                     g.CoverImage
+                     g.CoverImage,
+                     g.ReleaseDate
                  })
                  .Take(5)
                  .ToArrayAsync();
