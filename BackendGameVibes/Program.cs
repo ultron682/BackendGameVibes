@@ -127,6 +127,8 @@ builder.Services.AddTransient<MailService>();
 builder.Services.AddSingleton<HtmlTemplateService>();
 builder.Services.AddSingleton<SteamService>();
 builder.Services.AddScoped<RoleService>();
+builder.Services.AddScoped<ThreadService>();
+builder.Services.AddScoped<PostService>();
 builder.Services.AddHttpClient();
 
 

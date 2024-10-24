@@ -2,7 +2,7 @@
 using BackendGameVibes.Data;
 using BackendGameVibes.Helpers;
 using BackendGameVibes.Models.Forum;
-using BackendGameVibes.Models.Requests;
+using BackendGameVibes.Models.Requests.Forum;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 
@@ -16,11 +16,14 @@ namespace BackendGameVibes.Services {
             _mapper = mapper;
         }
 
-        public async Task<ActionResult<ForumThread>> AddThread(ForumThreadDTO thread) {
-            ForumPost newForumPost = _mapper.Map<ForumPost>(thread.FirstPost);
+        public async Task<ForumThread> AddThreadAsync(NewForumThreadDTO newThread) {
+            ForumThread? newForumThread = _mapper.Map<ForumThread>(newThread);
 
-
-            ForumThread? newForumThread = _mapper.Map<ForumThread>(thread);
+            ForumPost newForumPost = new() {
+                Content = newThread.FirstForumPostContent,
+                ThreadId = newForumThread.Id,
+                UserOwnerId = newThread.UserOwnerId
+            };
             newForumThread.Posts!.Add(newForumPost);
 
             _context.ForumThreads.Add(newForumThread);

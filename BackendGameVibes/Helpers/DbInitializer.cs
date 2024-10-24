@@ -130,7 +130,7 @@ namespace BackendGameVibes.Helpers {
                 await gameService.CreateGame(2651280), // Marvel's Spider-Man 2
                 await gameService.CreateGame(2246340), // Monster Hunter Wilds
                 await gameService.CreateGame(1850050), // Alien: Rogue Incursion
-                await gameService.CreateGame(2671160), // Galactic Civilizations IV - Megastructures
+                //await gameService.CreateGame(2671160), // Galactic Civilizations IV - Megastructures
                 await gameService.CreateGame(2677660), // Indiana Jones i Wielki Krąg
                 await gameService.CreateGame(2767030), // Marvel Rivals
             };

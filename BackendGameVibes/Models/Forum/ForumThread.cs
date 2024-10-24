@@ -12,7 +12,7 @@
         public DateTime LastUpdatedDateTime {
             get; set;
         }
-        public string? UserId {
+        public string? UserOwnerId {
             get; set;
         }
         public int? SectionId {
@@ -21,7 +21,7 @@
 
         public ICollection<ForumPost>? Posts {
             get; set;
-        }
+        } = [];
         public UserGameVibes? UserOwner {
             get; set;
         }

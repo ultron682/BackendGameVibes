@@ -1,8 +1,7 @@
 ﻿using BackendGameVibes.Models.Steam;
 using System.Text.Json;
 
-namespace BackendGameVibes.Services
-{
+namespace BackendGameVibes.Services {
     public class SteamService {
         public SteamApp[] steamGames = null; // only steamID and name!!!
         private readonly HttpClient _httpClient;
@@ -30,7 +29,7 @@ namespace BackendGameVibes.Services
             }
         }
 
-        public async Task<SteamApp[]> GetAllGameIds() {
+        public async Task<SteamApp[]?> GetAllGameIds() {
             var response = await _httpClient.GetAsync("https://api.steampowered.com/ISteamApps/GetAppList/v0002/?key=STEAMKEY&format=json");
 
             if (response.IsSuccessStatusCode) {
@@ -42,13 +41,13 @@ namespace BackendGameVibes.Services
 
 
                 var appListWrapper = JsonSerializer.Deserialize<AppListWrapper>(jsonString, options);
-                return appListWrapper.Applist.Apps;
+                return appListWrapper!.Applist.Apps;
             }
 
             return null;
         }
 
-        public async Task<GameData> GetInfoGame(int id) {
+        public async Task<GameData?> GetInfoGame(int id) {
             var response = await _httpClient.GetAsync($"https://store.steampowered.com/api/appdetails?appids={id}");
 
             if (response.IsSuccessStatusCode) {

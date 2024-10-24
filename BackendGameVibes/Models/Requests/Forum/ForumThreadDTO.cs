@@ -1,11 +1,11 @@
 ﻿using BackendGameVibes.Models.Forum;
 
-namespace BackendGameVibes.Models.Requests {
+namespace BackendGameVibes.Models.Requests.Forum {
     public class ForumThreadDTO {
         public string? Title {
             get; set;
         }
-        public string? UserIdOwner {
+        public string? UserOwnerId {
             get; set;
         }
         public int? SectionId {

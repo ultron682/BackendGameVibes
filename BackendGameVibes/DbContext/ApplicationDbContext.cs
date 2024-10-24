@@ -257,7 +257,7 @@ namespace BackendGameVibes.Data {
 
                 entity.HasOne(t => t.UserOwner)
                     .WithMany(u => u.ForumThreads)
-                    .HasForeignKey(t => t.UserId)
+                    .HasForeignKey(t => t.UserOwnerId)
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(t => t.Section)
