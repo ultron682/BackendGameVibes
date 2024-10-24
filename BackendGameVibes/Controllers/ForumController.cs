@@ -22,11 +22,10 @@ namespace BackendGameVibes.Controllers {
         }
 
 
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<Thread>>> GetThreads() {
-        //    return await _threadService.GetAllThreads();
-        //    ;
-        //}
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Thread>>> GetThreads() {
+            return Ok(await _threadService.GetAllThreads());
+        }
 
         [HttpPost("thread")]
         public async Task<ActionResult<Thread>> CreateThread(NewForumThreadDTO forumThreadDTO) {

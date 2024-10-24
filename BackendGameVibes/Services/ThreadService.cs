@@ -3,7 +3,9 @@ using BackendGameVibes.Data;
 using BackendGameVibes.Helpers;
 using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Requests.Forum;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Threading;
 
 namespace BackendGameVibes.Services {
@@ -32,8 +34,10 @@ namespace BackendGameVibes.Services {
             return newForumThread;
         }
 
-        //public async Task<ActionResult<IEnumerable<Thread>>> GetAllThreads() {
-
-        //}
+        public async Task<IEnumerable<ForumThread>> GetAllThreads() {
+            return await _context.ForumThreads
+                .Include(t => t.Posts)
+                .ToListAsync();
+        }
     }
 }
