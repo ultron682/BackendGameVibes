@@ -26,6 +26,7 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpPost("send-friend-request:id")]
+        [SwaggerOperation("zaproszenie znajmowego. do znajomego wysylany jest email z tokenem i linkiem do endpoint confirm-friend-request:id")]
         public async Task<ActionResult<object>> SendFriendRequstAsync([FromQuery] string id) {
             var user = await _accountService.GetUserByIdAsync(id);
             if (user == null) {
