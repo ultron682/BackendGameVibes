@@ -1,4 +1,5 @@
 ﻿using BackendGameVibes.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -25,8 +26,22 @@ namespace BackendGameVibes.Controllers {
             }
         }
 
+        [HttpGet("search-user:nick")]
+        [SwaggerOperation("wyszukiwanie mozliwych uzytkownikow do dodania znajomych po nicku")]
+        public async Task<ActionResult<object>> SearchUserAsync(string nick) {
+            var user = await _accountService.GetUserByEmailAsync(nick);
+            if (user == null) {
+                return NotFound();
+            }
+            else {
+                var accountInfo = await _accountService.GetAccountInfoAsync(user.Id, user);
+                return Ok(accountInfo);
+            }
+        }
+
         [HttpPost("send-friend-request:id")]
-        [SwaggerOperation("zaproszenie znajmowego. do znajomego wysylany jest email z tokenem i linkiem do endpoint confirm-friend-request:id")]
+        [Authorize()]
+        [SwaggerOperation("todo: do znajomego wysylane jest powiadomienie. na swoim koncie będzie mogl zaakceptować lub odrzucić bez powiadamienia osoby ktora wyslala zapro. jak git to odpala endpoint confirm-friend-request:id")]
         public async Task<ActionResult<object>> SendFriendRequstAsync([FromQuery] string id) {
             var user = await _accountService.GetUserByIdAsync(id);
             if (user == null) {
