@@ -28,14 +28,17 @@ namespace BackendGameVibes.Controllers {
 
         [HttpGet("search-user:nick")]
         [SwaggerOperation("wyszukiwanie mozliwych uzytkownikow do dodania znajomych po nicku")]
+        [Authorize]
         public async Task<ActionResult<object>> SearchUserAsync(string nick) {
-            var user = await _accountService.GetUserByEmailAsync(nick);
-            if (user == null) {
+            Console.WriteLine(User.Identity!.Name!);
+            string myNickname = User.Identity!.Name!;
+
+            var users = await _accountService.FindUserByNickname(myNickname, nick);
+            if (users == null) {
                 return NotFound();
             }
             else {
-                var accountInfo = await _accountService.GetAccountInfoAsync(user.Id, user);
-                return Ok(accountInfo);
+                return Ok(users);
             }
         }
 

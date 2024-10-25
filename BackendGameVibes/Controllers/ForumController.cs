@@ -27,6 +27,11 @@ namespace BackendGameVibes.Controllers {
             return Ok(await _threadService.GetAllThreads());
         }
 
+        [HttpGet("thread/:id")]
+        public async Task<ActionResult<IEnumerable<ForumPost>>> GetPosts(int id) {
+            return Ok(await _threadService.GetForumThread(id));
+        }
+
         [HttpPost("thread")]
         public async Task<ActionResult<Thread>> CreateThread(NewForumThreadDTO forumThreadDTO) {
             if (ModelState.IsValid) {

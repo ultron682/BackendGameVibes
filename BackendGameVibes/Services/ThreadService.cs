@@ -40,6 +40,12 @@ namespace BackendGameVibes.Services {
                 .ToListAsync();
         }
 
+        public async Task<ForumThread?> GetForumThread(int id) {
+            return await _context.ForumThreads
+                .Include(t => t.Posts)
+                .FirstOrDefaultAsync(t => t.Id == id);
+        }
+
         public void Dispose() {
             _context.Dispose();
         }

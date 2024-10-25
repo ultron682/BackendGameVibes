@@ -209,6 +209,18 @@ namespace BackendGameVibes.Services {
             return await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
         }
 
+        public async Task<object[]> FindUserByNickname(string myNickname, string searchName) {
+            var findedUsers = await _context.Users
+                .Where(u => u.UserName!.Contains(searchName) && u.UserName != myNickname)
+                .Select(u => new {
+                    u.Id,
+                    u.UserName
+                })
+                .ToArrayAsync();
+
+            return findedUsers;
+        }
+
         public void Dispose() {
             _context.Dispose();
             _userManager.Dispose();
