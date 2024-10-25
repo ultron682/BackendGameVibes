@@ -94,22 +94,30 @@ namespace BackendGameVibes.Helpers {
 
                 //Normal user      
                 var newUser = new UserGameVibes {
-                    UserName = "user",
+                    UserName = "test",
                     Email = "test@test.com",
                     EmailConfirmed = true
                 };
                 var newUser2 = new UserGameVibes {
-                    UserName = "user2",
+                    UserName = "test2",
                     Email = "test2@test.com",
+                    EmailConfirmed = true
+                };
+                var newUser3 = new UserGameVibes {
+                    UserName = "test3",
+                    Email = "test3@test.com",
                     EmailConfirmed = true
                 };
                 string userPWD = "Test123.";
 
                 IdentityResult chkUser = await userManager.CreateAsync(newUser, userPWD);
                 await userManager.CreateAsync(newUser2, userPWD);
+                await userManager.CreateAsync(newUser3, userPWD);
 
                 if (chkUser.Succeeded) {
                     await userManager.AddToRoleAsync(newUser, "user");
+                    await userManager.AddToRoleAsync(newUser2, "user");
+                    await userManager.AddToRoleAsync(newUser3, "user");
                 }
             }
 
@@ -122,6 +130,7 @@ namespace BackendGameVibes.Helpers {
             }
 
             UserGameVibes? userTest = await userManager.FindByEmailAsync("test@test.com");
+            UserGameVibes? userTest2 = await userManager.FindByEmailAsync("test2@test.com");
 
             (Game? game, bool isSuccess) createdGame1 = await gameService.CreateGame(292030); // The Witcher 3
 
