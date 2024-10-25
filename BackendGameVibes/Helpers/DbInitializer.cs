@@ -1,5 +1,6 @@
 ﻿using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
+using BackendGameVibes.Services;
 using Microsoft.AspNetCore.Identity;
 using System.Runtime.CompilerServices;
 
@@ -32,6 +33,7 @@ namespace BackendGameVibes.Helpers {
             using var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             using var reviewService = scope.ServiceProvider.GetRequiredService<IReviewService>();
             using var gameService = scope.ServiceProvider.GetRequiredService<IGameService>();
+            using var threadService = scope.ServiceProvider.GetService<ThreadService>();
             Random random = new();
 
 

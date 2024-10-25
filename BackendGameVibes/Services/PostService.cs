@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendGameVibes.Services {
-    public class PostService {
+    public class PostService : IDisposable {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
 
@@ -29,6 +29,10 @@ namespace BackendGameVibes.Services {
             await _context.SaveChangesAsync();
 
             return newForumPost;
+        }
+
+        public void Dispose() {
+            _context.Dispose();
         }
     }
 }

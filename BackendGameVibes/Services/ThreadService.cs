@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading;
 
 namespace BackendGameVibes.Services {
-    public class ThreadService {
+    public class ThreadService : IDisposable {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
 
@@ -38,6 +38,10 @@ namespace BackendGameVibes.Services {
             return await _context.ForumThreads
                 .Include(t => t.Posts)
                 .ToListAsync();
+        }
+
+        public void Dispose() {
+            _context.Dispose();
         }
     }
 }
