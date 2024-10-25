@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace BackendGameVibes.Services {
     public class SteamService {
-        public SteamApp[] steamGames = null; // only steamID and name!!!
+        public SteamApp[]? steamGames = null; // only steamID and name!!!
         private readonly HttpClient _httpClient;
 
 
@@ -15,7 +15,7 @@ namespace BackendGameVibes.Services {
         private async void InitSteamApi() {
             Console.WriteLine("Started init Steam games");
             steamGames = await GetAllGameIds();
-            Console.WriteLine("Steam games ready");
+            Console.WriteLine("Finished map Steam games");
         }
 
         public SteamApp[]? FindSteamApp(string name) {

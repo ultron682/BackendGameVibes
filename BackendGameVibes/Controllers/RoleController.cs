@@ -1,4 +1,5 @@
-﻿using BackendGameVibes.Services;
+﻿using BackendGameVibes.IServices;
+using BackendGameVibes.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,9 +9,9 @@ namespace BackendGameVibes.Controllers {
     [Route("api/[controller]")]
     [ApiController]
     public class RoleController : ControllerBase {
-        private readonly RoleService _roleService;
+        private readonly IRoleService _roleService;
 
-        public RoleController(RoleService roleService) {
+        public RoleController(IRoleService roleService) {
             _roleService = roleService;
         }
 

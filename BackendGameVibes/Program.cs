@@ -4,6 +4,7 @@ using BackendGameVibes.Helpers;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
 using BackendGameVibes.Services;
+using BackendGameVibes.Services.Forum;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -129,9 +130,9 @@ builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddTransient<MailService>();
 builder.Services.AddSingleton<HtmlTemplateService>();
 builder.Services.AddSingleton<SteamService>();
-builder.Services.AddScoped<RoleService>();
-builder.Services.AddScoped<ThreadService>();
-builder.Services.AddScoped<PostService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IForumThreadService, ForumThreadService>();
+builder.Services.AddScoped<IForumPostService, ForumPostService>();
 builder.Services.AddHttpClient();
 
 

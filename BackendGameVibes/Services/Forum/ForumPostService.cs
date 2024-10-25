@@ -5,13 +5,13 @@ using BackendGameVibes.Models.Requests.Forum;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackendGameVibes.Services {
-    public class PostService : IDisposable {
+namespace BackendGameVibes.Services.Forum {
+    public class ForumPostService : IForumPostService {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
 
 
-        public PostService(ApplicationDbContext context, IMapper mapper) {
+        public ForumPostService(ApplicationDbContext context, IMapper mapper) {
             _context = context;
             _mapper = mapper;
         }

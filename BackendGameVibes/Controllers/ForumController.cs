@@ -1,7 +1,7 @@
 ﻿using BackendGameVibes.Data;
 using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Requests.Forum;
-using BackendGameVibes.Services;
+using BackendGameVibes.Services.Forum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +13,10 @@ namespace BackendGameVibes.Controllers {
     [ApiController]
     //[Authorize]
     public class ForumController : ControllerBase {
-        private readonly PostService _postService;
-        private readonly ThreadService _threadService;
+        private readonly ForumPostService _postService;
+        private readonly ForumThreadService _threadService;
 
-        public ForumController(PostService postService, ThreadService threadService) {
+        public ForumController(ForumPostService postService, ForumThreadService threadService) {
             _postService = postService;
             _threadService = threadService;
         }
@@ -55,5 +55,6 @@ namespace BackendGameVibes.Controllers {
                 return BadRequest("Wrong ForumThreadDTO");
             }
         }
+
     }
 }

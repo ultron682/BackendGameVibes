@@ -1,19 +1,21 @@
 ﻿using AutoMapper;
 using BackendGameVibes.Data;
 using BackendGameVibes.Helpers;
+using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Requests.Forum;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
 using System.Threading;
 
-namespace BackendGameVibes.Services {
-    public class ThreadService : IDisposable {
+namespace BackendGameVibes.Services.Forum {
+    public class ForumThreadService : IForumThreadService {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
 
-        public ThreadService(ApplicationDbContext context, IMapper mapper) {
+        public ForumThreadService(ApplicationDbContext context, IMapper mapper) {
             _context = context;
             _mapper = mapper;
         }
@@ -44,6 +46,30 @@ namespace BackendGameVibes.Services {
             return await _context.ForumThreads
                 .Include(t => t.Posts)
                 .FirstOrDefaultAsync(t => t.Id == id);
+        }
+
+        public async Task<IEnumerable<object>> GetLandingThreads() {
+            return await _context.ForumThreads
+                .Include(t => t.Posts)
+                .TakeLast(5)
+                .Select(t => new {
+                    t.Id,
+                    t.Title,
+                    t.CreatedDateTime,
+                    t.LastUpdatedDateTime,
+                    t.UserOwnerId,
+                    t.UserOwner,
+                    t.SectionId,
+                    t.Section,
+                    Posts = t.Posts!.Select(p => new {
+                        p.Id,
+                        p.Content,
+                        p.CreatedDateTime,
+                        p.UserOwnerId,
+                        p.UserOwner
+                    })
+                })
+                .ToListAsync();
         }
 
         public void Dispose() {
