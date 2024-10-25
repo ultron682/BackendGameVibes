@@ -59,8 +59,8 @@ namespace BackendGameVibes.Services.Forum {
                     t.CreatedDateTime,
                     t.LastUpdatedDateTime,
                     t.UserOwnerId,
-                    username = t.UserOwner,
-                    t.Section,
+                    usernameOwner = t.UserOwner!.UserName,
+                    section = t.Section!.Name,
                     //Posts = t.Posts!.Select(p => new {
                     //    p.Id,
                     //    p.Content,

@@ -26,7 +26,7 @@ namespace BackendGameVibes.Controllers {
                 games = await _gameService.GetLandingGames(),
                 reviews = await _reviewService.GetLandingReviews(),
                 upcomingGames = await _gameService.GetUpcomingGames(),
-                newestForumThreads = await _forumThreadService.GetLandingThreads()
+                latestForumThreads = await _forumThreadService.GetLandingThreads()
             };
 
             return landingPage;
