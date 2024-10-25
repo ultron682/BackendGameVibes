@@ -210,15 +210,20 @@ namespace BackendGameVibes.Services {
         }
 
         public async Task<object[]> FindUsersNickAndIdsByNickname(string myNickname, string searchName) {
-            var findedUsers = await _context.Users
-                .Where(u => u.UserName!.Contains(searchName) && u.UserName != myNickname)
-                .Select(u => new {
-                    u.Id,
-                    u.UserName
-                })
-                .ToArrayAsync();
+            var allStandardUsers = await _userManager.GetUsersInRoleAsync("user");
 
-            return findedUsers;
+            myNickname = myNickname.ToUpper();
+            searchName = searchName.ToUpper();
+
+            return allStandardUsers
+                 .Where(u =>
+                 u.NormalizedUserName!.Contains(searchName)
+                 && u.NormalizedUserName != myNickname)
+                 .Select(u => new {
+                     u.Id,
+                     u.UserName
+                 })
+                 .ToArray();
         }
 
         public void Dispose() {
