@@ -1,7 +1,6 @@
-﻿using BackendGameVibes.Data;
+﻿using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Requests.Forum;
-using BackendGameVibes.Services.Forum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +12,10 @@ namespace BackendGameVibes.Controllers {
     [ApiController]
     //[Authorize]
     public class ForumController : ControllerBase {
-        private readonly ForumPostService _postService;
-        private readonly ForumThreadService _threadService;
+        private readonly IForumPostService _postService;
+        private readonly IForumThreadService _threadService;
 
-        public ForumController(ForumPostService postService, ForumThreadService threadService) {
+        public ForumController(IForumPostService postService, IForumThreadService threadService) {
             _postService = postService;
             _threadService = threadService;
         }
@@ -54,6 +53,11 @@ namespace BackendGameVibes.Controllers {
             else {
                 return BadRequest("Wrong ForumThreadDTO");
             }
+        }
+
+        [HttpGet("section")]
+        public async Task<ActionResult<IEnumerable<object>>> GetSections() {
+            return Ok(await _threadService.GetSections());
         }
 
     }

@@ -15,7 +15,7 @@ namespace BackendGameVibes.Services {
         private async void InitSteamApi() {
             Console.WriteLine("Started init Steam games");
             steamGames = await GetAllGameIds();
-            Console.WriteLine("Finished map Steam games");
+            Console.WriteLine("Finished map SteamId to names");
         }
 
         public SteamApp[]? FindSteamApp(string name) {

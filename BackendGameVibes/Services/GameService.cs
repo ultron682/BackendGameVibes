@@ -163,7 +163,9 @@ namespace BackendGameVibes.Services {
                                 g.Title,
                                 g.CoverImage,
                                 Rating = g.Reviews!.Where(c => c.GameId == g.Id).Select(c => c.GameplayScore).Average().ToString("0.0")
+
                             })
+                            .OrderBy(r => EF.Functions.Random())
                             .Take(5)
                             .ToArrayAsync();
 
@@ -182,8 +184,9 @@ namespace BackendGameVibes.Services {
                      g.CoverImage,
                      g.ReleaseDate
                  })
-                 .Take(5)
-                 .ToArrayAsync();
+                .OrderBy(r => EF.Functions.Random())
+                .Take(5)
+                .ToArrayAsync();
         }
     }
 }

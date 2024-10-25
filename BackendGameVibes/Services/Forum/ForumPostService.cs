@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BackendGameVibes.Data;
+using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Requests.Forum;
 using Microsoft.AspNetCore.Mvc;

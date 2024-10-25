@@ -74,6 +74,15 @@ namespace BackendGameVibes.Services.Forum {
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<object>> GetSections() {
+            return await _context.ForumSections
+                .Select(s => new {
+                    s.Id,
+                    s.Name
+                })
+                .ToListAsync();
+        }
+
         public void Dispose() {
             _context.Dispose();
         }

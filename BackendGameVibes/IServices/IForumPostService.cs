@@ -2,7 +2,7 @@
 using BackendGameVibes.Models.Requests.Forum;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BackendGameVibes.Services {
+namespace BackendGameVibes.IServices {
     public interface IForumPostService : IDisposable {
         Task<ForumPost> AddForumPost(ForumPostDTO forumPostDTO);
         Task<ActionResult<IEnumerable<ForumPost>>> GetAllPosts(int idThread);
