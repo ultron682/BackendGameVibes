@@ -190,7 +190,8 @@ namespace BackendGameVibes.Helpers {
                 }
             }
 
-            for (int i = 0; i < 15; i++) {
+            // user #1 threads
+            for (int i = 0; i < 9; i++) {
                 ForumThread newForumThread = await threadService!.AddThreadAsync(new NewForumThreadDTO {
                     Title = $"Forum Thread {i} " + GenerateRandomSentence(2),
                     UserOwnerId = userTest!.Id,
@@ -208,7 +209,26 @@ namespace BackendGameVibes.Helpers {
                 }
             }
 
-            Console.WriteLine("Finish Init DB");
+            // user #2 threads 
+            for (int i = 0; i < 9; i++) {
+                ForumThread newForumThread = await threadService!.AddThreadAsync(new NewForumThreadDTO {
+                    Title = $"Forum Thread {i} " + GenerateRandomSentence(2),
+                    UserOwnerId = userTest2!.Id,
+                    SectionId = 1,
+                    FirstForumPostContent = GenerateRandomSentence(random.Next(10, 30))
+                });
+
+                int postsCount = random.Next(0, 10);
+                for (int j = 0; j < postsCount; j++) {
+                    await postService!.AddForumPost(new ForumPostDTO {
+                        Content = $"{postsCount} " + GenerateRandomSentence(random.Next(10, 30)),
+                        ThreadId = newForumThread.Id,
+                        UserOwnerId = userTest2!.Id
+                    });
+                }
+            }
+
+            Console.WriteLine("Finished Init DB");
         }
     }
 }
