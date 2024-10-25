@@ -209,7 +209,7 @@ namespace BackendGameVibes.Services {
             return await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
         }
 
-        public async Task<object[]> FindUserByNickname(string myNickname, string searchName) {
+        public async Task<object[]> FindUsersNickAndIdsByNickname(string myNickname, string searchName) {
             var findedUsers = await _context.Users
                 .Where(u => u.UserName!.Contains(searchName) && u.UserName != myNickname)
                 .Select(u => new {

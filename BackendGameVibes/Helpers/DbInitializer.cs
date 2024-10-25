@@ -98,9 +98,15 @@ namespace BackendGameVibes.Helpers {
                     Email = "test@test.com",
                     EmailConfirmed = true
                 };
+                var newUser2 = new UserGameVibes {
+                    UserName = "user2",
+                    Email = "test2@test.com",
+                    EmailConfirmed = true
+                };
                 string userPWD = "Test123.";
 
                 IdentityResult chkUser = await userManager.CreateAsync(newUser, userPWD);
+                await userManager.CreateAsync(newUser2, userPWD);
 
                 if (chkUser.Succeeded) {
                     await userManager.AddToRoleAsync(newUser, "user");
