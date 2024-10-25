@@ -1,5 +1,7 @@
 ﻿using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
+using BackendGameVibes.Models.Forum;
+using BackendGameVibes.Models.Requests.Forum;
 using BackendGameVibes.Services;
 using Microsoft.AspNetCore.Identity;
 using System.Runtime.CompilerServices;
@@ -12,7 +14,7 @@ namespace BackendGameVibes.Helpers {
         "ut", "labore", "et", "dolore", "magna", "aliqua"
        };
 
-        public static string GenerateRandomComment(int wordCount) {
+        public static string GenerateRandomSentence(int wordCount) {
             Random random = new Random();
             var words = new List<string>();
 
@@ -34,6 +36,7 @@ namespace BackendGameVibes.Helpers {
             using var reviewService = scope.ServiceProvider.GetRequiredService<IReviewService>();
             using var gameService = scope.ServiceProvider.GetRequiredService<IGameService>();
             using var threadService = scope.ServiceProvider.GetService<ThreadService>();
+            using var postService = scope.ServiceProvider.GetService<PostService>();
             Random random = new();
 
 
@@ -162,12 +165,30 @@ namespace BackendGameVibes.Helpers {
                 for (int i = 0; i < 100; i++) {
                     await reviewService.AddReviewAsync(new Review {
                         GameId = createdGames[random.Next(0, createdGames.Count)].game!.Id,
-                        Comment = GenerateRandomComment(random.Next(10, 30)),
+                        Comment = GenerateRandomSentence(random.Next(10, 30)),
                         GeneralScore = random.Next(1, 11), // 1-10
                         GraphicsScore = random.Next(1, 11),
                         AudioScore = random.Next(1, 11),
                         GameplayScore = random.Next(1, 11),
                         UserGameVibesId = userTest!.Id
+                    });
+                }
+            }
+
+            for (int i = 0; i < 15; i++) {
+                ForumThread newForumThread = await threadService!.AddThreadAsync(new NewForumThreadDTO {
+                    Title = $"Forum Thread {i} " + GenerateRandomSentence(2),
+                    UserOwnerId = userTest!.Id,
+                    SectionId = 1,
+                    FirstForumPostContent = GenerateRandomSentence(random.Next(10, 30))
+                });
+
+                int postsCount = random.Next(0, 10);
+                for (int j = 0; j < postsCount; j++) {
+                    await postService!.AddForumPost(new ForumPostDTO {
+                        Content = $"{postsCount} " + GenerateRandomSentence(random.Next(10, 30)),
+                        ThreadId = newForumThread.Id,
+                        UserOwnerId = userTest!.Id
                     });
                 }
             }
