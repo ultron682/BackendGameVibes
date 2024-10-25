@@ -51,24 +51,26 @@ namespace BackendGameVibes.Services.Forum {
         public async Task<IEnumerable<object>> GetLandingThreads() {
             return await _context.ForumThreads
                 .Include(t => t.Posts)
-                .TakeLast(5)
+                .Include(t => t.Section)
+                .Include(t => t.UserOwner)
                 .Select(t => new {
                     t.Id,
                     t.Title,
                     t.CreatedDateTime,
                     t.LastUpdatedDateTime,
                     t.UserOwnerId,
-                    t.UserOwner,
-                    t.SectionId,
+                    username = t.UserOwner,
                     t.Section,
-                    Posts = t.Posts!.Select(p => new {
-                        p.Id,
-                        p.Content,
-                        p.CreatedDateTime,
-                        p.UserOwnerId,
-                        p.UserOwner
-                    })
+                    //Posts = t.Posts!.Select(p => new {
+                    //    p.Id,
+                    //    p.Content,
+                    //    p.CreatedDateTime,
+                    //    p.UserOwnerId,
+                    //    p.UserOwner
+                    //})
                 })
+                .OrderByDescending(ft => ft.CreatedDateTime)
+                .Take(5)
                 .ToListAsync();
         }
 
