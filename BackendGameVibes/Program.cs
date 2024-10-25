@@ -119,7 +119,6 @@ builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailS
 builder.Services.AddControllers()
     .AddJsonOptions(options => {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-        options.JsonSerializerOptions.ReferenceHandler = null;
     });
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));

@@ -129,8 +129,11 @@ namespace BackendGameVibes.Helpers {
                 await roleManager.CreateAsync(role);
             }
 
-            UserGameVibes? userTest = await userManager.FindByEmailAsync("test@test.com");
-            UserGameVibes? userTest2 = await userManager.FindByEmailAsync("test2@test.com");
+            var usersTest = new UserGameVibes?[] {
+                await userManager.FindByEmailAsync("test@test.com"),
+                await userManager.FindByEmailAsync("test2@test.com"),
+                await userManager.FindByEmailAsync("test3@test.com")
+            };
 
             (Game? game, bool isSuccess) createdGame1 = await gameService.CreateGame(292030); // The Witcher 3
 
@@ -164,7 +167,7 @@ namespace BackendGameVibes.Helpers {
                     GraphicsScore = 7.5,
                     AudioScore = 6.5,
                     GameplayScore = 8.9,
-                    UserGameVibesId = userTest!.Id
+                    UserGameVibesId = usersTest[0]!.Id
                 });
 
                 await reviewService.AddReviewAsync(new Review {
@@ -174,7 +177,7 @@ namespace BackendGameVibes.Helpers {
                     GraphicsScore = 7.5,
                     AudioScore = 6.5,
                     GameplayScore = 8.9,
-                    UserGameVibesId = userTest!.Id
+                    UserGameVibesId = usersTest[1]!.Id
                 });
 
                 for (int i = 0; i < 100; i++) {
@@ -185,7 +188,7 @@ namespace BackendGameVibes.Helpers {
                         GraphicsScore = random.Next(1, 11),
                         AudioScore = random.Next(1, 11),
                         GameplayScore = random.Next(1, 11),
-                        UserGameVibesId = userTest!.Id
+                        UserGameVibesId = usersTest[random.Next(0, usersTest.Length)]!.Id
                     });
                 }
             }
@@ -194,7 +197,7 @@ namespace BackendGameVibes.Helpers {
             for (int i = 0; i < 9; i++) {
                 ForumThread newForumThread = await threadService!.AddThreadAsync(new NewForumThreadDTO {
                     Title = $"Forum Thread {i} " + GenerateRandomSentence(2),
-                    UserOwnerId = userTest!.Id,
+                    UserOwnerId = usersTest[0]!.Id,
                     SectionId = 1,
                     FirstForumPostContent = GenerateRandomSentence(random.Next(10, 30))
                 });
@@ -204,7 +207,7 @@ namespace BackendGameVibes.Helpers {
                     await postService!.AddForumPost(new ForumPostDTO {
                         Content = $"{postsCount} " + GenerateRandomSentence(random.Next(10, 30)),
                         ThreadId = newForumThread.Id,
-                        UserOwnerId = userTest!.Id
+                        UserOwnerId = usersTest[random.Next(0, usersTest.Length)]!.Id
                     });
                 }
             }
@@ -213,7 +216,7 @@ namespace BackendGameVibes.Helpers {
             for (int i = 0; i < 9; i++) {
                 ForumThread newForumThread = await threadService!.AddThreadAsync(new NewForumThreadDTO {
                     Title = $"Forum Thread {i} " + GenerateRandomSentence(2),
-                    UserOwnerId = userTest2!.Id,
+                    UserOwnerId = usersTest[1]!.Id,
                     SectionId = 1,
                     FirstForumPostContent = GenerateRandomSentence(random.Next(10, 30))
                 });
@@ -223,7 +226,7 @@ namespace BackendGameVibes.Helpers {
                     await postService!.AddForumPost(new ForumPostDTO {
                         Content = $"{postsCount} " + GenerateRandomSentence(random.Next(10, 30)),
                         ThreadId = newForumThread.Id,
-                        UserOwnerId = userTest2!.Id
+                        UserOwnerId = usersTest[random.Next(0, usersTest.Length)]!.Id
                     });
                 }
             }
