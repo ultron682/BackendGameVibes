@@ -6,8 +6,7 @@ using BackendGameVibes.Services.Forum;
 using Microsoft.AspNetCore.Identity;
 using System.Runtime.CompilerServices;
 
-namespace BackendGameVibes.Helpers
-{
+namespace BackendGameVibes.Helpers {
     public class DbInitializer {
         private static readonly string[] LoremIpsumWords = {
         "lorem", "ipsum", "dolor", "sit", "amet", "consectetur",
@@ -36,8 +35,8 @@ namespace BackendGameVibes.Helpers
             using var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             using var reviewService = scope.ServiceProvider.GetRequiredService<IReviewService>();
             using var gameService = scope.ServiceProvider.GetRequiredService<IGameService>();
-            using var threadService = scope.ServiceProvider.GetService<ForumThreadService>();
-            using var postService = scope.ServiceProvider.GetService<ForumPostService>();
+            using var threadService = scope.ServiceProvider.GetService<IForumThreadService>();
+            using var postService = scope.ServiceProvider.GetService<IForumPostService>();
             Random random = new();
 
 

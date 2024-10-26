@@ -3,7 +3,6 @@ using BackendGameVibes.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Diagnostics;
 using BackendGameVibes.Models.Forum;
-using System;
 
 namespace BackendGameVibes.Data {
     public class ApplicationDbContext : IdentityDbContext<UserGameVibes> {

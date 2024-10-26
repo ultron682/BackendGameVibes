@@ -42,6 +42,19 @@ namespace BackendGameVibes.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ForumSections",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ForumSections", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Games",
                 columns: table => new
                 {
@@ -51,7 +64,7 @@ namespace BackendGameVibes.Migrations
                     Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
                     ReleaseDate = table.Column<DateOnly>(type: "TEXT", nullable: true),
                     SteamId = table.Column<int>(type: "INTEGER", nullable: false),
-                    HeaderImage = table.Column<string>(type: "TEXT", nullable: true)
+                    CoverImage = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -318,6 +331,35 @@ namespace BackendGameVibes.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ForumThreads",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Title = table.Column<string>(type: "TEXT", nullable: true),
+                    CreatedDateTime = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    LastUpdatedDateTime = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    UserOwnerId = table.Column<string>(type: "TEXT", nullable: true),
+                    SectionId = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ForumThreads", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ForumThreads_AspNetUsers_UserOwnerId",
+                        column: x => x.UserOwnerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ForumThreads_ForumSections_SectionId",
+                        column: x => x.SectionId,
+                        principalTable: "ForumSections",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Reviews",
                 columns: table => new
                 {
@@ -373,6 +415,35 @@ namespace BackendGameVibes.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ForumPosts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Content = table.Column<string>(type: "TEXT", nullable: true),
+                    CreatedDateTime = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    LastUpdatedDateTime = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ThreadId = table.Column<int>(type: "INTEGER", nullable: true),
+                    UserOwnerId = table.Column<string>(type: "TEXT", nullable: true),
+                    Likes = table.Column<int>(type: "INTEGER", nullable: false, defaultValue: 0),
+                    DisLikes = table.Column<int>(type: "INTEGER", nullable: false, defaultValue: 0)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ForumPosts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ForumPosts_AspNetUsers_UserOwnerId",
+                        column: x => x.UserOwnerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ForumPosts_ForumThreads_ThreadId",
+                        column: x => x.ThreadId,
+                        principalTable: "ForumThreads",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.InsertData(
                 table: "ForumRoles",
                 columns: new[] { "Id", "Name", "Threshold" },
@@ -382,6 +453,17 @@ namespace BackendGameVibes.Migrations
                     { 2, "experienced", 100 },
                     { 3, "powerful", 1000 },
                     { 4, "superhero", 10000 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "ForumSections",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "general" },
+                    { 2, "technologies" },
+                    { 3, "offtopic" },
+                    { 4, "advices" }
                 });
 
             migrationBuilder.InsertData(
@@ -435,6 +517,26 @@ namespace BackendGameVibes.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ForumPosts_ThreadId",
+                table: "ForumPosts",
+                column: "ThreadId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ForumPosts_UserOwnerId",
+                table: "ForumPosts",
+                column: "UserOwnerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ForumThreads_SectionId",
+                table: "ForumThreads",
+                column: "SectionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ForumThreads_UserOwnerId",
+                table: "ForumThreads",
+                column: "UserOwnerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GameImages_GameId",
@@ -491,6 +593,9 @@ namespace BackendGameVibes.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "ForumPosts");
+
+            migrationBuilder.DropTable(
                 name: "GameImages");
 
             migrationBuilder.DropTable(
@@ -512,16 +617,22 @@ namespace BackendGameVibes.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "ForumThreads");
+
+            migrationBuilder.DropTable(
                 name: "Genres");
 
             migrationBuilder.DropTable(
                 name: "Platforms");
 
             migrationBuilder.DropTable(
+                name: "Games");
+
+            migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Games");
+                name: "ForumSections");
 
             migrationBuilder.DropTable(
                 name: "ForumRoles");
