@@ -22,9 +22,10 @@ FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./BackendGameVibes.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
+
 # Ten etap jest używany w środowisku produkcyjnym lub w przypadku uruchamiania z programu VS w trybie regularnym (domyślnie, gdy nie jest używana konfiguracja debugowania)
 FROM base AS final
 WORKDIR /app
-COPY "./BackendGameVibes/GameVibesDatabase.db" .
+#COPY "./BackendGameVibes/GameVibesDatabase.db" .
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "BackendGameVibes.dll"]
+CMD ["dotnet", "BackendGameVibes.dll"]
