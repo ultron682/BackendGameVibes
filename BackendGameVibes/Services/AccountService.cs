@@ -2,6 +2,7 @@
 using BackendGameVibes.Helpers;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
+using BackendGameVibes.Models.Friends;
 using BackendGameVibes.Models.Requests;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -94,6 +95,11 @@ namespace BackendGameVibes.Services {
                         r.AudioScore,
                         r.Comment,
                         r.CreatedAt
+                    }).ToArray(),
+                    Friends = u.Friends.Select(f => new {
+                        f.FriendId,
+                        f.FriendUser!.UserName,
+                        f.FriendsSince
                     }).ToArray(),
                 })
                 .FirstOrDefaultAsync();
@@ -224,6 +230,83 @@ namespace BackendGameVibes.Services {
                      u.UserName
                  })
                  .ToArray();
+        }
+
+
+
+        private async Task<bool> SendNewFriendRequestEmailAsync(string email, string userSenderNick) {
+            if (userSenderNick == null || email == null)
+                return false;
+
+            string emailBody = await _htmlTemplateService.GetEmailTemplateAsync("wwwroot/EmailTemplates/new_friend_request.html",
+            new Dictionary<string, string>
+            {
+                { "UserName", userSenderNick }
+            });
+
+            _mail_Service.SendMail(new MailData() {
+                EmailBody = emailBody,
+                EmailSubject = "New friend request",
+                EmailToId = email,
+                EmailToName = userSenderNick
+            });
+            return true;
+        }
+
+        public async Task<bool> SendFriendRequestAsync(string senderId, string receiverId) {
+            var existingRequest = await _context.FriendRequests
+                .FirstOrDefaultAsync(fr => fr.SenderUserId == senderId && fr.ReceiverUserId == receiverId);
+
+            if (existingRequest == null) {
+                var friendRequest = new FriendRequest {
+                    SenderUserId = senderId,
+                    ReceiverUserId = receiverId
+                };
+
+                var userSender = await _userManager.FindByIdAsync(senderId);
+                var userReceiver = await _userManager.FindByIdAsync(receiverId);
+
+                if (userSender != null && userReceiver != null)
+                    await SendNewFriendRequestEmailAsync(userSender!.Email!, userReceiver!.UserName!);
+
+                _context.FriendRequests.Add(friendRequest);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        public async Task<bool> ConfirmFriendRequestAsync(string userId, string friendId) {
+            var friendRequest = await _context.FriendRequests
+                .FirstOrDefaultAsync(fr => fr.SenderUserId == userId && fr.ReceiverUserId == friendId && fr.IsAccepted == null);
+
+            if (friendRequest != null) {
+                friendRequest.IsAccepted = true;
+
+                var friend1 = new Friend { UserId = userId, FriendId = friendId };
+                var friend2 = new Friend { UserId = friendId, FriendId = userId };
+
+                _context.FriendRequests.Update(friendRequest);
+                _context.Friends.AddRange(friend1, friend2);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> RevokeFriendRequestAsync(string userId, string friendId) {
+            var friendRequest = await _context.FriendRequests
+                .FirstOrDefaultAsync(fr => fr.SenderUserId == userId && fr.ReceiverUserId == friendId && fr.IsAccepted == null);
+
+            if (friendRequest != null) {
+                friendRequest.IsAccepted = false;
+                _context.FriendRequests.Update(friendRequest);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
         }
 
         public void Dispose() {

@@ -177,6 +177,61 @@ namespace BackendGameVibes.Migrations
                     b.ToTable("ForumThreads");
                 });
 
+            modelBuilder.Entity("BackendGameVibes.Models.Friends.Friend", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FriendId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FriendsSince")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FriendId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Friends");
+                });
+
+            modelBuilder.Entity("BackendGameVibes.Models.Friends.FriendRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool?>("IsAccepted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReceiverUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("SentAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverUserId");
+
+                    b.HasIndex("SenderUserId");
+
+                    b.ToTable("FriendRequests");
+                });
+
             modelBuilder.Entity("BackendGameVibes.Models.Game", b =>
                 {
                     b.Property<int>("Id")
@@ -654,6 +709,40 @@ namespace BackendGameVibes.Migrations
                     b.Navigation("UserOwner");
                 });
 
+            modelBuilder.Entity("BackendGameVibes.Models.Friends.Friend", b =>
+                {
+                    b.HasOne("BackendGameVibes.Models.UserGameVibes", "FriendUser")
+                        .WithMany()
+                        .HasForeignKey("FriendId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("BackendGameVibes.Models.UserGameVibes", "User")
+                        .WithMany("Friends")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("FriendUser");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BackendGameVibes.Models.Friends.FriendRequest", b =>
+                {
+                    b.HasOne("BackendGameVibes.Models.UserGameVibes", "ReceiverUser")
+                        .WithMany("FriendRequestsReceived")
+                        .HasForeignKey("ReceiverUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("BackendGameVibes.Models.UserGameVibes", "SenderUser")
+                        .WithMany("FriendRequestsSent")
+                        .HasForeignKey("SenderUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("ReceiverUser");
+
+                    b.Navigation("SenderUser");
+                });
+
             modelBuilder.Entity("BackendGameVibes.Models.GameImage", b =>
                 {
                     b.HasOne("BackendGameVibes.Models.Game", "Game")
@@ -824,6 +913,12 @@ namespace BackendGameVibes.Migrations
 
             modelBuilder.Entity("BackendGameVibes.Models.UserGameVibes", b =>
                 {
+                    b.Navigation("FriendRequestsReceived");
+
+                    b.Navigation("FriendRequestsSent");
+
+                    b.Navigation("Friends");
+
                     b.Navigation("UserForumPosts");
 
                     b.Navigation("UserForumThreads");

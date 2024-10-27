@@ -290,6 +290,9 @@ namespace BackendGameVibes.Data {
 
 
             mB.Entity<FriendRequest>(ent => {
+                ent.Property(fR => fR.SentAt)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
                 ent.HasOne(fr => fr.SenderUser)
                    .WithMany(u => u.FriendRequestsSent)
                    .HasForeignKey(fr => fr.SenderUserId)
@@ -302,6 +305,9 @@ namespace BackendGameVibes.Data {
             });
 
             mB.Entity<Friend>(ent => {
+                ent.Property(fR => fR.FriendsSince)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
                 ent.HasOne(f => f.User)
                     .WithMany(u => u.Friends)
                     .HasForeignKey(f => f.UserId)

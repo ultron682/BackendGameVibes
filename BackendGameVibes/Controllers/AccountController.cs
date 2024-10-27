@@ -197,5 +197,79 @@ namespace BackendGameVibes.Controllers {
             var result = await _accountService.ConfirmResetPasswordAsync(email, token, newPassword);
             return result.Succeeded ? Ok("Password reset successfully") : BadRequest("Failed to reset password");
         }
+
+        [HttpGet("user/:id")]
+        [SwaggerOperation("podstawowe info o uzytkowniku. do publicznego profilu gracza. na razie zwraca wszystkie dane o user")]
+        public async Task<ActionResult<object>> GetUserAsync(string id) {
+            var user = await _accountService.GetUserByIdAsync(id);
+            if (user == null) {
+                return NotFound();
+            }
+            else {
+                var accountInfo = await _accountService.GetAccountInfoAsync(user.Id, user);
+                return Ok(accountInfo);
+            }
+        }
+
+        [HttpGet("user/search:nick")]
+        [SwaggerOperation("Require authorization >=user. Wyszukiwanie mozliwych uzytkownikow do dodania znajomych po nicku, (bez modów i adminów)")]
+        [Authorize]
+        public async Task<ActionResult<object>> SearchUserAsync(string nick) {
+            Console.WriteLine(User.Identity!.Name!);
+            string myNickname = User.Identity!.Name!;
+
+            var users = await _accountService.FindUsersNickAndIdsByNickname(myNickname, nick);
+            if (users == null) {
+                return NotFound();
+            }
+            else {
+                return Ok(users);
+            }
+        }
+
+        [HttpPost("user/send-friend-request:id")]
+        [Authorize]
+        [SwaggerOperation("autoryzowany uzytkownik wysyla zaproszenie")]
+        public async Task<IActionResult> SendFriendRequestAsync(string id) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            bool success = await _accountService.SendFriendRequestAsync(userId, id);
+            if (success)
+                return Ok("Zaproszenie wysłane");
+            else
+                return BadRequest("Zaproszenie juz wyslane wczesniej");
+        }
+
+        [HttpPost("user/confirm-friend-request:id")]
+        [SwaggerOperation("autoryzowany uzytkownik akceptuje zaproszenie")]
+        [Authorize]
+        public async Task<IActionResult> ConfirmFriendRequestAsync(string id) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            bool success = await _accountService.ConfirmFriendRequestAsync(userId, id);
+            if (success)
+                return Ok("Zaproszenie zaakceptowane");
+            else
+                return BadRequest("error");
+        }
+
+        [HttpPost("user/revoke-friend-request:id")]
+        [SwaggerOperation("autoryzowany uzytkownik akceptuje zaproszenie")]
+        [Authorize]
+        public async Task<IActionResult> RevokeFriendRequestAsync(string id) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            bool success = await _accountService.RevokeFriendRequestAsync(userId, id);
+            if (success)
+                return Ok("Zaproszenie odrzucone");
+            else
+                return BadRequest("error");
+        }
     }
 }
