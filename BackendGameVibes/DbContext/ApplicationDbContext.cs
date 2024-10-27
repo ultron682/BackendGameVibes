@@ -3,6 +3,7 @@ using BackendGameVibes.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Diagnostics;
 using BackendGameVibes.Models.Forum;
+using BackendGameVibes.Models.Friends;
 
 namespace BackendGameVibes.Data {
     public class ApplicationDbContext : IdentityDbContext<UserGameVibes> {
@@ -39,249 +40,280 @@ namespace BackendGameVibes.Data {
         public DbSet<ForumRole> ForumRoles {
             get; set;
         }
+        public DbSet<FriendRequest> FriendRequests {
+            get; set;
+        }
+        public DbSet<Friend> Friends {
+            get; set;
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.LogTo(message => Debug.WriteLine(message));
             base.OnConfiguring(optionsBuilder);
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder) {
-            // UserGameVibes entity
-            modelBuilder.Entity<UserGameVibes>(entity => {
-                entity.HasOne(u => u.ForumRole)
+        protected override void OnModelCreating(ModelBuilder mB) {
+            // UserGameVibes ent
+            mB.Entity<UserGameVibes>(ent => {
+                ent.HasOne(u => u.ForumRole)
                     .WithMany(fr => fr.Users)
                     .HasForeignKey(u => u.ForumRoleId)
                     .OnDelete(DeleteBehavior.SetNull);
 
-                entity.Property(u => u.Description)
+                ent.Property(u => u.Description)
                     .HasMaxLength(500);
 
-                entity.Property(u => u.ExperiencePoints)
+                ent.Property(u => u.ExperiencePoints)
                     .HasDefaultValue(10);
 
-                entity.Property(u => u.ForumRoleId)
+                ent.Property(u => u.ForumRoleId)
                     .HasDefaultValue(1);
 
-                entity
+                ent
                     .HasMany(u => u.UserReviews)
                     .WithOne(r => r.UserGameVibes)
                     .HasForeignKey(u => u.UserGameVibesId)
                     .OnDelete(DeleteBehavior.SetNull);
 
-                entity
+                ent
                     .HasMany(u => u.UserFollowedGames)
                     .WithMany(g => g.PlayersFollowing)
                     .UsingEntity(j => j.ToTable("UsersGamesFollow"));
             });
 
-            // ForumRole entity
-            modelBuilder.Entity<ForumRole>(entity => {
-                entity.HasKey(fr => fr.Id);
+            // ForumRole ent
+            mB.Entity<ForumRole>(ent => {
+                ent.HasKey(fr => fr.Id);
 
-                entity.Property(fr => fr.Name)
+                ent.Property(fr => fr.Name)
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(fr => fr.Threshold)
+                ent.Property(fr => fr.Threshold)
                     .IsRequired();
 
-                entity.HasData(
+                ent.HasData(
                     new ForumRole() { Id = 1, Name = "beginner", Threshold = 0 },
                     new ForumRole() { Id = 2, Name = "experienced", Threshold = 100 },
                     new ForumRole() { Id = 3, Name = "powerful", Threshold = 1000 },
                     new ForumRole() { Id = 4, Name = "superhero", Threshold = 10000 });
             });
 
-            // Game entity
-            modelBuilder.Entity<Game>(entity => {
-                entity.HasKey(g => g.Id);
+            // Game ent
+            mB.Entity<Game>(ent => {
+                ent.HasKey(g => g.Id);
 
-                entity.Property(g => g.Title)
+                ent.Property(g => g.Title)
                     .IsRequired()
                     .HasMaxLength(100);
 
-                entity.Property(g => g.Description)
+                ent.Property(g => g.Description)
                     .HasMaxLength(1000);
 
-                entity.HasMany(g => g.Platforms)
+                ent.HasMany(g => g.Platforms)
                     .WithMany(p => p.Games)
                     .UsingEntity(j => j.ToTable("GamesPlatforms")); // many to many so we need 3 table to store the relationship
 
-                entity.HasMany(g => g.Genres)
+                ent.HasMany(g => g.Genres)
                     .WithMany(gen => gen.Games)
                     .UsingEntity(j => j.ToTable("GamesGenres")); // many to many so we need 3 table to store the relationship
 
-                entity.HasMany(g => g.GameImages)
+                ent.HasMany(g => g.GameImages)
                     .WithOne(img => img.Game)
                     .HasForeignKey(img => img.GameId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasMany(g => g.SystemRequirements)
+                ent.HasMany(g => g.SystemRequirements)
                     .WithOne(sr => sr.Game)
                     .HasForeignKey(sr => sr.GameId)
                     .OnDelete(DeleteBehavior.SetNull);
             });
 
-            // Platform entity
-            modelBuilder.Entity<Platform>(entity => {
-                entity.HasKey(p => p.Id);
+            // Platform ent
+            mB.Entity<Platform>(ent => {
+                ent.HasKey(p => p.Id);
 
-                entity.Property(p => p.Name)
+                ent.Property(p => p.Name)
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.HasData(
+                ent.HasData(
                     new Platform() { Id = 1, Name = "Windows" },
                     new Platform() { Id = 2, Name = "Linux" },
                     new Platform() { Id = 3, Name = "MacOS" });
             });
 
-            // Genre entity
-            modelBuilder.Entity<Genre>(entity => {
-                entity.HasKey(g => g.Id);
+            // Genre ent
+            mB.Entity<Genre>(ent => {
+                ent.HasKey(g => g.Id);
 
-                entity.Property(g => g.Name)
+                ent.Property(g => g.Name)
                     .IsRequired()
                     .HasMaxLength(50);
 
                 // steam Ids with their corresponding name genres, jednak tego jest duzo wiecej więc z automatu będą się dodawać niewystępujące jeszcze w bazie
             });
 
-            // GameImage entity
-            modelBuilder.Entity<GameImage>(entity => {
-                entity.HasKey(gi => gi.Id);
+            // GameImage ent
+            mB.Entity<GameImage>(ent => {
+                ent.HasKey(gi => gi.Id);
 
-                entity.Property(gi => gi.ImagePath)
+                ent.Property(gi => gi.ImagePath)
                     .IsRequired()
                     .HasMaxLength(255);
             });
 
-            // SystemRequirement entity
-            modelBuilder.Entity<SystemRequirement>(entity => {
-                entity.HasKey(sr => sr.Id);
+            // SystemRequirement ent
+            mB.Entity<SystemRequirement>(ent => {
+                ent.HasKey(sr => sr.Id);
 
-                entity.Property(sr => sr.CpuRequirement)
+                ent.Property(sr => sr.CpuRequirement)
                     .IsRequired()
                     .HasMaxLength(100);
 
-                entity.Property(sr => sr.GpuRequirement)
+                ent.Property(sr => sr.GpuRequirement)
                     .IsRequired()
                     .HasMaxLength(100);
 
-                entity.Property(sr => sr.RamRequirement)
+                ent.Property(sr => sr.RamRequirement)
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(sr => sr.DiskRequirement)
+                ent.Property(sr => sr.DiskRequirement)
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(sr => sr.OperatingSystemRequirement)
+                ent.Property(sr => sr.OperatingSystemRequirement)
                     .IsRequired()
                     .HasMaxLength(100);
 
-                entity.HasOne(sr => sr.Game)
+                ent.HasOne(sr => sr.Game)
                     .WithMany(g => g.SystemRequirements)
                     .HasForeignKey(sr => sr.GameId)
                     .OnDelete(DeleteBehavior.SetNull);
             });
 
-            // Review entity
-            modelBuilder.Entity<Review>(entity => {
-                entity.HasKey(r => r.Id);
+            // Review ent
+            mB.Entity<Review>(ent => {
+                ent.HasKey(r => r.Id);
 
-                entity.Property(r => r.GeneralScore)
+                ent.Property(r => r.GeneralScore)
                     .IsRequired()
                     .HasPrecision(3, 2);
 
-                entity.Property(r => r.GraphicsScore)
+                ent.Property(r => r.GraphicsScore)
                     .IsRequired()
                     .HasPrecision(3, 2);
 
-                entity.Property(r => r.AudioScore)
+                ent.Property(r => r.AudioScore)
                     .IsRequired()
                     .HasPrecision(3, 2);
 
-                entity.Property(r => r.GameplayScore)
+                ent.Property(r => r.GameplayScore)
                     .IsRequired()
                     .HasPrecision(3, 2);
 
-                entity.Property(r => r.Comment)
+                ent.Property(r => r.Comment)
                     .HasMaxLength(1000);
 
-                entity.Property(r => r.CreatedAt)
+                ent.Property(r => r.CreatedAt)
                     .HasDefaultValueSql("CURRENT_TIMESTAMP")
                     .IsRequired();
 
-                entity.HasOne(r => r.Game)
+                ent.HasOne(r => r.Game)
                     .WithMany(g => g.Reviews)
                     .HasForeignKey(r => r.GameId)
                     .OnDelete(DeleteBehavior.SetNull);
             });
 
-            modelBuilder.Entity<ForumSection>(entity => {
-                entity.HasData(
+            mB.Entity<ForumSection>(ent => {
+                ent.HasData(
                     new ForumSection() { Id = 1, Name = "general" },
                     new ForumSection() { Id = 2, Name = "technologies" },
                     new ForumSection() { Id = 3, Name = "offtopic" },
                     new ForumSection() { Id = 4, Name = "advices" });
             });
 
-            modelBuilder.Entity<ForumThread>(entity => {
-                entity.HasKey(t => t.Id);
+            mB.Entity<ForumThread>(ent => {
+                ent.HasKey(t => t.Id);
 
-                entity.Property(t => t.CreatedDateTime)
+                ent.Property(t => t.CreatedDateTime)
                     .HasDefaultValueSql("CURRENT_TIMESTAMP")
                     .IsRequired()
                     .ValueGeneratedOnAdd();
 
-                entity.Property(t => t.LastUpdatedDateTime)
+                ent.Property(t => t.LastUpdatedDateTime)
                     .HasDefaultValueSql("CURRENT_TIMESTAMP")
                     .IsRequired()
                     .ValueGeneratedOnAddOrUpdate();
 
-                entity.HasOne(t => t.UserOwner)
+                ent.HasOne(t => t.UserOwner)
                     .WithMany(u => u.UserForumThreads)
                     .HasForeignKey(t => t.UserOwnerId)
                     .OnDelete(DeleteBehavior.SetNull);
 
-                entity.HasOne(t => t.Section)
+                ent.HasOne(t => t.Section)
                     .WithMany(s => s.Threads)
                     .HasForeignKey(t => t.SectionId)
                     .OnDelete(DeleteBehavior.SetNull);
 
-                entity.HasMany(t => t.Posts)
+                ent.HasMany(t => t.Posts)
                     .WithOne(p => p.Thread)
                     .HasForeignKey(p => p.ThreadId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<ForumPost>(entity => {
-                entity.HasKey(p => p.Id);
+            mB.Entity<ForumPost>(ent => {
+                ent.HasKey(p => p.Id);
 
-                entity.Property(p => p.CreatedDateTime)
+                ent.Property(p => p.CreatedDateTime)
                     .HasDefaultValueSql("CURRENT_TIMESTAMP")
                     .IsRequired()
                     .ValueGeneratedOnAdd();
 
-                entity.Property(p => p.LastUpdatedDateTime)
+                ent.Property(p => p.LastUpdatedDateTime)
                     .HasDefaultValueSql("CURRENT_TIMESTAMP")
                     .IsRequired()
                     .ValueGeneratedOnAddOrUpdate();
 
-                entity.Property(p => p.Likes)
+                ent.Property(p => p.Likes)
                     .HasDefaultValue(0);
 
-                entity.Property(p => p.DisLikes)
+                ent.Property(p => p.DisLikes)
                     .HasDefaultValue(0);
 
-                entity.HasOne(p => p.UserOwner)
+                ent.HasOne(p => p.UserOwner)
                     .WithMany(u => u.UserForumPosts)
                     .HasForeignKey(p => p.UserOwnerId)
                     .OnDelete(DeleteBehavior.SetNull);
             });
 
-            base.OnModelCreating(modelBuilder);
+
+            mB.Entity<FriendRequest>(ent => {
+                ent.HasOne(fr => fr.SenderUser)
+                   .WithMany(u => u.FriendRequestsSent)
+                   .HasForeignKey(fr => fr.SenderUserId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+                ent.HasOne(fr => fr.ReceiverUser)
+                    .WithMany(u => u.FriendRequestsReceived)
+                    .HasForeignKey(fr => fr.ReceiverUserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            mB.Entity<Friend>(ent => {
+                ent.HasOne(f => f.User)
+                    .WithMany(u => u.Friends)
+                    .HasForeignKey(f => f.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                ent.HasOne(f => f.FriendUser)
+                    .WithMany()
+                    .HasForeignKey(f => f.FriendId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            base.OnModelCreating(mB);
         }
 
     }
