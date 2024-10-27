@@ -23,10 +23,13 @@ namespace BackendGameVibes.Models {
         public ForumRole? ForumRole {
             get; set;
         }
-        public ICollection<Game>? FollowedGames {
+        public ICollection<Game>? UserFollowedGames {
             get; set;
         }
-        public ICollection<ForumThread>? ForumThreads {
+        public ICollection<ForumThread>? UserForumThreads {
+            get; set;
+        }
+        public ICollection<ForumPost>? UserForumPosts {
             get; set;
         }
     }

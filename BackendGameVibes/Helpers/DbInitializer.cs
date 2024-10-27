@@ -28,22 +28,22 @@ namespace BackendGameVibes.Helpers {
 
         public static async Task InitializeAsync(AsyncServiceScope scope) {
             using var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserGameVibes>>();
+            using var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            if (await userManager.FindByEmailAsync("test@test.com") != null)
+            bool roleExist = await roleManager.RoleExistsAsync("admin");
+            if (roleExist)
                 return;
 
-            using var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             using var reviewService = scope.ServiceProvider.GetRequiredService<IReviewService>();
             using var gameService = scope.ServiceProvider.GetRequiredService<IGameService>();
             using var threadService = scope.ServiceProvider.GetService<IForumThreadService>();
             using var postService = scope.ServiceProvider.GetService<IForumPostService>();
             Random random = new();
 
-
             Console.WriteLine("Start Init DB");
 
-            bool x = await roleManager.RoleExistsAsync("admin");
-            if (!x) {
+
+            if (!roleExist) {
                 var role = new IdentityRole();
                 role.Name = "admin";
                 await roleManager.CreateAsync(role);
@@ -64,8 +64,8 @@ namespace BackendGameVibes.Helpers {
             }
 
             // Creating mod role     
-            x = await roleManager.RoleExistsAsync("mod");
-            if (!x) {
+            roleExist = await roleManager.RoleExistsAsync("mod");
+            if (!roleExist) {
                 var role = new IdentityRole();
                 role.Name = "mod";
                 await roleManager.CreateAsync(role);
@@ -86,13 +86,13 @@ namespace BackendGameVibes.Helpers {
             }
 
             // Creating user role     
-            x = await roleManager.RoleExistsAsync("user");
-            if (!x) {
+            roleExist = await roleManager.RoleExistsAsync("user");
+            if (!roleExist) {
                 var role = new IdentityRole();
                 role.Name = "user";
                 await roleManager.CreateAsync(role);
 
-                //Normal user      
+                //Normal users    
                 var newUser = new UserGameVibes {
                     UserName = "test",
                     Email = "test@test.com",
@@ -122,8 +122,8 @@ namespace BackendGameVibes.Helpers {
             }
 
             // Creating guest role - something like [AllowAnonymous], todo: remove???
-            x = await roleManager.RoleExistsAsync("guest");
-            if (!x) {
+            roleExist = await roleManager.RoleExistsAsync("guest");
+            if (!roleExist) {
                 var role = new IdentityRole();
                 role.Name = "guest";
                 await roleManager.CreateAsync(role);

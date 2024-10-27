@@ -393,7 +393,6 @@ namespace BackendGameVibes.Migrations
                         .HasDefaultValue(10);
 
                     b.Property<int?>("ForumRoleId")
-                        .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(1);
@@ -480,15 +479,15 @@ namespace BackendGameVibes.Migrations
 
             modelBuilder.Entity("GameUserGameVibes", b =>
                 {
-                    b.Property<int>("FollowedGamesId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("PlayersFollowingId")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("FollowedGamesId", "PlayersFollowingId");
+                    b.Property<int>("UserFollowedGamesId")
+                        .HasColumnType("INTEGER");
 
-                    b.HasIndex("PlayersFollowingId");
+                    b.HasKey("PlayersFollowingId", "UserFollowedGamesId");
+
+                    b.HasIndex("UserFollowedGamesId");
 
                     b.ToTable("UsersGamesFollow", (string)null);
                 });
@@ -625,11 +624,13 @@ namespace BackendGameVibes.Migrations
                 {
                     b.HasOne("BackendGameVibes.Models.Forum.ForumThread", "Thread")
                         .WithMany("Posts")
-                        .HasForeignKey("ThreadId");
+                        .HasForeignKey("ThreadId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("BackendGameVibes.Models.UserGameVibes", "UserOwner")
-                        .WithMany()
-                        .HasForeignKey("UserOwnerId");
+                        .WithMany("UserForumPosts")
+                        .HasForeignKey("UserOwnerId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Thread");
 
@@ -641,12 +642,12 @@ namespace BackendGameVibes.Migrations
                     b.HasOne("BackendGameVibes.Models.Forum.ForumSection", "Section")
                         .WithMany("Threads")
                         .HasForeignKey("SectionId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("BackendGameVibes.Models.UserGameVibes", "UserOwner")
-                        .WithMany("ForumThreads")
+                        .WithMany("UserForumThreads")
                         .HasForeignKey("UserOwnerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Section");
 
@@ -668,12 +669,12 @@ namespace BackendGameVibes.Migrations
                     b.HasOne("BackendGameVibes.Models.Game", "Game")
                         .WithMany("Reviews")
                         .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("BackendGameVibes.Models.UserGameVibes", "UserGameVibes")
                         .WithMany("UserReviews")
                         .HasForeignKey("UserGameVibesId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Game");
 
@@ -685,7 +686,7 @@ namespace BackendGameVibes.Migrations
                     b.HasOne("BackendGameVibes.Models.Game", "Game")
                         .WithMany("SystemRequirements")
                         .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
 
                     b.Navigation("Game");
@@ -696,8 +697,7 @@ namespace BackendGameVibes.Migrations
                     b.HasOne("BackendGameVibes.Models.Forum.ForumRole", "ForumRole")
                         .WithMany("Users")
                         .HasForeignKey("ForumRoleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("ForumRole");
                 });
@@ -734,15 +734,15 @@ namespace BackendGameVibes.Migrations
 
             modelBuilder.Entity("GameUserGameVibes", b =>
                 {
-                    b.HasOne("BackendGameVibes.Models.Game", null)
-                        .WithMany()
-                        .HasForeignKey("FollowedGamesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BackendGameVibes.Models.UserGameVibes", null)
                         .WithMany()
                         .HasForeignKey("PlayersFollowingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackendGameVibes.Models.Game", null)
+                        .WithMany()
+                        .HasForeignKey("UserFollowedGamesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -824,7 +824,9 @@ namespace BackendGameVibes.Migrations
 
             modelBuilder.Entity("BackendGameVibes.Models.UserGameVibes", b =>
                 {
-                    b.Navigation("ForumThreads");
+                    b.Navigation("UserForumPosts");
+
+                    b.Navigation("UserForumThreads");
 
                     b.Navigation("UserReviews");
                 });

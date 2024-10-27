@@ -17,14 +17,32 @@ namespace BackendGameVibes.Controllers {
     [Route("api/[controller]")]
     [SwaggerTag("Require authorization admin")]
     public class AdministrationController : ControllerBase {
+        private readonly UserManager<UserGameVibes> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly IAccountService _accountService;
+        private readonly IHostApplicationLifetime _applicationLifetime;
 
-        public AdministrationController(ApplicationDbContext context, IMapper mapper, IAccountService accountService) {
+        public AdministrationController(ApplicationDbContext context,
+            UserManager<UserGameVibes> userManager,
+            IHostApplicationLifetime applicationLifetime,
+            IMapper mapper,
+            IAccountService accountService) {
             _context = context;
             _mapper = mapper;
             _accountService = accountService;
+            _userManager = userManager;
+            _applicationLifetime = applicationLifetime;
+        }
+
+        [SwaggerOperation("Usuwa baze i tworzy plik bazy od początku. Zamyka aplikację którą trzeba ręcznie ponownie uruchomic")]
+        [HttpGet("DROP_DATABASE")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetDatabase() {
+            await _context.Database.EnsureDeletedAsync();
+            await _context.Database.EnsureCreatedAsync();
+            _applicationLifetime.StopApplication();
+            return Ok("Database deleted");
         }
 
 
@@ -52,13 +70,17 @@ namespace BackendGameVibes.Controllers {
         [HttpDelete("user")]
         [Authorize("admin")]
         public async Task<IActionResult> DeleteUser(string userId) {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if (user == null) {
+            UserGameVibes? userGameVibes = await _userManager.FindByIdAsync(userId);
+            if (userGameVibes == null) {
                 return NotFound();
             }
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-            return Ok();
+            else {
+                IdentityResult identityResult = await _userManager.DeleteAsync(userGameVibes);
+                if (identityResult.Succeeded)
+                    return Ok();
+                else
+                    return BadRequest();
+            }
         }
 
         [HttpDelete("review")]

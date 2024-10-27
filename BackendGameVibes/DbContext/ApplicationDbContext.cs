@@ -51,7 +51,7 @@ namespace BackendGameVibes.Data {
                 entity.HasOne(u => u.ForumRole)
                     .WithMany(fr => fr.Users)
                     .HasForeignKey(u => u.ForumRoleId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.SetNull);
 
                 entity.Property(u => u.Description)
                     .HasMaxLength(500);
@@ -60,15 +60,16 @@ namespace BackendGameVibes.Data {
                     .HasDefaultValue(10);
 
                 entity.Property(u => u.ForumRoleId)
-                    .IsRequired(true)
                     .HasDefaultValue(1);
 
                 entity
                     .HasMany(u => u.UserReviews)
-                    .WithOne(r => r.UserGameVibes);
+                    .WithOne(r => r.UserGameVibes)
+                    .HasForeignKey(u => u.UserGameVibesId)
+                    .OnDelete(DeleteBehavior.SetNull);
 
                 entity
-                    .HasMany(u => u.FollowedGames)
+                    .HasMany(u => u.UserFollowedGames)
                     .WithMany(g => g.PlayersFollowing)
                     .UsingEntity(j => j.ToTable("UsersGamesFollow"));
             });
@@ -83,11 +84,6 @@ namespace BackendGameVibes.Data {
 
                 entity.Property(fr => fr.Threshold)
                     .IsRequired();
-
-                entity.HasMany(fr => fr.Users)
-                    .WithOne(u => u.ForumRole)
-                    .HasForeignKey(u => u.ForumRoleId)
-                    .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasData(
                     new ForumRole() { Id = 1, Name = "beginner", Threshold = 0 },
@@ -123,7 +119,7 @@ namespace BackendGameVibes.Data {
                 entity.HasMany(g => g.SystemRequirements)
                     .WithOne(sr => sr.Game)
                     .HasForeignKey(sr => sr.GameId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             // Platform entity
@@ -158,11 +154,6 @@ namespace BackendGameVibes.Data {
                 entity.Property(gi => gi.ImagePath)
                     .IsRequired()
                     .HasMaxLength(255);
-
-                entity.HasOne(gi => gi.Game)
-                    .WithMany(g => g.GameImages)
-                    .HasForeignKey(gi => gi.GameId)
-                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             // SystemRequirement entity
@@ -192,7 +183,7 @@ namespace BackendGameVibes.Data {
                 entity.HasOne(sr => sr.Game)
                     .WithMany(g => g.SystemRequirements)
                     .HasForeignKey(sr => sr.GameId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             // Review entity
@@ -222,15 +213,10 @@ namespace BackendGameVibes.Data {
                     .HasDefaultValueSql("CURRENT_TIMESTAMP")
                     .IsRequired();
 
-                entity.HasOne(r => r.UserGameVibes)
-                    .WithMany(u => u.UserReviews)
-                    .HasForeignKey(r => r.UserGameVibesId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
                 entity.HasOne(r => r.Game)
                     .WithMany(g => g.Reviews)
                     .HasForeignKey(r => r.GameId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             modelBuilder.Entity<ForumSection>(entity => {
@@ -255,18 +241,19 @@ namespace BackendGameVibes.Data {
                     .ValueGeneratedOnAddOrUpdate();
 
                 entity.HasOne(t => t.UserOwner)
-                    .WithMany(u => u.ForumThreads)
+                    .WithMany(u => u.UserForumThreads)
                     .HasForeignKey(t => t.UserOwnerId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.SetNull);
 
                 entity.HasOne(t => t.Section)
                     .WithMany(s => s.Threads)
                     .HasForeignKey(t => t.SectionId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.SetNull);
 
                 entity.HasMany(t => t.Posts)
-                .WithOne(p => p.Thread)
-                .HasForeignKey(p => p.ThreadId);
+                    .WithOne(p => p.Thread)
+                    .HasForeignKey(p => p.ThreadId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<ForumPost>(entity => {
@@ -287,6 +274,11 @@ namespace BackendGameVibes.Data {
 
                 entity.Property(p => p.DisLikes)
                     .HasDefaultValue(0);
+
+                entity.HasOne(p => p.UserOwner)
+                    .WithMany(u => u.UserForumPosts)
+                    .HasForeignKey(p => p.UserOwnerId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             base.OnModelCreating(modelBuilder);
