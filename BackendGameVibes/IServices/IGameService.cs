@@ -13,5 +13,6 @@ namespace BackendGameVibes.IServices {
         Task<object[]> GetGenres();
         Task<object[]> GetLandingGames();
         Task<object[]> GetUpcomingGames();
+        Task<IEnumerable<object>> GetGameReviews(int id);
     }
 }

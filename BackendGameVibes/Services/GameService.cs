@@ -66,6 +66,30 @@ namespace BackendGameVibes.Services {
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<IEnumerable<object>> GetGameReviews(int id) {
+            return await _context.Games
+                .Include(g => g.Reviews)
+                //.ThenInclude(g => g.UserGameVibes)
+                .Where(g => g.Id == id)
+                .Select(g => new {
+                    g.Id,
+                    g.Title,
+                    Reviews = g.Reviews!.Where(r => r.GameId == g.Id)
+                        .Select(r => new {
+                            r.Id,
+                            r.GeneralScore,
+                            r.GameplayScore,
+                            r.GraphicsScore,
+                            r.AudioScore,
+                            r.Comment,
+                            Username = r.UserGameVibes != null ? r.UserGameVibes.UserName : "NoUsername",
+                            r.CreatedAt,
+                        })
+                        .ToArray()
+                })
+                .ToArrayAsync();
+        }
+
         public async Task<(Game?, bool)> CreateGame(int steamGameId) {
             Game? foundGame = await _context.Games.Where(g => g.SteamId == steamGameId).FirstOrDefaultAsync();
             if (foundGame != null)

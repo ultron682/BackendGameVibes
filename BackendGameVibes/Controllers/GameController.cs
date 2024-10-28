@@ -53,6 +53,17 @@ namespace BackendGameVibes.Controllers {
             }
         }
 
+        [HttpGet("{id}/reviews")]
+        public async Task<ActionResult> GetGameReviews(int id) {
+            var gameReviews = await _gameService.GetGameReviews(id);
+            if (gameReviews == null) {
+                return NotFound();
+            }
+            else {
+                return Ok(gameReviews);
+            }
+        }
+
         [HttpPost]
         [Authorize(Roles = "admin,mod")]
         [SwaggerOperation("Require authorization admin or mod")]
