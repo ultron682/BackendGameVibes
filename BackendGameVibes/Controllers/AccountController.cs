@@ -1,4 +1,5 @@
 ﻿using BackendGameVibes.IServices;
+using BackendGameVibes.Models.Friends;
 using BackendGameVibes.Models.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -12,7 +13,6 @@ using System.Text.Json;
 namespace BackendGameVibes.Controllers {
     [ApiController]
     [Route("account")]
-    [Authorize]
     public class AccountController : ControllerBase {
         private readonly IAccountService _accountService;
 
@@ -85,7 +85,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpGet]
         [Authorize]
-        [SwaggerOperation("Require authorization")]
+        [SwaggerOperation("Zwraca informacje o uzytkowniku")]
         public async Task<IActionResult> GetAccountInfo() {
             var email = User.FindFirstValue(ClaimTypes.Email);
             if (email == null)
@@ -199,6 +199,7 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpGet("user/:id")]
+        [Authorize]
         [SwaggerOperation("podstawowe info o uzytkowniku. do publicznego profilu gracza. na razie zwraca wszystkie dane o user")]
         public async Task<ActionResult<object>> GetUserAsync(string id) {
             var user = await _accountService.GetUserByIdAsync(id);
@@ -261,13 +262,15 @@ namespace BackendGameVibes.Controllers {
             if (userId == null)
                 return Unauthorized("User not authenticated, claim not found");
 
-            (bool success, bool isExistingFriend) = await _accountService.SendFriendRequestAsync(userId, receiverUserId);
+            (bool success, bool? isExistingFriend, FriendRequest? friendRequest) = await _accountService.SendFriendRequestAsync(userId, receiverUserId);
             if (success && isExistingFriend == false)
                 return StatusCode(200, "Zaproszenie wysłane");
-            else if (success == false && isExistingFriend == false)
-                return StatusCode(201, "Zaproszenie juz wyslane wczesniej. nie sa znajomymi");
+            else if (success == false && isExistingFriend == false && friendRequest != null && friendRequest!.IsAccepted == null)
+                return StatusCode(201, "Zaproszenie pomiedzy uzytkonwikami wyslane juz wczesniej. nie sa aktualnie znajomymi");
             else if (success == false && isExistingFriend == true)
                 return StatusCode(202, "Juz sa znajomymi");
+            else if (success == false && friendRequest != null && friendRequest!.IsAccepted == false)
+                return StatusCode(203, "Zaproszony znajomy odrzucil zaproszenie. uwaga: uzytkownik nadal moze zaakceptowac zaproszenie");
             else
                 return BadRequest("error");
         }
