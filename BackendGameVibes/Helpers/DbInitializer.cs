@@ -1,7 +1,8 @@
 ﻿using BackendGameVibes.IServices;
-using BackendGameVibes.Models;
 using BackendGameVibes.Models.Forum;
+using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.Requests.Forum;
+using BackendGameVibes.Models.User;
 using BackendGameVibes.Services.Forum;
 using Microsoft.AspNetCore.Identity;
 using System.Runtime.CompilerServices;

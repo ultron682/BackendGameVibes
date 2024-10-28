@@ -1,4 +1,7 @@
-﻿namespace BackendGameVibes.Models.Forum {
+﻿using BackendGameVibes.Models.User;
+
+namespace BackendGameVibes.Models.Forum
+{
     public class ForumRole {
         public int Id {
             get; set;

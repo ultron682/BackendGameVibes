@@ -1,6 +1,7 @@
 ﻿using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
-using BackendGameVibes.Models;
+using BackendGameVibes.Models.Games;
+using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

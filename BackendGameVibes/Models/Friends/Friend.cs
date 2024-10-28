@@ -1,4 +1,7 @@
-﻿namespace BackendGameVibes.Models.Friends {
+﻿using BackendGameVibes.Models.User;
+
+namespace BackendGameVibes.Models.Friends
+{
     public class Friend {
         public int Id { get; set; }
         public string? UserId { get; set; }

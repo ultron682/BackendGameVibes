@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
-using BackendGameVibes.Models;
 using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Requests;
 using BackendGameVibes.Models.Requests.Forum;
+using BackendGameVibes.Models.User;
 
-namespace BackendGameVibes.Helpers {
+namespace BackendGameVibes.Helpers
+{
     public class AutoMapperProfile : Profile {
         public AutoMapperProfile() {
             CreateMap<ReviewDTO, Review>();

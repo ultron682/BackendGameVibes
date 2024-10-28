@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
-using BackendGameVibes.Models;
 using BackendGameVibes.Models.Requests;
+using BackendGameVibes.Models.User;
 using BackendGameVibes.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -11,7 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace BackendGameVibes.Controllers {
+namespace BackendGameVibes.Controllers
+{
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]

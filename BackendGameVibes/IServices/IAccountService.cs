@@ -1,8 +1,9 @@
-﻿using BackendGameVibes.Models;
-using BackendGameVibes.Models.Requests;
+﻿using BackendGameVibes.Models.Requests;
+using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 
-namespace BackendGameVibes.IServices {
+namespace BackendGameVibes.IServices
+{
     public interface IAccountService {
         Task<IdentityResult> ConfirmEmailAsync(string userId, string token);
         Task<string> GenerateJwtTokenAsync(UserGameVibes user);
@@ -21,5 +22,7 @@ namespace BackendGameVibes.IServices {
         Task<(bool, bool)> SendFriendRequestAsync(string senderId, string receiverId);
         Task<bool> ConfirmFriendRequestAsync(string userId, string friendId);
         Task<bool> RevokeFriendRequestAsync(string userId, string friendId);
+        Task<bool> RemoveFriendAsync(string userId, string friendId);
+        Task<IEnumerable<object>> GetAllFriendsOfUser(string userId);
     }
 }

@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using BackendGameVibes.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Diagnostics;
 using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Friends;
+using BackendGameVibes.Models.Games;
+using BackendGameVibes.Models.User;
 
 namespace BackendGameVibes.Data {
     public class ApplicationDbContext : IdentityDbContext<UserGameVibes> {

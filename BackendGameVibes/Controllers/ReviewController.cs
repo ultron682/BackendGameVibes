@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using BackendGameVibes.Models;
 using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Requests;
@@ -8,6 +7,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Swashbuckle.AspNetCore.Annotations;
+using BackendGameVibes.Models.User;
 
 namespace BackendGameVibes.Controllers {
     [ApiController]

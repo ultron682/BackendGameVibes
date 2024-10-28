@@ -4,6 +4,7 @@ using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
 using BackendGameVibes.Models.Friends;
 using BackendGameVibes.Models.Requests;
+using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -232,7 +233,17 @@ namespace BackendGameVibes.Services {
                  .ToArray();
         }
 
+        public async Task<IEnumerable<object>> GetAllFriendsOfUser(string userId) {
+            var friends = await _context.Friends
+             .Where(f => f.UserId == userId)
+             .Select(f => new {
+                 f.FriendId,
+                 f.FriendUser!.UserName
+             })
+             .ToArrayAsync();
 
+            return friends;
+        }
 
         private async Task<bool> SendNewFriendRequestEmailAsync(string email, string userSenderNick) {
             if (userSenderNick == null || email == null)
@@ -312,11 +323,33 @@ namespace BackendGameVibes.Services {
             return false;
         }
 
+        public async Task<bool> RemoveFriendAsync(string userId, string friendId) {
+            var friendRequest = await _context.FriendRequests
+                .FirstOrDefaultAsync(fr => fr.SenderUserId == userId && fr.ReceiverUserId == friendId && fr.IsAccepted == true);
+
+            var friend1 = await _context.Friends
+             .FirstOrDefaultAsync(f => f.UserId == userId && f.FriendId == friendId);
+
+            var friend2 = await _context.Friends
+                .FirstOrDefaultAsync(f => f.UserId == friendId && f.FriendId == userId);
+
+            if (friend1 != null && friend2 != null && friendRequest != null) {
+                _context.FriendRequests.Remove(friendRequest);
+
+                _context.Friends.Remove(friend1);
+                _context.Friends.Remove(friend2);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
+
         public void Dispose() {
             _context.Dispose();
             _userManager.Dispose();
             _roleManager.Dispose();
-            Console.WriteLine("Account service dispose");
+            Console.WriteLine("Account service dispose, Log tylko dla testow");
         }
     }
 }

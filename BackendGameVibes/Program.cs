@@ -3,6 +3,7 @@ using BackendGameVibes.Data;
 using BackendGameVibes.Helpers;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
+using BackendGameVibes.Models.User;
 using BackendGameVibes.Services;
 using BackendGameVibes.Services.Forum;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
