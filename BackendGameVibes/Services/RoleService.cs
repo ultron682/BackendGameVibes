@@ -1,5 +1,5 @@
 ﻿using BackendGameVibes.IServices;
-using BackendGameVibes.Models;
+using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

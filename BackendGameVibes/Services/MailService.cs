@@ -4,32 +4,28 @@ using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
 
-namespace BackendGameVibes.Services
-{
-    public class MailService
-    {
+namespace BackendGameVibes.Services {
+    public class MailService {
         MailSettings Mail_Settings;
-        public MailService(IOptions<MailSettings> options)
-        {
+        public MailService(IOptions<MailSettings> options) {
             Mail_Settings = options.Value;
         }
-        public bool SendMail(MailData Mail_Data)
-        {
-            try
-            {
+        public bool SendMail(MailData Mail_Data) {
+            try {
                 if (Mail_Settings.UserName == string.Empty) {
                     Console.WriteLine("Sending emails disabled due to Mail Settings not found in appsettings.json or  appsettings.Development.json ");
+                    Console.WriteLine(Mail_Data.EmailBody);
                     return false;
                 }
 
                 MimeMessage email_Message = new MimeMessage();
                 MailboxAddress email_From = new MailboxAddress(Mail_Settings.Name, Mail_Settings.EmailId);
                 email_Message.From.Add(email_From);
-                
+
                 MailboxAddress email_To = new MailboxAddress(Mail_Data.EmailToName, Mail_Data.EmailToId);
                 email_Message.To.Add(email_To);
                 email_Message.Subject = Mail_Data.EmailSubject;
-                
+
                 BodyBuilder emailBodyBuilder = new BodyBuilder();
                 emailBodyBuilder.HtmlBody = Mail_Data.EmailBody;
                 email_Message.Body = emailBodyBuilder.ToMessageBody();
@@ -42,8 +38,7 @@ namespace BackendGameVibes.Services
                 MailClient.Dispose();
                 return true;
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Console.WriteLine(ex.ToString());
                 return false;
             }

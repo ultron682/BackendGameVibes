@@ -1,9 +1,14 @@
-﻿using BackendGameVibes.IServices;
-using BackendGameVibes.Models;
+﻿using BackendGameVibes.Data;
+using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Forum;
+using BackendGameVibes.Models.Friends;
+using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.Requests.Forum;
+using BackendGameVibes.Models.User;
 using BackendGameVibes.Services.Forum;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using MimeKit;
 using System.Runtime.CompilerServices;
 
 namespace BackendGameVibes.Helpers {
@@ -26,7 +31,7 @@ namespace BackendGameVibes.Helpers {
             return string.Join(" ", words) + ".";
         }
 
-        public static async Task InitializeAsync(AsyncServiceScope scope) {
+        public static async Task InitializeAsync(AsyncServiceScope scope, ApplicationDbContext applicationDbContext) {
             using var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserGameVibes>>();
             using var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
@@ -134,6 +139,21 @@ namespace BackendGameVibes.Helpers {
                 await userManager.FindByEmailAsync("test2@test.com"),
                 await userManager.FindByEmailAsync("test3@test.com")
             };
+
+
+            var friendRequest = new FriendRequest {
+                SenderUserId = usersTest[0]!.Id,
+                ReceiverUserId = usersTest[1]!.Id,
+                IsAccepted = true
+            };
+            applicationDbContext.FriendRequests.Add(friendRequest);
+
+            var friend1 = new Friend { UserId = usersTest[0]!.Id, FriendId = usersTest[1]!.Id };
+            var friend2 = new Friend { UserId = usersTest[1]!.Id, FriendId = usersTest[0]!.Id };
+            applicationDbContext.Friends.AddRange(friend1, friend2);
+
+            await applicationDbContext.SaveChangesAsync();
+
 
             (Game? game, bool isSuccess) createdGame1 = await gameService.CreateGame(292030); // The Witcher 3
 

@@ -3,6 +3,7 @@ using BackendGameVibes.Data;
 using BackendGameVibes.Helpers;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
+using BackendGameVibes.Models.User;
 using BackendGameVibes.Services;
 using BackendGameVibes.Services.Forum;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -11,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -37,21 +39,8 @@ builder.Services.AddSwaggerGen(c => {
         BearerFormat = "JWT",
         Scheme = "bearer"
     });
+    c.OperationFilter<AuthorizeCheckOperationFilter>();
     c.EnableAnnotations();
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type=ReferenceType.SecurityScheme,
-                    Id="Bearer"
-                }
-            },
-            new string[]{}
-        }
-    });
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => {
@@ -155,7 +144,8 @@ app.Services.GetService<SteamService>(); // on start backend download steam game
 using (var scope = app.Services.CreateAsyncScope()) {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await dbContext.Database.EnsureCreatedAsync();
-    await DbInitializer.InitializeAsync(scope);
+    //await dbContext.Database.MigrateAsync();
+    await DbInitializer.InitializeAsync(scope, dbContext);
 }
 
 app.Run();

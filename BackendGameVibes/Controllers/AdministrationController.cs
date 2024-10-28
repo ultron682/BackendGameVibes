@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
-using BackendGameVibes.Models;
 using BackendGameVibes.Models.Requests;
+using BackendGameVibes.Models.User;
 using BackendGameVibes.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -94,6 +94,25 @@ namespace BackendGameVibes.Controllers {
             _context.Reviews.Remove(review);
             await _context.SaveChangesAsync();
             return Ok("removed");
+        }
+
+        [HttpPatch]
+        [Authorize(Policy = "modOrAdmin")]
+        public async Task<IActionResult> UpdateUser(UserGameVibesDTO user) {
+            UserGameVibes? userGameVibes = await _userManager.FindByIdAsync(user.Id);
+            if (userGameVibes == null) {
+                return NotFound();
+            }
+
+            //userGameVibes.UserName = user.UserName;
+            //userGameVibes.Email = user.Email;
+            //userGameVibes.Description = user.Description;
+            //userGameVibes.ProfilePicture = user.ProfilePicture;
+            //userGameVibes.ExperiencePoints = user.ExperiencePoints;
+            //userGameVibes.ForumRoleId = user.ForumRoleId;
+
+            //await _userManager.UpdateAsync(userGameVibes);
+            return Ok("todo");
         }
 
     }

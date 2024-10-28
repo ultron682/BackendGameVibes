@@ -2,7 +2,9 @@
 using BackendGameVibes.Helpers;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
+using BackendGameVibes.Models.Friends;
 using BackendGameVibes.Models.Requests;
+using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -95,6 +97,23 @@ namespace BackendGameVibes.Services {
                         r.Comment,
                         r.CreatedAt
                     }).ToArray(),
+                    Friends = u.Friends.Select(f => new {
+                        f.FriendId,
+                        f.FriendUser!.UserName,
+                        f.FriendsSince
+                    }).ToArray(),
+                    FriendRequestsReceived = u.FriendRequestsReceived.Select(fr => new {
+                        fr.Id,
+                        SenderId = fr.SenderUserId,
+                        SenderName = fr.SenderUser!.UserName,
+                        fr.IsAccepted
+                    }).ToArray(),
+                    FriendRequestsSent = u.FriendRequestsSent.Select(fr => new {
+                        fr.Id,
+                        ReceiverId = fr.ReceiverUserId,
+                        ReceiverName = fr.ReceiverUser!.UserName,
+                        fr.IsAccepted
+                    }).ToArray()
                 })
                 .FirstOrDefaultAsync();
 
@@ -209,13 +228,13 @@ namespace BackendGameVibes.Services {
             return await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
         }
 
-        public async Task<object[]> FindUsersNickAndIdsByNickname(string myNickname, string searchName) {
+        public async Task<object[]> FindUsersNickAndIdsByNickname(string myUserId, string myNickname, string searchName) {
             var allStandardUsers = await _userManager.GetUsersInRoleAsync("user");
 
             myNickname = myNickname.ToUpper();
             searchName = searchName.ToUpper();
 
-            return allStandardUsers
+            var othersUsers = allStandardUsers
                  .Where(u =>
                  u.NormalizedUserName!.Contains(searchName)
                  && u.NormalizedUserName != myNickname)
@@ -224,13 +243,155 @@ namespace BackendGameVibes.Services {
                      u.UserName
                  })
                  .ToArray();
+
+            var resultWithIsFriend = othersUsers.Select(u => new {
+                u.Id,
+                u.UserName,
+                IsFriend = _context.Friends.Any(f => f.UserId == myUserId && f.FriendId == u.Id)
+            }).ToArray();
+
+            return resultWithIsFriend;
+        }
+
+        public async Task<IEnumerable<object>> GetAllFriendsOfUser(string userId) {
+            var friends = await _context.Friends
+             .Where(f => f.UserId == userId)
+             .Select(f => new {
+                 f.FriendId,
+                 f.FriendUser!.UserName,
+                 f.FriendsSince
+             })
+             .ToArrayAsync();
+
+            return friends;
+        }
+
+        private async Task<bool> SendNewFriendRequestEmailAsync(string email, string userSenderNick) {
+            if (userSenderNick == null || email == null)
+                return false;
+
+            string emailBody = await _htmlTemplateService.GetEmailTemplateAsync("wwwroot/EmailTemplates/new_friend_request.html",
+            new Dictionary<string, string>
+            {
+                { "UserName", userSenderNick }
+            });
+
+            _mail_Service.SendMail(new MailData() {
+                EmailBody = emailBody,
+                EmailSubject = "New friend request",
+                EmailToId = email,
+                EmailToName = userSenderNick
+            });
+            return true;
+        }
+
+        public async Task<(bool, bool, FriendRequest?)> SendFriendRequestAsync(string senderId, string receiverId) {
+            var existingRequest = await _context.FriendRequests
+                .FirstOrDefaultAsync(fr => (fr.SenderUserId == senderId && fr.ReceiverUserId == receiverId)
+                ||
+                (fr.SenderUserId == receiverId && fr.ReceiverUserId == senderId));
+
+            bool isExistingFriends = await _context.Friends
+                .AnyAsync(f => f.UserId == senderId && f.FriendId == receiverId);
+
+            if (existingRequest == null && isExistingFriends == false) {
+                var friendRequest = new FriendRequest {
+                    SenderUserId = senderId,
+                    ReceiverUserId = receiverId
+                };
+
+                var userSender = await _userManager.FindByIdAsync(senderId);
+                var userReceiver = await _userManager.FindByIdAsync(receiverId);
+
+                if (userSender != null && userReceiver != null)
+                    await SendNewFriendRequestEmailAsync(userReceiver!.Email!, userSender!.UserName!);
+
+                _context.FriendRequests.Add(friendRequest);
+                await _context.SaveChangesAsync();
+                return (true, isExistingFriends, existingRequest);
+            }
+            else {
+                return (false, isExistingFriends, existingRequest);
+            }
+        }
+
+        public async Task<bool> ConfirmFriendRequestAsync(string userId, string friendId) {
+            var friendRequest = await _context.FriendRequests
+                .FirstOrDefaultAsync(fr => fr.SenderUserId == friendId && fr.ReceiverUserId == userId && (fr.IsAccepted == null || fr.IsAccepted == false));
+
+            if (friendRequest != null) {
+                friendRequest.IsAccepted = true;
+
+                var friend1 = new Friend { UserId = userId, FriendId = friendId };
+                var friend2 = new Friend { UserId = friendId, FriendId = userId };
+
+                _context.FriendRequests.Update(friendRequest);
+                _context.Friends.AddRange(friend1, friend2);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> RevokeFriendRequestAsync(string userId, string friendId) {
+            var friendRequest = await _context.FriendRequests
+                .FirstOrDefaultAsync(fr => fr.SenderUserId == friendId && fr.ReceiverUserId == userId && fr.IsAccepted == null);
+
+            if (friendRequest != null) {
+                friendRequest.IsAccepted = false;
+                _context.FriendRequests.Update(friendRequest);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> RemoveFriendAsync(string userId, string friendId) {
+            var friendRequest = await _context.FriendRequests
+                .FirstOrDefaultAsync(fr =>
+                (
+                (fr.SenderUserId == userId && fr.ReceiverUserId == friendId)
+                ||
+                (fr.SenderUserId == friendId && fr.ReceiverUserId == userId)
+                )
+                && fr.IsAccepted == true);
+
+            var friend1 = await _context.Friends
+             .FirstOrDefaultAsync(f => f.UserId == userId && f.FriendId == friendId);
+
+            var friend2 = await _context.Friends
+                .FirstOrDefaultAsync(f => f.UserId == friendId && f.FriendId == userId);
+
+            if (friendRequest != null)
+                _context.FriendRequests.Remove(friendRequest);
+
+            if (friend1 != null && friend2 != null) {
+                _context.Friends.Remove(friend1);
+                _context.Friends.Remove(friend2);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<IEnumerable<object>> GetFriendRequestsForUser(string userId) {
+            var friendRequests = await _context.FriendRequests
+                .Where(fr => fr.ReceiverUserId == userId && (fr.IsAccepted == null || fr.IsAccepted == false))
+                .Select(fr => new {
+                    fr.Id,
+                    SenderId = fr.SenderUserId,
+                    SenderName = fr.SenderUser!.UserName,
+                    fr.IsAccepted
+                })
+                .ToArrayAsync();
+
+            return friendRequests;
         }
 
         public void Dispose() {
             _context.Dispose();
             _userManager.Dispose();
             _roleManager.Dispose();
-            Console.WriteLine("Account service dispose");
         }
     }
 }

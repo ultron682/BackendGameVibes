@@ -1,6 +1,7 @@
 ﻿using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
+using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.Requests;
 using BackendGameVibes.Models.Steam;
 using Microsoft.AspNetCore.Authorization;
@@ -125,7 +126,7 @@ namespace BackendGameVibes.Services {
 
             foreach (var steamGenre in steamGenres) {
                 if (dbGenreIds.Contains(int.Parse(steamGenre.id)) == false) {
-                    var newGenre = new Models.Genre { Id = int.Parse(steamGenre.id), Name = steamGenre.description };
+                    var newGenre = new Models.Games.Genre { Id = int.Parse(steamGenre.id), Name = steamGenre.description };
                     _context.Genres.Add(newGenre);
                     if (game.Genres!.Contains(newGenre) == false)
                         game.Genres.Add(newGenre);

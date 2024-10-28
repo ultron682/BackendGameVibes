@@ -1,4 +1,6 @@
-﻿namespace BackendGameVibes.Models {
+﻿using BackendGameVibes.Models.Games;
+
+namespace BackendGameVibes.Models.User {
     public class Review {
         public int Id {
             get; set;

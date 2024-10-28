@@ -1,4 +1,4 @@
-﻿using BackendGameVibes.Models;
+﻿using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.Requests;
 using BackendGameVibes.Models.Steam;
 

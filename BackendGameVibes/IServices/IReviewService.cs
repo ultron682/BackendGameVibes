@@ -1,7 +1,8 @@
-﻿using BackendGameVibes.Models;
+﻿using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BackendGameVibes.IServices {
+namespace BackendGameVibes.IServices
+{
     public interface IReviewService : IDisposable {
         Task<IEnumerable<object>> GetAllReviewsAsync();
         Task<object?> GetReviewByIdAsync(int id);
