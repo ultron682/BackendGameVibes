@@ -98,7 +98,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPatch]
         [Authorize(Policy = "modOrAdmin")]
-        public async Task<IActionResult> UpdateUser(UserGameVibesRequest user) {
+        public async Task<IActionResult> UpdateUser(UserGameVibesDTO user) {
             UserGameVibes? userGameVibes = await _userManager.FindByIdAsync(user.Id);
             if (userGameVibes == null) {
                 return NotFound();

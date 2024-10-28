@@ -5,7 +5,7 @@ using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 
 namespace BackendGameVibes.Models.Requests {
-    public class UserGameVibesRequest : IdentityUser {
+    public class UserGameVibesDTO : IdentityUser {
         public byte[]? ProfilePicture {
             get; set;
         }
