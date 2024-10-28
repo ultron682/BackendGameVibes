@@ -11,8 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace BackendGameVibes.Controllers
-{
+namespace BackendGameVibes.Controllers {
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
@@ -95,6 +94,25 @@ namespace BackendGameVibes.Controllers
             _context.Reviews.Remove(review);
             await _context.SaveChangesAsync();
             return Ok("removed");
+        }
+
+        [HttpPatch]
+        [Authorize(Policy = "modOrAdmin")]
+        public async Task<IActionResult> UpdateUser(UserGameVibesRequest user) {
+            UserGameVibes? userGameVibes = await _userManager.FindByIdAsync(user.Id);
+            if (userGameVibes == null) {
+                return NotFound();
+            }
+
+            //userGameVibes.UserName = user.UserName;
+            //userGameVibes.Email = user.Email;
+            //userGameVibes.Description = user.Description;
+            //userGameVibes.ProfilePicture = user.ProfilePicture;
+            //userGameVibes.ExperiencePoints = user.ExperiencePoints;
+            //userGameVibes.ForumRoleId = user.ForumRoleId;
+
+            //await _userManager.UpdateAsync(userGameVibes);
+            return Ok("todo");
         }
 
     }

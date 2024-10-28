@@ -360,19 +360,6 @@ namespace BackendGameVibes.Services {
             return false;
         }
 
-        public async Task<object> GetAllFriendRequestsForUser(string userId) {
-            var friendRequests = await _context.FriendRequests
-                .Where(fr => fr.ReceiverUserId == userId && fr.IsAccepted == null)
-                .Select(fr => new {
-                    fr.Id,
-                    SenderId = fr.SenderUserId,
-                    SenderName = fr.SenderUser!.UserName
-                })
-                .ToArrayAsync();
-
-            return friendRequests;
-        }
-
         public async Task<IEnumerable<object>> GetFriendRequestsForUser(string userId) {
             var friendRequests = await _context.FriendRequests
                 .Where(fr => fr.ReceiverUserId == userId && fr.IsAccepted == null)

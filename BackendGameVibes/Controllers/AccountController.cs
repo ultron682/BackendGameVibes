@@ -253,7 +253,7 @@ namespace BackendGameVibes.Controllers {
             return Ok(friendRequests);
         }
 
-        [HttpPost("user/send-friend-request:id")]
+        [HttpPost("user/send-friend-request:{receiverUserId}")]
         [Authorize]
         [SwaggerOperation("autoryzowany uzytkownik wysyla zaproszenie. 200 - wyslano, 201 - zaproszenie wyslane wczesniej i oczekuje na odpowiedz, 202 - Juz sa znajomymi")]
         public async Task<IActionResult> SendFriendRequestAsync(string receiverUserId) {
@@ -272,7 +272,7 @@ namespace BackendGameVibes.Controllers {
                 return BadRequest("error");
         }
 
-        [HttpPost("user/confirm-friend-request:id")]
+        [HttpPost("user/confirm-friend-request:{receiverUserId}")]
         [SwaggerOperation("autoryzowany uzytkownik akceptuje zaproszenie")]
         [Authorize]
         public async Task<IActionResult> ConfirmFriendRequestAsync(string receiverUserId) {
@@ -287,7 +287,7 @@ namespace BackendGameVibes.Controllers {
                 return BadRequest("Brak aktualnego zaproszenia");
         }
 
-        [HttpPost("user/revoke-friend-request:id")]
+        [HttpPost("user/revoke-friend-request:{receiverUserId}")]
         [SwaggerOperation("autoryzowany uzytkownik odrzuca zaproszenie")]
         [Authorize]
         public async Task<IActionResult> RevokeFriendRequestAsync(string receiverUserId) {
@@ -302,7 +302,7 @@ namespace BackendGameVibes.Controllers {
                 return BadRequest("Brak aktualnego zaproszenia");
         }
 
-        [HttpDelete("user/remove-friend:id")]
+        [HttpDelete("user/remove-friend:{friendId}")]
         [SwaggerOperation("autoryzowany uzytkownik usuwa znajomego")]
         [Authorize]
         public async Task<IActionResult> RemoveFriendAsync(string friendId) {

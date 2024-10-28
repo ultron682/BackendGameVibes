@@ -232,7 +232,7 @@ namespace BackendGameVibes.Migrations
                     b.ToTable("FriendRequests");
                 });
 
-            modelBuilder.Entity("BackendGameVibes.Models.Game", b =>
+            modelBuilder.Entity("BackendGameVibes.Models.Games.Game", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -261,7 +261,7 @@ namespace BackendGameVibes.Migrations
                     b.ToTable("Games");
                 });
 
-            modelBuilder.Entity("BackendGameVibes.Models.GameImage", b =>
+            modelBuilder.Entity("BackendGameVibes.Models.Games.GameImage", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -282,7 +282,7 @@ namespace BackendGameVibes.Migrations
                     b.ToTable("GameImages");
                 });
 
-            modelBuilder.Entity("BackendGameVibes.Models.Genre", b =>
+            modelBuilder.Entity("BackendGameVibes.Models.Games.Genre", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -298,7 +298,7 @@ namespace BackendGameVibes.Migrations
                     b.ToTable("Genres");
                 });
 
-            modelBuilder.Entity("BackendGameVibes.Models.Platform", b =>
+            modelBuilder.Entity("BackendGameVibes.Models.Games.Platform", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -331,7 +331,48 @@ namespace BackendGameVibes.Migrations
                         });
                 });
 
-            modelBuilder.Entity("BackendGameVibes.Models.Review", b =>
+            modelBuilder.Entity("BackendGameVibes.Models.Games.SystemRequirement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CpuRequirement")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DiskRequirement")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("GameId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("GpuRequirement")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OperatingSystemRequirement")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RamRequirement")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameId");
+
+                    b.ToTable("SystemRequirements");
+                });
+
+            modelBuilder.Entity("BackendGameVibes.Models.User.Review", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -378,48 +419,7 @@ namespace BackendGameVibes.Migrations
                     b.ToTable("Reviews");
                 });
 
-            modelBuilder.Entity("BackendGameVibes.Models.SystemRequirement", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("CpuRequirement")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("DiskRequirement")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("GameId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("GpuRequirement")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("OperatingSystemRequirement")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("RamRequirement")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GameId");
-
-                    b.ToTable("SystemRequirements");
-                });
-
-            modelBuilder.Entity("BackendGameVibes.Models.UserGameVibes", b =>
+            modelBuilder.Entity("BackendGameVibes.Models.User.UserGameVibes", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -682,7 +682,7 @@ namespace BackendGameVibes.Migrations
                         .HasForeignKey("ThreadId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("BackendGameVibes.Models.UserGameVibes", "UserOwner")
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "UserOwner")
                         .WithMany("UserForumPosts")
                         .HasForeignKey("UserOwnerId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -699,7 +699,7 @@ namespace BackendGameVibes.Migrations
                         .HasForeignKey("SectionId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("BackendGameVibes.Models.UserGameVibes", "UserOwner")
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "UserOwner")
                         .WithMany("UserForumThreads")
                         .HasForeignKey("UserOwnerId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -711,12 +711,12 @@ namespace BackendGameVibes.Migrations
 
             modelBuilder.Entity("BackendGameVibes.Models.Friends.Friend", b =>
                 {
-                    b.HasOne("BackendGameVibes.Models.UserGameVibes", "FriendUser")
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "FriendUser")
                         .WithMany()
                         .HasForeignKey("FriendId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("BackendGameVibes.Models.UserGameVibes", "User")
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "User")
                         .WithMany("Friends")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -728,12 +728,12 @@ namespace BackendGameVibes.Migrations
 
             modelBuilder.Entity("BackendGameVibes.Models.Friends.FriendRequest", b =>
                 {
-                    b.HasOne("BackendGameVibes.Models.UserGameVibes", "ReceiverUser")
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "ReceiverUser")
                         .WithMany("FriendRequestsReceived")
                         .HasForeignKey("ReceiverUserId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("BackendGameVibes.Models.UserGameVibes", "SenderUser")
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "SenderUser")
                         .WithMany("FriendRequestsSent")
                         .HasForeignKey("SenderUserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -743,9 +743,9 @@ namespace BackendGameVibes.Migrations
                     b.Navigation("SenderUser");
                 });
 
-            modelBuilder.Entity("BackendGameVibes.Models.GameImage", b =>
+            modelBuilder.Entity("BackendGameVibes.Models.Games.GameImage", b =>
                 {
-                    b.HasOne("BackendGameVibes.Models.Game", "Game")
+                    b.HasOne("BackendGameVibes.Models.Games.Game", "Game")
                         .WithMany("GameImages")
                         .HasForeignKey("GameId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -753,14 +753,25 @@ namespace BackendGameVibes.Migrations
                     b.Navigation("Game");
                 });
 
-            modelBuilder.Entity("BackendGameVibes.Models.Review", b =>
+            modelBuilder.Entity("BackendGameVibes.Models.Games.SystemRequirement", b =>
                 {
-                    b.HasOne("BackendGameVibes.Models.Game", "Game")
+                    b.HasOne("BackendGameVibes.Models.Games.Game", "Game")
+                        .WithMany("SystemRequirements")
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+                });
+
+            modelBuilder.Entity("BackendGameVibes.Models.User.Review", b =>
+                {
+                    b.HasOne("BackendGameVibes.Models.Games.Game", "Game")
                         .WithMany("Reviews")
                         .HasForeignKey("GameId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("BackendGameVibes.Models.UserGameVibes", "UserGameVibes")
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "UserGameVibes")
                         .WithMany("UserReviews")
                         .HasForeignKey("UserGameVibesId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -770,18 +781,7 @@ namespace BackendGameVibes.Migrations
                     b.Navigation("UserGameVibes");
                 });
 
-            modelBuilder.Entity("BackendGameVibes.Models.SystemRequirement", b =>
-                {
-                    b.HasOne("BackendGameVibes.Models.Game", "Game")
-                        .WithMany("SystemRequirements")
-                        .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
-
-                    b.Navigation("Game");
-                });
-
-            modelBuilder.Entity("BackendGameVibes.Models.UserGameVibes", b =>
+            modelBuilder.Entity("BackendGameVibes.Models.User.UserGameVibes", b =>
                 {
                     b.HasOne("BackendGameVibes.Models.Forum.ForumRole", "ForumRole")
                         .WithMany("Users")
@@ -793,13 +793,13 @@ namespace BackendGameVibes.Migrations
 
             modelBuilder.Entity("GameGenre", b =>
                 {
-                    b.HasOne("BackendGameVibes.Models.Game", null)
+                    b.HasOne("BackendGameVibes.Models.Games.Game", null)
                         .WithMany()
                         .HasForeignKey("GamesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BackendGameVibes.Models.Genre", null)
+                    b.HasOne("BackendGameVibes.Models.Games.Genre", null)
                         .WithMany()
                         .HasForeignKey("GenresId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -808,13 +808,13 @@ namespace BackendGameVibes.Migrations
 
             modelBuilder.Entity("GamePlatform", b =>
                 {
-                    b.HasOne("BackendGameVibes.Models.Game", null)
+                    b.HasOne("BackendGameVibes.Models.Games.Game", null)
                         .WithMany()
                         .HasForeignKey("GamesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BackendGameVibes.Models.Platform", null)
+                    b.HasOne("BackendGameVibes.Models.Games.Platform", null)
                         .WithMany()
                         .HasForeignKey("PlatformsId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -823,13 +823,13 @@ namespace BackendGameVibes.Migrations
 
             modelBuilder.Entity("GameUserGameVibes", b =>
                 {
-                    b.HasOne("BackendGameVibes.Models.UserGameVibes", null)
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", null)
                         .WithMany()
                         .HasForeignKey("PlayersFollowingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BackendGameVibes.Models.Game", null)
+                    b.HasOne("BackendGameVibes.Models.Games.Game", null)
                         .WithMany()
                         .HasForeignKey("UserFollowedGamesId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -847,7 +847,7 @@ namespace BackendGameVibes.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("BackendGameVibes.Models.UserGameVibes", null)
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -856,7 +856,7 @@ namespace BackendGameVibes.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("BackendGameVibes.Models.UserGameVibes", null)
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -871,7 +871,7 @@ namespace BackendGameVibes.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BackendGameVibes.Models.UserGameVibes", null)
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -880,7 +880,7 @@ namespace BackendGameVibes.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("BackendGameVibes.Models.UserGameVibes", null)
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -902,7 +902,7 @@ namespace BackendGameVibes.Migrations
                     b.Navigation("Posts");
                 });
 
-            modelBuilder.Entity("BackendGameVibes.Models.Game", b =>
+            modelBuilder.Entity("BackendGameVibes.Models.Games.Game", b =>
                 {
                     b.Navigation("GameImages");
 
@@ -911,7 +911,7 @@ namespace BackendGameVibes.Migrations
                     b.Navigation("SystemRequirements");
                 });
 
-            modelBuilder.Entity("BackendGameVibes.Models.UserGameVibes", b =>
+            modelBuilder.Entity("BackendGameVibes.Models.User.UserGameVibes", b =>
                 {
                     b.Navigation("FriendRequestsReceived");
 
