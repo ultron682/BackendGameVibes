@@ -39,22 +39,8 @@ builder.Services.AddSwaggerGen(c => {
         BearerFormat = "JWT",
         Scheme = "bearer"
     });
-    c.OperationFilter<SecurityRequirementsOperationFilter>();
+    c.OperationFilter<AuthorizeCheckOperationFilter>();
     c.EnableAnnotations();
-    //c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    //{
-    //    {
-    //        new OpenApiSecurityScheme
-    //        {
-    //            Reference = new OpenApiReference
-    //            {
-    //                Type=ReferenceType.SecurityScheme,
-    //                Id="Bearer"
-    //            }
-    //        },
-    //        new string[]{}
-    //    }
-    //});
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => {
