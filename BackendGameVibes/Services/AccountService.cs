@@ -253,11 +253,14 @@ namespace BackendGameVibes.Services {
             return true;
         }
 
-        public async Task<bool> SendFriendRequestAsync(string senderId, string receiverId) {
+        public async Task<(bool, bool)> SendFriendRequestAsync(string senderId, string receiverId) {
             var existingRequest = await _context.FriendRequests
                 .FirstOrDefaultAsync(fr => fr.SenderUserId == senderId && fr.ReceiverUserId == receiverId);
 
-            if (existingRequest == null) {
+            bool isExistingFriends = await _context.Friends
+                .AnyAsync(f => f.UserId == senderId && f.FriendId == receiverId);
+
+            if (existingRequest == null && isExistingFriends == false) {
                 var friendRequest = new FriendRequest {
                     SenderUserId = senderId,
                     ReceiverUserId = receiverId
@@ -267,14 +270,14 @@ namespace BackendGameVibes.Services {
                 var userReceiver = await _userManager.FindByIdAsync(receiverId);
 
                 if (userSender != null && userReceiver != null)
-                    await SendNewFriendRequestEmailAsync(userSender!.Email!, userReceiver!.UserName!);
+                    await SendNewFriendRequestEmailAsync(userReceiver!.Email!, userSender!.UserName!);
 
                 _context.FriendRequests.Add(friendRequest);
                 await _context.SaveChangesAsync();
-                return true;
+                return (true, isExistingFriends);
             }
             else {
-                return false;
+                return (false, isExistingFriends);
             }
         }
 

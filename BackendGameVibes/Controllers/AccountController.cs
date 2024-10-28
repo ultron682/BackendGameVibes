@@ -230,27 +230,27 @@ namespace BackendGameVibes.Controllers {
         [HttpPost("user/send-friend-request:id")]
         [Authorize]
         [SwaggerOperation("autoryzowany uzytkownik wysyla zaproszenie")]
-        public async Task<IActionResult> SendFriendRequestAsync(string id) {
+        public async Task<IActionResult> SendFriendRequestAsync(string receiverUserId) {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
                 return Unauthorized("User not authenticated, claim not found");
 
-            bool success = await _accountService.SendFriendRequestAsync(userId, id);
+            (bool success, bool isExistingFriends) = await _accountService.SendFriendRequestAsync(userId, receiverUserId);
             if (success)
                 return Ok("Zaproszenie wysłane");
             else
-                return BadRequest("Zaproszenie juz wyslane wczesniej");
+                return BadRequest("Zaproszenie juz wyslane wczesniej. Istniejący znajomy: " + isExistingFriends);
         }
 
         [HttpPost("user/confirm-friend-request:id")]
         [SwaggerOperation("autoryzowany uzytkownik akceptuje zaproszenie")]
         [Authorize]
-        public async Task<IActionResult> ConfirmFriendRequestAsync(string id) {
+        public async Task<IActionResult> ConfirmFriendRequestAsync(string receiverUserId) {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
                 return Unauthorized("User not authenticated, claim not found");
 
-            bool success = await _accountService.ConfirmFriendRequestAsync(userId, id);
+            bool success = await _accountService.ConfirmFriendRequestAsync(userId, receiverUserId);
             if (success)
                 return Ok("Zaproszenie zaakceptowane");
             else
@@ -260,16 +260,31 @@ namespace BackendGameVibes.Controllers {
         [HttpPost("user/revoke-friend-request:id")]
         [SwaggerOperation("autoryzowany uzytkownik akceptuje zaproszenie")]
         [Authorize]
-        public async Task<IActionResult> RevokeFriendRequestAsync(string id) {
+        public async Task<IActionResult> RevokeFriendRequestAsync(string receiverUserId) {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
                 return Unauthorized("User not authenticated, claim not found");
 
-            bool success = await _accountService.RevokeFriendRequestAsync(userId, id);
+            bool success = await _accountService.RevokeFriendRequestAsync(userId, receiverUserId);
             if (success)
                 return Ok("Zaproszenie odrzucone");
             else
                 return BadRequest("error");
+        }
+
+        [HttpDelete("user/remove-friend:id")]
+        [SwaggerOperation("autoryzowany uzytkownik usuwa znajomego")]
+        [Authorize]
+        public async Task<IActionResult> RemoveFriendAsync(string friendId) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            //bool success = await _accountService.RevokeFriendRequestAsync(userId, friendId);
+            //if (success)
+            return Ok("TODO: Usunięto znajomego");
+            //else
+            //    return BadRequest("error");
         }
     }
 }

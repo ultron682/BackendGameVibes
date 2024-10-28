@@ -18,7 +18,7 @@ namespace BackendGameVibes.IServices {
         Task<(bool, string)> StartResetPasswordAsync(string email);
         Task<IdentityResult> ConfirmResetPasswordAsync(string email, string resetToken, string newPassword);
         Task<object[]> FindUsersNickAndIdsByNickname(string myNickname, string searchName);
-        Task<bool> SendFriendRequestAsync(string senderId, string receiverId);
+        Task<(bool, bool)> SendFriendRequestAsync(string senderId, string receiverId);
         Task<bool> ConfirmFriendRequestAsync(string userId, string friendId);
         Task<bool> RevokeFriendRequestAsync(string userId, string friendId);
     }
