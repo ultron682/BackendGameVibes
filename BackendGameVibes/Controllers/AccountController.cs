@@ -216,8 +216,9 @@ namespace BackendGameVibes.Controllers {
         [Authorize]
         public async Task<ActionResult<object>> SearchUserAsync(string nick) {
             string myNickname = User.Identity!.Name!;
+            string myUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-            var users = await _accountService.FindUsersNickAndIdsByNickname(myNickname, nick);
+            var users = await _accountService.FindUsersNickAndIdsByNickname(myUserId, myNickname, nick);
             if (users == null) {
                 return NotFound();
             }
@@ -237,6 +238,19 @@ namespace BackendGameVibes.Controllers {
 
             var friends = await _accountService.GetAllFriendsOfUser(userId);
             return Ok(friends);
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("user/friend-requests")]
+        [SwaggerOperation("Require authorization >=user. Zwraca liste zaproszen do znajomych")]
+        public async Task<ActionResult<object>> GetFriendRequests() {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            var friendRequests = await _accountService.GetFriendRequestsForUser(userId);
+            return Ok(friendRequests);
         }
 
         [HttpPost("user/send-friend-request:id")]

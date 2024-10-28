@@ -216,13 +216,13 @@ namespace BackendGameVibes.Services {
             return await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
         }
 
-        public async Task<object[]> FindUsersNickAndIdsByNickname(string myNickname, string searchName) {
+        public async Task<object[]> FindUsersNickAndIdsByNickname(string myUserId, string myNickname, string searchName) {
             var allStandardUsers = await _userManager.GetUsersInRoleAsync("user");
 
             myNickname = myNickname.ToUpper();
             searchName = searchName.ToUpper();
 
-            return allStandardUsers
+            var othersUsers = allStandardUsers
                  .Where(u =>
                  u.NormalizedUserName!.Contains(searchName)
                  && u.NormalizedUserName != myNickname)
@@ -231,6 +231,14 @@ namespace BackendGameVibes.Services {
                      u.UserName
                  })
                  .ToArray();
+
+            var resultWithIsFriend = othersUsers.Select(u => new {
+                u.Id,
+                u.UserName,
+                IsFriend = _context.Friends.Any(f => f.UserId == myUserId && f.FriendId == u.Id)
+            }).ToArray();
+
+            return resultWithIsFriend;
         }
 
         public async Task<IEnumerable<object>> GetAllFriendsOfUser(string userId) {
@@ -238,7 +246,8 @@ namespace BackendGameVibes.Services {
              .Where(f => f.UserId == userId)
              .Select(f => new {
                  f.FriendId,
-                 f.FriendUser!.UserName
+                 f.FriendUser!.UserName,
+                 f.FriendsSince
              })
              .ToArrayAsync();
 
@@ -294,7 +303,7 @@ namespace BackendGameVibes.Services {
 
         public async Task<bool> ConfirmFriendRequestAsync(string userId, string friendId) {
             var friendRequest = await _context.FriendRequests
-                .FirstOrDefaultAsync(fr => fr.SenderUserId == userId && fr.ReceiverUserId == friendId && fr.IsAccepted == null);
+                .FirstOrDefaultAsync(fr => fr.SenderUserId == friendId && fr.ReceiverUserId == userId && fr.IsAccepted == null);
 
             if (friendRequest != null) {
                 friendRequest.IsAccepted = true;
@@ -312,7 +321,7 @@ namespace BackendGameVibes.Services {
 
         public async Task<bool> RevokeFriendRequestAsync(string userId, string friendId) {
             var friendRequest = await _context.FriendRequests
-                .FirstOrDefaultAsync(fr => fr.SenderUserId == userId && fr.ReceiverUserId == friendId && fr.IsAccepted == null);
+                .FirstOrDefaultAsync(fr => fr.SenderUserId == friendId && fr.ReceiverUserId == userId && fr.IsAccepted == null);
 
             if (friendRequest != null) {
                 friendRequest.IsAccepted = false;
@@ -325,7 +334,13 @@ namespace BackendGameVibes.Services {
 
         public async Task<bool> RemoveFriendAsync(string userId, string friendId) {
             var friendRequest = await _context.FriendRequests
-                .FirstOrDefaultAsync(fr => fr.SenderUserId == userId && fr.ReceiverUserId == friendId && fr.IsAccepted == true);
+                .FirstOrDefaultAsync(fr =>
+                (
+                (fr.SenderUserId == userId && fr.ReceiverUserId == friendId)
+                ||
+                (fr.SenderUserId == friendId && fr.ReceiverUserId == userId)
+                )
+                && fr.IsAccepted == true);
 
             var friend1 = await _context.Friends
              .FirstOrDefaultAsync(f => f.UserId == userId && f.FriendId == friendId);
@@ -333,9 +348,10 @@ namespace BackendGameVibes.Services {
             var friend2 = await _context.Friends
                 .FirstOrDefaultAsync(f => f.UserId == friendId && f.FriendId == userId);
 
-            if (friend1 != null && friend2 != null && friendRequest != null) {
+            if (friendRequest != null)
                 _context.FriendRequests.Remove(friendRequest);
 
+            if (friend1 != null && friend2 != null) {
                 _context.Friends.Remove(friend1);
                 _context.Friends.Remove(friend2);
                 await _context.SaveChangesAsync();
@@ -344,6 +360,31 @@ namespace BackendGameVibes.Services {
             return false;
         }
 
+        public async Task<object> GetAllFriendRequestsForUser(string userId) {
+            var friendRequests = await _context.FriendRequests
+                .Where(fr => fr.ReceiverUserId == userId && fr.IsAccepted == null)
+                .Select(fr => new {
+                    fr.Id,
+                    SenderId = fr.SenderUserId,
+                    SenderName = fr.SenderUser!.UserName
+                })
+                .ToArrayAsync();
+
+            return friendRequests;
+        }
+
+        public async Task<IEnumerable<object>> GetFriendRequestsForUser(string userId) {
+            var friendRequests = await _context.FriendRequests
+                .Where(fr => fr.ReceiverUserId == userId && fr.IsAccepted == null)
+                .Select(fr => new {
+                    fr.Id,
+                    SenderId = fr.SenderUserId,
+                    SenderName = fr.SenderUser!.UserName
+                })
+                .ToArrayAsync();
+
+            return friendRequests;
+        }
 
         public void Dispose() {
             _context.Dispose();

@@ -2,8 +2,7 @@
 using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 
-namespace BackendGameVibes.IServices
-{
+namespace BackendGameVibes.IServices {
     public interface IAccountService {
         Task<IdentityResult> ConfirmEmailAsync(string userId, string token);
         Task<string> GenerateJwtTokenAsync(UserGameVibes user);
@@ -18,11 +17,12 @@ namespace BackendGameVibes.IServices
         Task<(bool Succeeded, IEnumerable<string> Errors)> ChangePasswordAsync(string userId, string currentPassword, string newPassword);
         Task<(bool, string)> StartResetPasswordAsync(string email);
         Task<IdentityResult> ConfirmResetPasswordAsync(string email, string resetToken, string newPassword);
-        Task<object[]> FindUsersNickAndIdsByNickname(string myNickname, string searchName);
+        Task<object[]> FindUsersNickAndIdsByNickname(string myUserId, string myNickname, string searchName);
         Task<(bool, bool)> SendFriendRequestAsync(string senderId, string receiverId);
         Task<bool> ConfirmFriendRequestAsync(string userId, string friendId);
         Task<bool> RevokeFriendRequestAsync(string userId, string friendId);
         Task<bool> RemoveFriendAsync(string userId, string friendId);
         Task<IEnumerable<object>> GetAllFriendsOfUser(string userId);
+        Task<IEnumerable<object>> GetFriendRequestsForUser(string userId);
     }
 }
