@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace BackendGameVibes.Controllers {
     [Authorize]
@@ -22,17 +23,20 @@ namespace BackendGameVibes.Controllers {
         private readonly IMapper _mapper;
         private readonly IAccountService _accountService;
         private readonly IHostApplicationLifetime _applicationLifetime;
+        private readonly IRoleService _roleService;
 
         public AdministrationController(ApplicationDbContext context,
             UserManager<UserGameVibes> userManager,
             IHostApplicationLifetime applicationLifetime,
             IMapper mapper,
-            IAccountService accountService) {
+            IAccountService accountService,
+            IRoleService roleService) {
             _context = context;
             _mapper = mapper;
             _accountService = accountService;
             _userManager = userManager;
             _applicationLifetime = applicationLifetime;
+            _roleService = roleService;
         }
 
         [SwaggerOperation("Usuwa baze i tworzy plik bazy od początku. Zamyka aplikację którą trzeba ręcznie ponownie uruchomic")]
@@ -113,6 +117,24 @@ namespace BackendGameVibes.Controllers {
 
             //await _userManager.UpdateAsync(userGameVibes);
             return Ok("todo");
+        }
+
+        [HttpGet]
+        [Authorize("admin")]
+        [SwaggerOperation("Require admin")]
+        public async Task<IActionResult> GetAllRoles() {
+            return Ok(await _roleService.GetAllRoles());
+        }
+
+        [HttpPost]
+        [Authorize("admin")]
+        [SwaggerOperation("Require admin")]
+        public async Task<IActionResult> CreateNewRole([Required] string name) {
+            IdentityResult result = await _roleService.CreateNewRole(name);
+            if (result.Succeeded)
+                return Ok(name);
+            else
+                return BadRequest(result);
         }
 
     }
