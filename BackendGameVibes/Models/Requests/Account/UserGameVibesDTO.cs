@@ -27,6 +27,10 @@ namespace BackendGameVibes.Models.Requests.Account {
         public new bool? PhoneNumberConfirmed {
             get; set;
         }
+        public new int? AccessFailedCount {
+            get; set;
+        }
+
         private new bool? TwoFactorEnabled {
             get; set;
         }

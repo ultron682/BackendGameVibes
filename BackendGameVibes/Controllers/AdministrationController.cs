@@ -168,6 +168,11 @@ namespace BackendGameVibes.Controllers {
                 await _userManager.SetLockoutEndDateAsync(userGameVibes, userDTO.LockoutEnd);
             }
 
+            if (userDTO.AccessFailedCount != null) {
+                userGameVibes.AccessFailedCount = (int)userDTO.AccessFailedCount;
+            }
+
+
 
             await _userManager.UpdateAsync(userGameVibes);
 
