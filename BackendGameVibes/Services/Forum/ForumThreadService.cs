@@ -83,6 +83,15 @@ namespace BackendGameVibes.Services.Forum {
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<object>> GetForumRoles() {
+            return await _context.ForumRoles
+             .Select(fr => new {
+                 fr.Id,
+                 fr.Name
+             })
+             .ToListAsync();
+        }
+
         public void Dispose() {
             _context.Dispose();
         }
