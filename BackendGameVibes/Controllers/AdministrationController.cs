@@ -224,7 +224,7 @@ namespace BackendGameVibes.Controllers {
                 .Select(r => new {
                     r.Id,
                     r.ReporterUserId,
-                    r.ReporterUser!.UserName,
+                    ReporterUserName = r.ReporterUser!.UserName,
                     r.ReviewId,
                     r.Review!.Comment,
                     r.Reason
@@ -241,7 +241,7 @@ namespace BackendGameVibes.Controllers {
                 .Select(p => new {
                     p.Id,
                     p.ReporterUserId,
-                    p.ReporterUser!.UserName,
+                    ReporterUserName = p.ReporterUser!.UserName,
                     p.ForumPostId,
                     p.ForumPost!.Content,
                     p.Reason
