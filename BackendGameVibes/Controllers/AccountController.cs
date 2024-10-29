@@ -3,6 +3,7 @@ using BackendGameVibes.Models.Friends;
 using BackendGameVibes.Models.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
@@ -77,6 +78,12 @@ namespace BackendGameVibes.Controllers {
                     //await _accountService.SaveTokenToDB(userToken); // todo: ERROR
 
                     return Ok(new { accessToken = token });
+                }
+                else if (loginResult!.IsLockedOut) {
+                    var timeToEndLockout = user.LockoutEnd!.Value.Subtract(DateTime.Now);
+
+                    await _accountService.SendLockedOutAccountEmailAsync(model.Email, user!);
+                    return StatusCode(471, timeToEndLockout.TotalMinutes);
                 }
             }
 

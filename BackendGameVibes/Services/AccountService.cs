@@ -59,7 +59,7 @@ namespace BackendGameVibes.Services {
         }
 
         public async Task<SignInResult?> LoginUserAsync(UserGameVibes user, string password) {
-            return await _signInManager.PasswordSignInAsync(user.UserName!, password, true, false);
+            return await _signInManager.PasswordSignInAsync(user.UserName!, password, true, true);
         }
 
         public async Task<UserGameVibes?> GetUserByIdAsync(string userId) {
@@ -155,6 +155,25 @@ namespace BackendGameVibes.Services {
             });
             return true;
         }
+
+        public async Task<bool> SendLockedOutAccountEmailAsync(string email, UserGameVibes user) {
+            if (user == null || email == null)
+                return false;
+
+            string emailBody = await _htmlTemplateService.GetEmailTemplateAsync("wwwroot/EmailTemplates/account_locked_out_template.html", new Dictionary<string, string>
+            {
+                { "UserName", user.UserName! }
+            });
+
+            _mail_Service.SendMail(new MailData() {
+                EmailBody = emailBody,
+                EmailSubject = "Your account is locked",
+                EmailToId = email,
+                EmailToName = user.UserName!
+            });
+            return true;
+        }
+
 
         public async Task<IdentityResult> ConfirmEmailAsync(string userId, string token) {
             var user = await _userManager.FindByIdAsync(userId);
