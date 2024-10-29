@@ -74,7 +74,15 @@ namespace BackendGameVibes.Controllers {
                 return Unauthorized("User not authenticated, claim not found");
 
             ReportedReview? reportedReview = await _reviewService.ReportReviewAsync(userId, reportRequest);
-            return Ok(reportedReview);
+            if (reportedReview != null)
+                return Ok(new {
+                    reportedReview.Id,
+                    reportedReview.ReviewId,
+                    reportedReview.ReporterUserId,
+                    reportedReview.Reason
+                });
+            else
+                return BadRequest("ErrorOnReportReview");
         }
 
         [HttpDelete("{id}")]
