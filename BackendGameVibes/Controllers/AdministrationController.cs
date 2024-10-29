@@ -116,6 +116,8 @@ namespace BackendGameVibes.Controllers {
                 return NotFound();
             }
 
+            IList<string> userRoles = await _userManager.GetRolesAsync(userGameVibes);
+
             if (userDTO.UserName != null)
                 userGameVibes.UserName = userDTO.UserName;
             if (userDTO.Description != null)
@@ -147,9 +149,22 @@ namespace BackendGameVibes.Controllers {
             if (string.IsNullOrEmpty(userDTO.PhoneNumber) == false) {
                 await _userManager.SetPhoneNumberAsync(userGameVibes, userDTO.PhoneNumber);
             }
+            if (string.IsNullOrEmpty(userDTO.RoleName) == false) {
+                foreach (string role in userRoles) {
+                    await _userManager.RemoveFromRoleAsync(userGameVibes, role);
+                }
+
+                await _userManager.AddToRoleAsync(userGameVibes, userDTO.RoleName!);
+            }
 
             await _userManager.UpdateAsync(userGameVibes);
-            return Ok(userGameVibes);
+
+            var currentRoles = await _userManager.GetRolesAsync(userGameVibes);
+
+            return Ok(new {
+                userGameVibes,
+                roles = currentRoles.ToArray()
+            });
         }
 
         [HttpGet("role")]

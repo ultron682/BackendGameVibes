@@ -15,6 +15,9 @@ namespace BackendGameVibes.Models.Requests.Account {
         public int? ForumRoleId {
             get; set;
         }
+        public string? RoleName {
+            get; set;
+        }
         public string? Password {
             get; set;
         }
