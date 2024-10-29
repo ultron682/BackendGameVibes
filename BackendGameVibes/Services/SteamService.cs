@@ -30,18 +30,24 @@ namespace BackendGameVibes.Services {
         }
 
         public async Task<SteamApp[]?> GetAllGameIds() {
-            var response = await _httpClient.GetAsync("https://api.steampowered.com/ISteamApps/GetAppList/v0002/?key=STEAMKEY&format=json");
+            try {
+                var response = await _httpClient.GetAsync("https://api.steampowered.com/ISteamApps/GetAppList/v0002/?key=STEAMKEY&format=json");
 
-            if (response.IsSuccessStatusCode) {
-                var jsonString = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode) {
+                    var jsonString = await response.Content.ReadAsStringAsync();
 
-                var options = new JsonSerializerOptions {
-                    PropertyNameCaseInsensitive = true,
-                };
+                    var options = new JsonSerializerOptions {
+                        PropertyNameCaseInsensitive = true,
+                    };
 
 
-                var appListWrapper = JsonSerializer.Deserialize<AppListWrapper>(jsonString, options);
-                return appListWrapper!.Applist.Apps;
+                    var appListWrapper = JsonSerializer.Deserialize<AppListWrapper>(jsonString, options);
+                    return appListWrapper!.Applist.Apps;
+                }
+            }
+            catch (Exception e) {
+                Console.WriteLine("Error when downloading steam ids with titles");
+                Console.WriteLine(e.Message);
             }
 
             return null;
