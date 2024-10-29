@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Requests;
+using BackendGameVibes.Models.Requests.Account;
 using BackendGameVibes.Models.Requests.Forum;
 using BackendGameVibes.Models.User;
 

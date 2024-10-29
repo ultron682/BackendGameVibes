@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
 using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
-using BackendGameVibes.Models.Requests;
+using BackendGameVibes.Models.Requests.Account;
 using BackendGameVibes.Models.User;
-using BackendGameVibes.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +13,7 @@ using System.ComponentModel.DataAnnotations;
 namespace BackendGameVibes.Controllers {
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/administration")]
     [SwaggerTag("Require authorization admin")]
     public class AdministrationController : ControllerBase {
         private readonly UserManager<UserGameVibes> _userManager;
@@ -55,6 +53,16 @@ namespace BackendGameVibes.Controllers {
         [Authorize("admin")]
         public async Task<IActionResult> GetAllUsers() {
             return Ok(await _context.Users.ToArrayAsync());
+        }
+
+        [HttpGet("user:{id}")]
+        [Authorize("admin")]
+        public async Task<IActionResult> GetUser(string id) {
+            UserGameVibes? userGameVibes = await _userManager.FindByIdAsync(id);
+            if (userGameVibes == null) {
+                return NotFound();
+            }
+            return Ok(userGameVibes);
         }
 
         [HttpPost("user")]
@@ -100,35 +108,60 @@ namespace BackendGameVibes.Controllers {
             return Ok("removed");
         }
 
-        [HttpPatch]
+        [HttpPatch("user")]
         [Authorize(Policy = "modOrAdmin")]
-        public async Task<IActionResult> UpdateUser(UserGameVibesDTO user) {
-            UserGameVibes? userGameVibes = await _userManager.FindByIdAsync(user.Id);
+        public async Task<IActionResult> UpdateUser(UserGameVibesDTO userDTO) {
+            UserGameVibes? userGameVibes = await _userManager.FindByIdAsync(userDTO.Id);
             if (userGameVibes == null) {
                 return NotFound();
             }
 
-            //userGameVibes.UserName = user.UserName;
-            //userGameVibes.Email = user.Email;
-            //userGameVibes.Description = user.Description;
-            //userGameVibes.ProfilePicture = user.ProfilePicture;
-            //userGameVibes.ExperiencePoints = user.ExperiencePoints;
-            //userGameVibes.ForumRoleId = user.ForumRoleId;
+            if (userDTO.UserName != null)
+                userGameVibes.UserName = userDTO.UserName;
+            if (userDTO.Description != null)
+                userGameVibes.Description = userDTO.Description;
+            //if (userDTO.ProfilePicture != null)
+            //    userGameVibes.ProfilePicture = userDTO.ProfilePicture;
+            if (userDTO.ExperiencePoints != null)
+                userGameVibes.ExperiencePoints = userDTO.ExperiencePoints;
+            if (userDTO.ForumRoleId != null)
+                userGameVibes.ForumRoleId = userDTO.ForumRoleId;
+            if (userDTO.Email != null) {
+                var emailChangeToken = await _userManager.GenerateChangeEmailTokenAsync(userGameVibes, userDTO.Email);
 
-            //await _userManager.UpdateAsync(userGameVibes);
-            return Ok("todo");
+                var changeEmailResult = await _userManager.ChangeEmailAsync(userGameVibes, userDTO.Email, emailChangeToken);
+
+                if (!changeEmailResult.Succeeded) {
+                    return BadRequest(changeEmailResult.Errors.ToArray());
+                }
+            }
+            if (userDTO.Password != null) {
+                var resetToken = await _userManager.GeneratePasswordResetTokenAsync(userGameVibes);
+
+                var resetPasswordResult = await _userManager.ResetPasswordAsync(userGameVibes, resetToken, userDTO.Password);
+
+                if (!resetPasswordResult.Succeeded) {
+                    return BadRequest(resetPasswordResult.Errors.ToArray());
+                }
+            }
+            if (string.IsNullOrEmpty(userDTO.PhoneNumber) == false) {
+                await _userManager.SetPhoneNumberAsync(userGameVibes, userDTO.PhoneNumber);
+            }
+
+            await _userManager.UpdateAsync(userGameVibes);
+            return Ok(userGameVibes);
         }
 
-        [HttpGet]
+        [HttpGet("role")]
         [Authorize("admin")]
-        [SwaggerOperation("Require admin")]
+        [SwaggerOperation("")]
         public async Task<IActionResult> GetAllRoles() {
             return Ok(await _roleService.GetAllRoles());
         }
 
-        [HttpPost]
+        [HttpPost("role")]
         [Authorize("admin")]
-        [SwaggerOperation("Require admin")]
+        [SwaggerOperation("")]
         public async Task<IActionResult> CreateNewRole([Required] string name) {
             IdentityResult result = await _roleService.CreateNewRole(name);
             if (result.Succeeded)
@@ -136,6 +169,5 @@ namespace BackendGameVibes.Controllers {
             else
                 return BadRequest(result);
         }
-
     }
 }

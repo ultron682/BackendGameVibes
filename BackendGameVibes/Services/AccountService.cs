@@ -3,7 +3,7 @@ using BackendGameVibes.Helpers;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
 using BackendGameVibes.Models.Friends;
-using BackendGameVibes.Models.Requests;
+using BackendGameVibes.Models.Requests.Account;
 using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +14,8 @@ using System.Text;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 
-namespace BackendGameVibes.Services {
+namespace BackendGameVibes.Services
+{
     public class AccountService : IAccountService, IDisposable {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<UserGameVibes> _userManager;

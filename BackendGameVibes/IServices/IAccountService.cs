@@ -1,9 +1,10 @@
 ﻿using BackendGameVibes.Models.Friends;
-using BackendGameVibes.Models.Requests;
+using BackendGameVibes.Models.Requests.Account;
 using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 
-namespace BackendGameVibes.IServices {
+namespace BackendGameVibes.IServices
+{
     public interface IAccountService {
         Task<IdentityResult> ConfirmEmailAsync(string userId, string token);
         Task<string> GenerateJwtTokenAsync(UserGameVibes user);

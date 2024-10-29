@@ -1,4 +1,3 @@
-using BackendGameVibes.Controllers;
 using BackendGameVibes.Data;
 using BackendGameVibes.Helpers;
 using BackendGameVibes.IServices;
@@ -6,13 +5,12 @@ using BackendGameVibes.Models;
 using BackendGameVibes.Models.User;
 using BackendGameVibes.Services;
 using BackendGameVibes.Services.Forum;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 using System.Text.Json.Serialization;
 

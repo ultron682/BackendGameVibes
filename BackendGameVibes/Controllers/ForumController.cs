@@ -60,5 +60,9 @@ namespace BackendGameVibes.Controllers {
             return Ok(await _threadService.GetSections());
         }
 
+        [HttpGet("forum-roles")]
+        public async Task<ActionResult<IEnumerable<object>>> GetForumRoles() {
+            return Ok(await _threadService.GetForumRoles());
+        }
     }
 }

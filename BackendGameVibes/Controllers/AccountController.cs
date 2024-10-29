@@ -1,6 +1,7 @@
 ﻿using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Friends;
 using BackendGameVibes.Models.Requests;
+using BackendGameVibes.Models.Requests.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -11,7 +12,8 @@ using System.Security.Claims;
 using System.Text.Json;
 
 
-namespace BackendGameVibes.Controllers {
+namespace BackendGameVibes.Controllers
+{
     [ApiController]
     [Route("account")]
     public class AccountController : ControllerBase {
