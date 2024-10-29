@@ -331,14 +331,12 @@ namespace BackendGameVibes.Data {
                 ent.HasOne(rr => rr.Review)
                     .WithMany(r => r.ReportedReviews)
                     .HasForeignKey(rr => rr.ReviewId)
-                    .OnDelete(DeleteBehavior.SetNull)
-                    .IsRequired();
+                    .OnDelete(DeleteBehavior.SetNull);
 
                 ent.HasOne(rr => rr.ReporterUser)
                     .WithMany(u => u.UserReportedReviews)
                     .HasForeignKey(rr => rr.ReporterUserId)
-                    .OnDelete(DeleteBehavior.SetNull)
-                    .IsRequired();
+                    .OnDelete(DeleteBehavior.SetNull);
 
                 ent.Property(rr => rr.Reason)
                     .HasMaxLength(255)
@@ -349,14 +347,12 @@ namespace BackendGameVibes.Data {
                 ent.HasOne(rr => rr.ForumPost)
                     .WithMany(r => r.ReportedPosts)
                     .HasForeignKey(rr => rr.ForumPostId)
-                    .OnDelete(DeleteBehavior.SetNull)
-                    .IsRequired();
+                    .OnDelete(DeleteBehavior.SetNull);
 
                 ent.HasOne(rr => rr.ReporterUser)
                     .WithMany(u => u.UserReportedPosts)
                     .HasForeignKey(rr => rr.ReporterUserId)
-                    .OnDelete(DeleteBehavior.SetNull)
-                    .IsRequired();
+                    .OnDelete(DeleteBehavior.SetNull);
 
                 ent.Property(rr => rr.Reason)
                     .HasMaxLength(255)

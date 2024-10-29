@@ -378,7 +378,7 @@ namespace BackendGameVibes.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("ForumPostId")
+                    b.Property<int?>("ForumPostId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Reason")
@@ -387,7 +387,6 @@ namespace BackendGameVibes.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ReporterUserId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -411,10 +410,9 @@ namespace BackendGameVibes.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ReporterUserId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ReviewId")
+                    b.Property<int?>("ReviewId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -823,14 +821,12 @@ namespace BackendGameVibes.Migrations
                     b.HasOne("BackendGameVibes.Models.Forum.ForumPost", "ForumPost")
                         .WithMany("ReportedPosts")
                         .HasForeignKey("ForumPostId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "ReporterUser")
                         .WithMany("UserReportedPosts")
                         .HasForeignKey("ReporterUserId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("ForumPost");
 
@@ -842,14 +838,12 @@ namespace BackendGameVibes.Migrations
                     b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "ReporterUser")
                         .WithMany("UserReportedReviews")
                         .HasForeignKey("ReporterUserId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("BackendGameVibes.Models.User.Review", "Review")
                         .WithMany("ReportedReviews")
                         .HasForeignKey("ReviewId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("ReporterUser");
 

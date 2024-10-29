@@ -55,7 +55,7 @@ namespace BackendGameVibes.Controllers {
             return Ok(await _context.Users.ToArrayAsync());
         }
 
-        [HttpGet("user:{id}")]
+        [HttpGet("user/{id}")]
         [Authorize("admin")]
         public async Task<IActionResult> GetUser(string id) {
             UserGameVibes? userGameVibes = await _userManager.FindByIdAsync(id);
@@ -95,7 +95,7 @@ namespace BackendGameVibes.Controllers {
             }
         }
 
-        [HttpDelete("review/:id")]
+        [HttpDelete("review/{id}")]
         [Authorize(Policy = "modOrAdmin")]
         public async Task<IActionResult> DeleteReview(int id) {
             var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == id);
@@ -108,7 +108,7 @@ namespace BackendGameVibes.Controllers {
             return Ok("removed");
         }
 
-        [HttpDelete("post/:id")]
+        [HttpDelete("post/{id}")]
         [Authorize(Policy = "modOrAdmin")]
         public async Task<IActionResult> DeletePost(int id) {
             var post = await _context.ForumPosts.FirstOrDefaultAsync(p => p.Id == id);
@@ -216,7 +216,7 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpGet("reviews/reported")]
-        [Authorize]
+        [Authorize(Policy = "modOrAdmin")]
         public async Task<IActionResult> GetReportedReviews() {
             return Ok(await _context.ReportedReviews
                 .Include(r => r.ReporterUser)
@@ -233,7 +233,7 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpGet("posts/reported")]
-        [Authorize]
+        [Authorize(Policy = "modOrAdmin")]
         public async Task<IActionResult> GetReportedPosts() {
             return Ok(await _context.ReportedPosts
                 .Include(p => p.ReporterUser)
@@ -248,11 +248,5 @@ namespace BackendGameVibes.Controllers {
                 })
                 .ToArrayAsync());
         }
-
-        //[HttpGet("reported/posts")]
-        //[Authorize]
-        //public async Task<IActionResult> GetReportedPosts() {
-        //    return Ok(await _context.ForumPosts.Where(p => p.IsReported).ToArrayAsync());
-        //}
     }
 }
