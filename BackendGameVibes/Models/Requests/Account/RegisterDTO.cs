@@ -1,4 +1,4 @@
-﻿namespace BackendGameVibes.Models.Requests;
+﻿namespace BackendGameVibes.Models.Requests.Account;
 
 public class RegisterDTO
 {
