@@ -48,7 +48,7 @@ namespace BackendGameVibes.Helpers {
 
             Console.WriteLine("Start Init DB");
 
-
+            Console.WriteLine("Adding users with roles");
             if (!roleExist) {
                 var role = new IdentityRole();
                 role.Name = "admin";
@@ -135,6 +135,8 @@ namespace BackendGameVibes.Helpers {
                 await roleManager.CreateAsync(role);
             }
 
+            Console.WriteLine("Adding friends");
+
             var usersTest = new UserGameVibes?[] {
                 await userManager.FindByEmailAsync("test@test.com"),
                 await userManager.FindByEmailAsync("test2@test.com"),
@@ -155,7 +157,7 @@ namespace BackendGameVibes.Helpers {
 
             await applicationDbContext.SaveChangesAsync();
 
-
+            Console.WriteLine("Adding games");
             (Game? game, bool isSuccess) createdGame1 = await gameService.CreateGame(292030); // The Witcher 3
 
             var createdGames = new List<(Game? game, bool isSuccess)>() {
@@ -213,7 +215,7 @@ namespace BackendGameVibes.Helpers {
                     });
                 }
             }
-
+            Console.WriteLine("Adding threads with posts");
             // user #1 threads
             for (int i = 0; i < 9; i++) {
                 ForumThread newForumThread = await threadService!.AddThreadAsync(new NewForumThreadDTO {
