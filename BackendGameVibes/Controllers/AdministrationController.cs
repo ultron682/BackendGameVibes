@@ -149,6 +149,10 @@ namespace BackendGameVibes.Controllers {
             if (string.IsNullOrEmpty(userDTO.PhoneNumber) == false) {
                 await _userManager.SetPhoneNumberAsync(userGameVibes, userDTO.PhoneNumber);
             }
+            if (userDTO.PhoneNumberConfirmed != null) {
+                userGameVibes.PhoneNumberConfirmed = userDTO.PhoneNumberConfirmed ?? false;
+            }
+
             if (string.IsNullOrEmpty(userDTO.RoleName) == false) {
                 foreach (string role in userRoles) {
                     await _userManager.RemoveFromRoleAsync(userGameVibes, role);
@@ -156,6 +160,14 @@ namespace BackendGameVibes.Controllers {
 
                 await _userManager.AddToRoleAsync(userGameVibes, userDTO.RoleName!);
             }
+            if (userDTO.LockoutEnabled != null) {
+                await _userManager.SetLockoutEnabledAsync(userGameVibes, (userDTO.LockoutEnabled != null && userDTO.LockoutEnabled == true));
+            }
+
+            if (userDTO.LockoutEnd != null) {
+                await _userManager.SetLockoutEndDateAsync(userGameVibes, userDTO.LockoutEnd);
+            }
+
 
             await _userManager.UpdateAsync(userGameVibes);
 

@@ -21,9 +21,17 @@ namespace BackendGameVibes.Models.Requests.Account {
         public string? Password {
             get; set;
         }
-        private new string? NormalizedUserName {
+        public new bool? LockoutEnabled {
             get; set;
         }
+        public new bool? PhoneNumberConfirmed {
+            get; set;
+        }
+        private new bool? TwoFactorEnabled {
+            get; set;
+        }
+
+
 
         private new string? NormalizedEmail { get; set; }
 
@@ -34,5 +42,8 @@ namespace BackendGameVibes.Models.Requests.Account {
         private new string? ConcurrencyStamp { get; set; }
 
         private new DateTimeOffset? LockoutEnd { get; set; }
+        private new string? NormalizedUserName {
+            get; set;
+        }
     }
 }
