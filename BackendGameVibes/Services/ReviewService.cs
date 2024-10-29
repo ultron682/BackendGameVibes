@@ -3,7 +3,7 @@ using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.Reported;
-using BackendGameVibes.Models.Requests;
+using BackendGameVibes.Models.Requests.Reported;
 using BackendGameVibes.Models.User;
 using Microsoft.EntityFrameworkCore;
 
@@ -85,7 +85,7 @@ namespace BackendGameVibes.Services {
             }
         }
 
-        public async Task<object[]> GetLandingReviews() {
+        public async Task<object[]> GetLandingReviewsAsync() {
             return await _context.Reviews
                 .Include(r => r.Game)
                 .Include(r => r.UserGameVibes)
@@ -102,13 +102,14 @@ namespace BackendGameVibes.Services {
 
         }
 
-        public async Task<object> ReportReview(ReportReviewDTO reportedReviewDTO) {
+        public async Task<ReportedReview?> ReportReviewAsync(string userId, ReportReviewDTO reportedReviewDTO) {
             var review = await _context.Reviews.FindAsync(reportedReviewDTO.ReviewId);
             if (review == null) {
-                return new { Error = "NoReview" };
+                return null;
             }
 
             var reportedReview = _mapper.Map<ReportedReview>(reportedReviewDTO);
+            reportedReview.ReporterUserId = userId;
 
             _context.ReportedReviews.Add(reportedReview);
             await _context.SaveChangesAsync();

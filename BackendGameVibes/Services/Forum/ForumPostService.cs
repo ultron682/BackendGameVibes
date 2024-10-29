@@ -3,10 +3,11 @@ using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Reported;
-using BackendGameVibes.Models.Requests;
 using BackendGameVibes.Models.Requests.Forum;
+using BackendGameVibes.Models.Requests.Reported;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace BackendGameVibes.Services.Forum {
     public class ForumPostService : IForumPostService {
@@ -34,13 +35,14 @@ namespace BackendGameVibes.Services.Forum {
             return newForumPost;
         }
 
-        public async Task<object> ReportPost(ReportPostDTO reportPostDTO) {
+        public async Task<ReportedPost?> ReportPost(string userId, ReportPostDTO reportPostDTO) {
             var post = await _context.ForumPosts.FindAsync(reportPostDTO.PostId);
             if (post == null) {
-                return new { Error = "NoPost" };
+                return null;
             }
 
             ReportedPost newReportPost = _mapper.Map<ReportedPost>(reportPostDTO);
+            newReportPost.ReporterUserId = userId;
 
             _context.ReportedPosts.Add(newReportPost);
             await _context.SaveChangesAsync();

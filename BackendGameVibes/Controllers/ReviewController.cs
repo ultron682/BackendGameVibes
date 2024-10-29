@@ -8,10 +8,12 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Swashbuckle.AspNetCore.Annotations;
 using BackendGameVibes.Models.User;
+using BackendGameVibes.Models.Requests.Reported;
+using BackendGameVibes.Models.Reported;
 
 namespace BackendGameVibes.Controllers {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/review")]
     public class ReviewController : ControllerBase {
         private readonly IReviewService _reviewService;
         private readonly IMapper _mapper;
@@ -63,6 +65,17 @@ namespace BackendGameVibes.Controllers {
         //    await _reviewService.UpdateReviewAsync(review);
         //    return NoContent();
         //}
+
+        [HttpPost("report")]
+        [Authorize]
+        public async Task<IActionResult> ReportReview([FromBody] ReportReviewDTO reportRequest) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            ReportedReview? reportedReview = await _reviewService.ReportReviewAsync(userId, reportRequest);
+            return Ok(reportedReview);
+        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReview(int id) {

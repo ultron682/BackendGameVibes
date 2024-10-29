@@ -348,7 +348,7 @@ namespace BackendGameVibes.Data {
             mB.Entity<ReportedPost>(ent => {
                 ent.HasOne(rr => rr.ForumPost)
                     .WithMany(r => r.ReportedPosts)
-                    .HasForeignKey(rr => rr.PostId)
+                    .HasForeignKey(rr => rr.ForumPostId)
                     .OnDelete(DeleteBehavior.SetNull)
                     .IsRequired();
 

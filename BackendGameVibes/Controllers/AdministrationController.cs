@@ -218,13 +218,35 @@ namespace BackendGameVibes.Controllers {
         [HttpGet("reviews/reported")]
         [Authorize]
         public async Task<IActionResult> GetReportedReviews() {
-            return Ok(await _context.ReportedReviews.ToArrayAsync());
+            return Ok(await _context.ReportedReviews
+                .Include(r => r.ReporterUser)
+                .Include(r => r.Review)
+                .Select(r => new {
+                    r.Id,
+                    r.ReporterUserId,
+                    r.ReporterUser!.UserName,
+                    r.ReviewId,
+                    r.Review!.Comment,
+                    r.Reason
+                })
+                .ToArrayAsync());
         }
 
         [HttpGet("posts/reported")]
         [Authorize]
         public async Task<IActionResult> GetReportedPosts() {
-            return Ok(await _context.ReportedPosts.ToArrayAsync());
+            return Ok(await _context.ReportedPosts
+                .Include(p => p.ReporterUser)
+                .Include(p => p.ForumPost)
+                .Select(p => new {
+                    p.Id,
+                    p.ReporterUserId,
+                    p.ReporterUser!.UserName,
+                    p.ForumPostId,
+                    p.ForumPost!.Content,
+                    p.Reason
+                })
+                .ToArrayAsync());
         }
 
         //[HttpGet("reported/posts")]

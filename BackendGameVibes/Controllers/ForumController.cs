@@ -1,14 +1,16 @@
 ﻿using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Requests.Forum;
+using BackendGameVibes.Models.Requests.Reported;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using System.Security.Claims;
 
 namespace BackendGameVibes.Controllers {
-    [Route("api/[controller]")]
+    [Route("api/forum")]
     [ApiController]
     //[Authorize]
     public class ForumController : ControllerBase {
@@ -21,7 +23,7 @@ namespace BackendGameVibes.Controllers {
         }
 
 
-        [HttpGet]
+        [HttpGet("thread")]
         public async Task<ActionResult<IEnumerable<Thread>>> GetThreads() {
             return Ok(await _threadService.GetAllThreads());
         }
@@ -44,6 +46,7 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpPost("post")]
+        [Authorize]
         public async Task<ActionResult<Thread>> CreatePost(ForumPostDTO forumPostDTO) {
             if (ModelState.IsValid) {
                 ForumPost forumPost = await _postService.AddForumPost(forumPostDTO);
@@ -63,6 +66,27 @@ namespace BackendGameVibes.Controllers {
         [HttpGet("forum-roles")]
         public async Task<ActionResult<IEnumerable<object>>> GetForumRoles() {
             return Ok(await _threadService.GetForumRoles());
+        }
+
+        [HttpPost("post/report")]
+        [Authorize]
+        public async Task<ActionResult<object>> ReportPost(ReportPostDTO reportPostDTO) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            var reportedForumPost = await _postService.ReportPost(userId, reportPostDTO);
+
+            if (reportedForumPost != null)
+                return Ok(new {
+                    reportedForumPost.Id,
+                    reportedForumPost.ForumPostId,
+                    reportedForumPost.ReporterUserId,
+                    reportedForumPost.Reason,
+                });
+            else {
+                return BadRequest("ErrorOnReportPost");
+            }
         }
     }
 }

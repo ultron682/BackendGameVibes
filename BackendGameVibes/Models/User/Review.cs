@@ -25,7 +25,7 @@ namespace BackendGameVibes.Models.User {
         }
         public string? Comment {
             get; set;
-        }
+        } // change property name from "Comment" to "Content"
         public DateTime? CreatedAt {
             get; set;
         }
