@@ -4,6 +4,7 @@ using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Friends;
 using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.Requests.Forum;
+using BackendGameVibes.Models.Requests.Reported;
 using BackendGameVibes.Models.User;
 using BackendGameVibes.Services.Forum;
 using Microsoft.AspNetCore.Identity;
@@ -249,6 +250,24 @@ namespace BackendGameVibes.Helpers {
                         UserOwnerId = usersTest[random.Next(0, usersTest.Length)]!.Id
                     });
                 }
+            }
+
+            Console.WriteLine("Adding review,post reports");
+            var reviews = await applicationDbContext.Reviews.ToListAsync();
+            var posts = await applicationDbContext.ForumPosts.ToListAsync();
+
+            for (int i = 0; i < 10; i++) {
+                await postService!.ReportPostAsync(usersTest[random.Next(0, usersTest.Length)]!.Id!,
+                    new ReportPostDTO {
+                        ForumPostId = posts[random.Next(0, posts.Count)].Id,
+                        Reason = "Spam " + GenerateRandomSentence(random.Next(5, 9))
+                    });
+
+                await reviewService.ReportReviewAsync(usersTest[random.Next(0, usersTest.Length)]!.Id!,
+                    new ReportReviewDTO {
+                        ReviewId = reviews[random.Next(0, reviews.Count)].Id,
+                        Reason = "Spam " + GenerateRandomSentence(random.Next(5, 9))
+                    });
             }
 
             Console.WriteLine("Finished Init DB");

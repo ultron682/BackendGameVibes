@@ -35,8 +35,8 @@ namespace BackendGameVibes.Services.Forum {
             return newForumPost;
         }
 
-        public async Task<ReportedPost?> ReportPost(string userId, ReportPostDTO reportPostDTO) {
-            var post = await _context.ForumPosts.FindAsync(reportPostDTO.PostId);
+        public async Task<ReportedPost?> ReportPostAsync(string userId, ReportPostDTO reportPostDTO) {
+            var post = await _context.ForumPosts.FindAsync(reportPostDTO.ForumPostId);
             if (post == null) {
                 return null;
             }

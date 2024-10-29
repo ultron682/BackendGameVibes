@@ -8,6 +8,6 @@ namespace BackendGameVibes.IServices {
     public interface IForumPostService : IDisposable {
         Task<ForumPost> AddForumPost(ForumPostDTO forumPostDTO);
         Task<ActionResult<IEnumerable<ForumPost>>> GetAllPosts(int idThread);
-        Task<ReportedPost?> ReportPost(string userId, ReportPostDTO reportPostDTO);
+        Task<ReportedPost?> ReportPostAsync(string userId, ReportPostDTO reportPostDTO);
     }
 }

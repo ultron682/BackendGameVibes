@@ -22,7 +22,7 @@ namespace BackendGameVibes.Helpers
             CreateMap<NewForumThreadDTO, ForumThread>();
             CreateMap<ForumThread, NewForumThreadDTO>();
             CreateMap<ReportPostDTO, ReportedPost>()
-                .ForMember(dest => dest.ForumPostId, opt => opt.MapFrom(src => src.PostId));
+                .ForMember(dest => dest.ForumPostId, opt => opt.MapFrom(src => src.ForumPostId));
             CreateMap<ReportedPost, ReportPostDTO>();
             CreateMap<ReportedReview, ReportReviewDTO>();
             CreateMap<ReportReviewDTO, ReportedReview>();

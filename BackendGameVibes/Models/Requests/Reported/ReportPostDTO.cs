@@ -3,6 +3,6 @@
     public class ReportPostDTO
     {
         public string? Reason { get; set; }
-        public int PostId { get; set; }
+        public int ForumPostId { get; set; }
     }
 }

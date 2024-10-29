@@ -75,7 +75,7 @@ namespace BackendGameVibes.Controllers {
             if (userId == null)
                 return Unauthorized("User not authenticated, claim not found");
 
-            var reportedForumPost = await _postService.ReportPost(userId, reportPostDTO);
+            var reportedForumPost = await _postService.ReportPostAsync(userId, reportPostDTO);
 
             if (reportedForumPost != null)
                 return Ok(new {
