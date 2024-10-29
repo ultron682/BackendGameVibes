@@ -2,6 +2,8 @@
 using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Forum;
+using BackendGameVibes.Models.Reported;
+using BackendGameVibes.Models.Requests;
 using BackendGameVibes.Models.Requests.Forum;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +32,20 @@ namespace BackendGameVibes.Services.Forum {
             await _context.SaveChangesAsync();
 
             return newForumPost;
+        }
+
+        public async Task<object> ReportPost(ReportPostDTO reportPostDTO) {
+            var post = await _context.ForumPosts.FindAsync(reportPostDTO.PostId);
+            if (post == null) {
+                return new { Error = "NoPost" };
+            }
+
+            ReportedPost newReportPost = _mapper.Map<ReportedPost>(reportPostDTO);
+
+            _context.ReportedPosts.Add(newReportPost);
+            await _context.SaveChangesAsync();
+
+            return newReportPost;
         }
 
         public void Dispose() {

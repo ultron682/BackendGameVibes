@@ -1,7 +1,6 @@
 ﻿using BackendGameVibes.Models.User;
 
-namespace BackendGameVibes.Models.Forum
-{
+namespace BackendGameVibes.Models.Forum {
     public class ForumPost {
         public int Id {
             get; set;
@@ -34,6 +33,8 @@ namespace BackendGameVibes.Models.Forum
         public UserGameVibes? UserOwner {
             get; set;
         }
-
+        public ICollection<Reported.ReportedPost>? ReportedPosts {
+            get; set;
+        } = [];
     }
 }

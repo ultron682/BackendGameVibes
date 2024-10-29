@@ -36,5 +36,8 @@ namespace BackendGameVibes.Models.User {
         public Game? Game {
             get; set;
         }
+        public ICollection<Reported.ReportedReview>? ReportedReviews {
+            get; set;
+        } = [];
     }
 }

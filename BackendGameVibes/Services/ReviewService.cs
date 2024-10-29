@@ -1,17 +1,20 @@
-﻿using BackendGameVibes.Data;
+﻿using AutoMapper;
+using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Games;
+using BackendGameVibes.Models.Reported;
+using BackendGameVibes.Models.Requests;
 using BackendGameVibes.Models.User;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendGameVibes.Services {
     public class ReviewService : IReviewService {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public ReviewService(ApplicationDbContext context) {
+        public ReviewService(ApplicationDbContext context, IMapper mapper) {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<object>> GetAllReviewsAsync() {
@@ -99,8 +102,22 @@ namespace BackendGameVibes.Services {
 
         }
 
+        public async Task<object> ReportReview(ReportReviewDTO reportedReviewDTO) {
+            var review = await _context.Reviews.FindAsync(reportedReviewDTO.ReviewId);
+            if (review == null) {
+                return new { Error = "NoReview" };
+            }
+
+            var reportedReview = _mapper.Map<ReportedReview>(reportedReviewDTO);
+
+            _context.ReportedReviews.Add(reportedReview);
+            await _context.SaveChangesAsync();
+
+            return reportedReview;
+        }
+
         public void Dispose() {
-            //_context?.Dispose();
+            _context?.Dispose();
         }
     }
 }
