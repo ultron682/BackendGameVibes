@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using BackendGameVibes.Models.Forum;
+using BackendGameVibes.Models.Reported;
 using BackendGameVibes.Models.Requests;
 using BackendGameVibes.Models.Requests.Account;
 using BackendGameVibes.Models.Requests.Forum;
 using BackendGameVibes.Models.User;
 
-namespace BackendGameVibes.Helpers
-{
+namespace BackendGameVibes.Helpers {
     public class AutoMapperProfile : Profile {
         public AutoMapperProfile() {
             CreateMap<ReviewDTO, Review>();
@@ -19,6 +19,10 @@ namespace BackendGameVibes.Helpers
             CreateMap<ForumThread, ForumThreadDTO>();
             CreateMap<NewForumThreadDTO, ForumThread>();
             CreateMap<ForumThread, NewForumThreadDTO>();
+            CreateMap<ReportPostDTO, ReportedPost>();
+            CreateMap<ReportedPost, ReportPostDTO>();
+            CreateMap<ReportedReview, ReportReviewDTO>();
+            CreateMap<ReportReviewDTO, ReportedReview>();
             //                           .ForMember(dest => dest.CurrentCity,
             //                              opt => opt.MapFrom(src => src.City));
         }
