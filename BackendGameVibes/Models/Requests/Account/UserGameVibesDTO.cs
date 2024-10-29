@@ -29,5 +29,7 @@ namespace BackendGameVibes.Models.Requests.Account {
         private new string? SecurityStamp { get; set; }
 
         private new string? ConcurrencyStamp { get; set; }
+
+        private new DateTimeOffset? LockoutEnd { get; set; }
     }
 }
