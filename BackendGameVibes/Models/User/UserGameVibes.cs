@@ -35,19 +35,19 @@ namespace BackendGameVibes.Models.User {
         public ICollection<ForumPost>? UserForumPosts {
             get; set;
         } = [];
-        public ICollection<FriendRequest> FriendRequestsSent {
+        public ICollection<FriendRequest> UserFriendRequestsSent {
             get; set;
         } = [];
-        public ICollection<FriendRequest> FriendRequestsReceived {
+        public ICollection<FriendRequest> UserFriendRequestsReceived {
             get; set;
         } = [];
-        public ICollection<Friend> Friends {
+        public ICollection<Friend> UserFriends {
             get; set;
         } = [];
-        public ICollection<ReportedReview> ReportedReviews {
+        public ICollection<ReportedReview> UserReportedReviews {
             get; set;
         } = [];
-        public ICollection<ReportedPost> ReportedPosts {
+        public ICollection<ReportedPost> UserReportedPosts {
             get; set;
         } = [];
     }

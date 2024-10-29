@@ -771,7 +771,7 @@ namespace BackendGameVibes.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "User")
-                        .WithMany("Friends")
+                        .WithMany("UserFriends")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -783,12 +783,12 @@ namespace BackendGameVibes.Migrations
             modelBuilder.Entity("BackendGameVibes.Models.Friends.FriendRequest", b =>
                 {
                     b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "ReceiverUser")
-                        .WithMany("FriendRequestsReceived")
+                        .WithMany("UserFriendRequestsReceived")
                         .HasForeignKey("ReceiverUserId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "SenderUser")
-                        .WithMany("FriendRequestsSent")
+                        .WithMany("UserFriendRequestsSent")
                         .HasForeignKey("SenderUserId")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -827,7 +827,7 @@ namespace BackendGameVibes.Migrations
                         .IsRequired();
 
                     b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "ReporterUser")
-                        .WithMany("ReportedPosts")
+                        .WithMany("UserReportedPosts")
                         .HasForeignKey("ReporterUserId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
@@ -840,7 +840,7 @@ namespace BackendGameVibes.Migrations
             modelBuilder.Entity("BackendGameVibes.Models.Reported.ReportedReview", b =>
                 {
                     b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "ReporterUser")
-                        .WithMany("ReportedReviews")
+                        .WithMany("UserReportedReviews")
                         .HasForeignKey("ReporterUserId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired();
@@ -1015,19 +1015,19 @@ namespace BackendGameVibes.Migrations
 
             modelBuilder.Entity("BackendGameVibes.Models.User.UserGameVibes", b =>
                 {
-                    b.Navigation("FriendRequestsReceived");
-
-                    b.Navigation("FriendRequestsSent");
-
-                    b.Navigation("Friends");
-
-                    b.Navigation("ReportedPosts");
-
-                    b.Navigation("ReportedReviews");
-
                     b.Navigation("UserForumPosts");
 
                     b.Navigation("UserForumThreads");
+
+                    b.Navigation("UserFriendRequestsReceived");
+
+                    b.Navigation("UserFriendRequestsSent");
+
+                    b.Navigation("UserFriends");
+
+                    b.Navigation("UserReportedPosts");
+
+                    b.Navigation("UserReportedReviews");
 
                     b.Navigation("UserReviews");
                 });

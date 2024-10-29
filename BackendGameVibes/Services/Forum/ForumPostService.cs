@@ -36,10 +36,16 @@ namespace BackendGameVibes.Services.Forum {
         }
 
         public async Task<ReportedPost?> ReportPostAsync(string userId, ReportPostDTO reportPostDTO) {
-            var post = await _context.ForumPosts.FindAsync(reportPostDTO.ForumPostId);
-            if (post == null) {
+            var forumPost = await _context.ForumPosts.FindAsync(reportPostDTO.ForumPostId);
+            if (forumPost == null) {
                 return null;
             }
+
+            var existingReport = await _context.ReportedPosts
+                .FirstOrDefaultAsync(rp => rp.ForumPostId == reportPostDTO.ForumPostId && rp.ReporterUserId == userId);
+
+            if (existingReport != null)
+                return existingReport;
 
             ReportedPost newReportPost = _mapper.Map<ReportedPost>(reportPostDTO);
             newReportPost.ReporterUserId = userId;
