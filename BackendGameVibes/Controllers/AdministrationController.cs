@@ -95,7 +95,7 @@ namespace BackendGameVibes.Controllers {
             }
         }
 
-        [HttpDelete("review")]
+        [HttpDelete("review/:id")]
         [Authorize(Policy = "modOrAdmin")]
         public async Task<IActionResult> DeleteReview(int id) {
             var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == id);
@@ -104,6 +104,19 @@ namespace BackendGameVibes.Controllers {
             }
 
             _context.Reviews.Remove(review);
+            await _context.SaveChangesAsync();
+            return Ok("removed");
+        }
+
+        [HttpDelete("post/:id")]
+        [Authorize(Policy = "modOrAdmin")]
+        public async Task<IActionResult> DeletePost(int id) {
+            var post = await _context.ForumPosts.FirstOrDefaultAsync(p => p.Id == id);
+            if (post == null) {
+                return NotFound();
+            }
+
+            _context.ForumPosts.Remove(post);
             await _context.SaveChangesAsync();
             return Ok("removed");
         }
@@ -201,5 +214,23 @@ namespace BackendGameVibes.Controllers {
             else
                 return BadRequest(result);
         }
+
+        [HttpGet("reviews/reported")]
+        [Authorize]
+        public async Task<IActionResult> GetReportedReviews() {
+            return Ok(await _context.ReportedReviews.ToArrayAsync());
+        }
+
+        [HttpGet("posts/reported")]
+        [Authorize]
+        public async Task<IActionResult> GetReportedPosts() {
+            return Ok(await _context.ReportedPosts.ToArrayAsync());
+        }
+
+        //[HttpGet("reported/posts")]
+        //[Authorize]
+        //public async Task<IActionResult> GetReportedPosts() {
+        //    return Ok(await _context.ForumPosts.Where(p => p.IsReported).ToArrayAsync());
+        //}
     }
 }

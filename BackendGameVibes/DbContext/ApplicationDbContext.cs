@@ -5,6 +5,7 @@ using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Friends;
 using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.User;
+using BackendGameVibes.Models.Reported;
 
 namespace BackendGameVibes.Data {
     public class ApplicationDbContext : IdentityDbContext<UserGameVibes> {
@@ -45,6 +46,12 @@ namespace BackendGameVibes.Data {
             get; set;
         }
         public DbSet<Friend> Friends {
+            get; set;
+        }
+        public DbSet<ReportedReview> ReportedReviews {
+            get; set;
+        }
+        public DbSet<ReportedPost> ReportedPosts {
             get; set;
         }
 
@@ -318,6 +325,42 @@ namespace BackendGameVibes.Data {
                     .WithMany()
                     .HasForeignKey(f => f.FriendId)
                     .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            mB.Entity<ReportedReview>(ent => {
+                ent.HasOne(rr => rr.Review)
+                    .WithMany(r => r.ReportedReviews)
+                    .HasForeignKey(rr => rr.ReviewId)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .IsRequired();
+
+                ent.HasOne(rr => rr.ReporterUser)
+                    .WithMany(u => u.ReportedReviews)
+                    .HasForeignKey(rr => rr.ReporterUserId)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .IsRequired();
+
+                ent.Property(rr => rr.Reason)
+                    .HasMaxLength(255)
+                    .IsRequired();
+            });
+
+            mB.Entity<ReportedPost>(ent => {
+                ent.HasOne(rr => rr.ForumPost)
+                    .WithMany(r => r.ReportedPosts)
+                    .HasForeignKey(rr => rr.PostId)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .IsRequired();
+
+                ent.HasOne(rr => rr.ReporterUser)
+                    .WithMany(u => u.ReportedPosts)
+                    .HasForeignKey(rr => rr.ReporterUserId)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .IsRequired();
+
+                ent.Property(rr => rr.Reason)
+                    .HasMaxLength(255)
+                    .IsRequired();
             });
 
             base.OnModelCreating(mB);
