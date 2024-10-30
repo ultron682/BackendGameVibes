@@ -37,7 +37,7 @@ namespace BackendGameVibes.Services {
         public async Task<IdentityResult> RegisterUserAsync(RegisterDTO model) {
             var user = new UserGameVibes { UserName = model.UserName, Email = model.Email };
             if (user.ProfilePicture == null) {
-                var defaultImagePath = Path.Combine("wwwroot/images", "default-profile.jpg");
+                var defaultImagePath = Path.Combine("wwwroot/Images", "default-profile.jpg");
                 var newProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultImagePath) };
 
                 user.ProfilePicture = newProfilePicture;

@@ -16,14 +16,14 @@ namespace BackendGameVibes.Controllers {
             _gameService = gameService;
         }
 
-        [HttpGet("steamIDs")]
-        public ActionResult<SteamApp[]> GetAllSteamIdsGames() {
-            var steamGames = _gameService.GetAllSteamIdsGames();
-            if (steamGames != null)
-                return Ok(steamGames);
-            else
-                return NotFound("GetAllSteamIdsGames unsuccessful");
-        }
+        //[HttpGet("steamIDs")]
+        //public ActionResult<SteamApp[]> GetAllSteamIdsGames() {
+        //    var steamGames = _gameService.GetAllSteamIdsGames();
+        //    if (steamGames != null)
+        //        return Ok(steamGames);
+        //    else
+        //        return NotFound("GetAllSteamIdsGames unsuccessful");
+        //}
 
         [HttpGet("search")]
         public ActionResult<SteamApp[]> FindSteamAppByName(string searchingName) {
