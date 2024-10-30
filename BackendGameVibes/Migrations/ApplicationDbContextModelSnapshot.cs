@@ -839,6 +839,50 @@ namespace BackendGameVibes.Migrations
                     b.Navigation("Game");
                 });
 
+            modelBuilder.Entity("BackendGameVibes.Models.Reported.ReportedPost", b =>
+                {
+                    b.HasOne("BackendGameVibes.Models.Forum.ForumPost", "ForumPost")
+                        .WithMany("ReportsToThisPosts")
+                        .HasForeignKey("ForumPostId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "ReporterUser")
+                        .WithMany("UserReportedPosts")
+                        .HasForeignKey("ReporterUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ForumPost");
+
+                    b.Navigation("ReporterUser");
+                });
+
+            modelBuilder.Entity("BackendGameVibes.Models.Reported.ReportedReview", b =>
+                {
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "ReporterUser")
+                        .WithMany("UserReportedReviews")
+                        .HasForeignKey("ReporterUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("BackendGameVibes.Models.User.Review", "Review")
+                        .WithMany("ReportedReviews")
+                        .HasForeignKey("ReviewId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ReporterUser");
+
+                    b.Navigation("Review");
+                });
+
+            modelBuilder.Entity("BackendGameVibes.Models.User.ProfilePicture", b =>
+                {
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "User")
+                        .WithOne("ProfilePicture")
+                        .HasForeignKey("BackendGameVibes.Models.User.ProfilePicture", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BackendGameVibes.Models.User.Review", b =>
                 {
                     b.HasOne("BackendGameVibes.Models.Games.Game", "Game")
@@ -964,7 +1008,7 @@ namespace BackendGameVibes.Migrations
 
             modelBuilder.Entity("BackendGameVibes.Models.Forum.ForumPost", b =>
                 {
-                    b.Navigation("ReportedPosts");
+                    b.Navigation("ReportsToThisPosts");
                 });
 
             modelBuilder.Entity("BackendGameVibes.Models.Forum.ForumRole", b =>
@@ -998,6 +1042,8 @@ namespace BackendGameVibes.Migrations
 
             modelBuilder.Entity("BackendGameVibes.Models.User.UserGameVibes", b =>
                 {
+                    b.Navigation("ProfilePicture");
+
                     b.Navigation("UserForumPosts");
 
                     b.Navigation("UserForumThreads");
@@ -1008,7 +1054,7 @@ namespace BackendGameVibes.Migrations
 
                     b.Navigation("UserFriends");
 
-                    b.Navigation("UserForumPosts");
+                    b.Navigation("UserReportedPosts");
 
                     b.Navigation("UserReportedReviews");
 

@@ -34,7 +34,7 @@ namespace BackendGameVibes.Models.Forum {
         public UserGameVibes? UserOwner {
             get; set;
         }
-        public ICollection<Reported.ReportedPost>? ReportedPosts {
+        public ICollection<Reported.ReportedPost>? ReportsToThisPosts {
             get; set;
         } = [];
     }
