@@ -5,6 +5,7 @@ using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Friends;
 using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.User;
+using BackendGameVibes.Models.Reported;
 using System.Reflection.Emit;
 
 namespace BackendGameVibes.Data {
@@ -46,6 +47,12 @@ namespace BackendGameVibes.Data {
             get; set;
         }
         public DbSet<Friend> Friends {
+            get; set;
+        }
+        public DbSet<ReportedReview> ReportedReviews {
+            get; set;
+        }
+        public DbSet<ReportedPost> ReportedPosts {
             get; set;
         }
         public DbSet<ProfilePicture> ProfilePictures {
@@ -300,12 +307,12 @@ namespace BackendGameVibes.Data {
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 ent.HasOne(fr => fr.SenderUser)
-                   .WithMany(u => u.FriendRequestsSent)
+                   .WithMany(u => u.UserFriendRequestsSent)
                    .HasForeignKey(fr => fr.SenderUserId)
                    .OnDelete(DeleteBehavior.Cascade);
 
                 ent.HasOne(fr => fr.ReceiverUser)
-                    .WithMany(u => u.FriendRequestsReceived)
+                    .WithMany(u => u.UserFriendRequestsReceived)
                     .HasForeignKey(fr => fr.ReceiverUserId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
@@ -315,7 +322,7 @@ namespace BackendGameVibes.Data {
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 ent.HasOne(f => f.User)
-                    .WithMany(u => u.Friends)
+                    .WithMany(u => u.UserFriends)
                     .HasForeignKey(f => f.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
 
@@ -332,7 +339,37 @@ namespace BackendGameVibes.Data {
                 .OnDelete(DeleteBehavior.Cascade);
             });
 
+            mB.Entity<ReportedReview>(ent => {
+                ent.HasOne(rr => rr.Review)
+                    .WithMany(r => r.ReportedReviews)
+                    .HasForeignKey(rr => rr.ReviewId)
+                    .OnDelete(DeleteBehavior.SetNull);
 
+                ent.HasOne(rr => rr.ReporterUser)
+                    .WithMany(u => u.UserReportedReviews)
+                    .HasForeignKey(rr => rr.ReporterUserId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                ent.Property(rr => rr.Reason)
+                    .HasMaxLength(255)
+                    .IsRequired();
+            });
+
+            mB.Entity<ReportedPost>(ent => {
+                ent.HasOne(rr => rr.ForumPost)
+                    .WithMany(r => r.ReportedPosts)
+                    .HasForeignKey(rr => rr.ForumPostId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                ent.HasOne(rr => rr.ReporterUser)
+                    .WithMany(u => u.UserReportedPosts)
+                    .HasForeignKey(rr => rr.ReporterUserId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                ent.Property(rr => rr.Reason)
+                    .HasMaxLength(255)
+                    .IsRequired();
+            });
 
             base.OnModelCreating(mB);
         }

@@ -104,18 +104,18 @@ namespace BackendGameVibes.Services {
                         r.Comment,
                         r.CreatedAt
                     }).ToArray(),
-                    Friends = u.Friends.Select(f => new {
+                    Friends = u.UserFriends.Select(f => new {
                         f.FriendId,
                         f.FriendUser!.UserName,
                         f.FriendsSince
                     }).ToArray(),
-                    FriendRequestsReceived = u.FriendRequestsReceived.Select(fr => new {
+                    FriendRequestsReceived = u.UserFriendRequestsReceived.Select(fr => new {
                         fr.Id,
                         SenderId = fr.SenderUserId,
                         SenderName = fr.SenderUser!.UserName,
                         fr.IsAccepted
                     }).ToArray(),
-                    FriendRequestsSent = u.FriendRequestsSent.Select(fr => new {
+                    FriendRequestsSent = u.UserFriendRequestsSent.Select(fr => new {
                         fr.Id,
                         ReceiverId = fr.ReceiverUserId,
                         ReceiverName = fr.ReceiverUser!.UserName,

@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using BackendGameVibes.Models.Forum;
+using BackendGameVibes.Models.Reported;
 using BackendGameVibes.Models.Requests;
 using BackendGameVibes.Models.Requests.Account;
 using BackendGameVibes.Models.Requests.Forum;
+using BackendGameVibes.Models.Requests.Reported;
 using BackendGameVibes.Models.User;
 
 namespace BackendGameVibes.Helpers
@@ -19,8 +21,11 @@ namespace BackendGameVibes.Helpers
             CreateMap<ForumThread, ForumThreadDTO>();
             CreateMap<NewForumThreadDTO, ForumThread>();
             CreateMap<ForumThread, NewForumThreadDTO>();
-            //                           .ForMember(dest => dest.CurrentCity,
-            //                              opt => opt.MapFrom(src => src.City));
+            CreateMap<ReportPostDTO, ReportedPost>()
+                .ForMember(dest => dest.ForumPostId, opt => opt.MapFrom(src => src.ForumPostId));
+            CreateMap<ReportedPost, ReportPostDTO>();
+            CreateMap<ReportedReview, ReportReviewDTO>();
+            CreateMap<ReportReviewDTO, ReportedReview>();
         }
     }
 }
