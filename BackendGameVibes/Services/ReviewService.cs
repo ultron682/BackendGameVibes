@@ -117,6 +117,27 @@ namespace BackendGameVibes.Services {
             return reportedReview;
         }
 
+        public async Task<ReportedReview?> FinishReportReviewAsync(int id, bool toRemoveReview) {
+            var reportedReview = await _context.ReportedReviews.FindAsync(id);
+            if (reportedReview == null) {
+                return null;
+            }
+
+            reportedReview.IsFinished = true;
+            _context.ReportedReviews.Update(reportedReview);
+
+            if (toRemoveReview) {
+                var review = await _context.Reviews.FindAsync(reportedReview.ReviewId);
+                if (review != null) {
+                    _context.Reviews.Remove(review);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return reportedReview;
+        }
+
         public void Dispose() {
             _context?.Dispose();
         }

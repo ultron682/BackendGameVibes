@@ -381,6 +381,9 @@ namespace BackendGameVibes.Migrations
                     b.Property<int?>("ForumPostId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsFinished")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Reason")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -395,13 +398,16 @@ namespace BackendGameVibes.Migrations
 
                     b.HasIndex("ReporterUserId");
 
-                    b.ToTable("ReportedPosts");
+                    b.ToTable("ReportedForumPosts");
                 });
 
             modelBuilder.Entity("BackendGameVibes.Models.Reported.ReportedReview", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsFinished")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Reason")

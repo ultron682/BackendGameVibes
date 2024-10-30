@@ -52,7 +52,7 @@ namespace BackendGameVibes.Data {
         public DbSet<ReportedReview> ReportedReviews {
             get; set;
         }
-        public DbSet<ReportedPost> ReportedPosts {
+        public DbSet<ReportedPost> ReportedForumPosts {
             get; set;
         }
         public DbSet<ProfilePicture> ProfilePictures {

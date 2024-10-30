@@ -6,6 +6,7 @@ namespace BackendGameVibes.Models.Reported {
         public string? Reason { get; set; }
         public int? ReviewId { get; set; }
         public Review? Review { get; set; }
+        public bool IsFinished { get; set; } = false;
         public string? ReporterUserId { get; set; }
         public UserGameVibes? ReporterUser { get; set; }
     }

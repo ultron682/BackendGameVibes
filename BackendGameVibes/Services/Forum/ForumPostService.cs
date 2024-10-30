@@ -41,7 +41,7 @@ namespace BackendGameVibes.Services.Forum {
                 return null;
             }
 
-            var existingReport = await _context.ReportedPosts
+            var existingReport = await _context.ReportedForumPosts
                 .FirstOrDefaultAsync(rp => rp.ForumPostId == reportPostDTO.ForumPostId && rp.ReporterUserId == userId);
 
             if (existingReport != null)
@@ -50,12 +50,32 @@ namespace BackendGameVibes.Services.Forum {
             ReportedPost newReportPost = _mapper.Map<ReportedPost>(reportPostDTO);
             newReportPost.ReporterUserId = userId;
 
-            _context.ReportedPosts.Add(newReportPost);
+            _context.ReportedForumPosts.Add(newReportPost);
             await _context.SaveChangesAsync();
 
             return newReportPost;
         }
 
+        public async Task<ReportedPost?> FinishReportPostAsync(int id, bool toRemovePost) {
+            var reportedPost = await _context.ReportedForumPosts.FindAsync(id);
+            if (reportedPost == null) {
+                return null;
+            }
+
+            reportedPost.IsFinished = true;
+            _context.ReportedForumPosts.Update(reportedPost);
+
+            if (toRemovePost) {
+                var post = await _context.ForumPosts.FindAsync(reportedPost.ForumPostId);
+                if (post != null) {
+                    _context.ForumPosts.Remove(post);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return reportedPost;
+        }
         public void Dispose() {
             _context.Dispose();
         }

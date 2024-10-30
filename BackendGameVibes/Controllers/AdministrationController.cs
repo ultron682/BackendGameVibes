@@ -23,19 +23,27 @@ namespace BackendGameVibes.Controllers {
         private readonly IAccountService _accountService;
         private readonly IHostApplicationLifetime _applicationLifetime;
         private readonly IRoleService _roleService;
-
+        private readonly IForumPostService _forumPostService;
+        private readonly IForumThreadService _forumThreadService;
+        private readonly IReviewService _reviewService;
         public AdministrationController(ApplicationDbContext context,
             UserManager<UserGameVibes> userManager,
             IHostApplicationLifetime applicationLifetime,
             IMapper mapper,
             IAccountService accountService,
-            IRoleService roleService) {
+            IRoleService roleService,
+            IForumPostService forumPostService,
+            IForumThreadService forumThreadService,
+            IReviewService reviewService) {
             _context = context;
             _mapper = mapper;
             _accountService = accountService;
             _userManager = userManager;
             _applicationLifetime = applicationLifetime;
             _roleService = roleService;
+            _forumPostService = forumPostService;
+            _forumThreadService = forumThreadService;
+            _reviewService = reviewService;
         }
 
         [SwaggerOperation("Usuwa baze i tworzy plik bazy od początku. Zamyka aplikację którą trzeba ręcznie ponownie uruchomic")]
@@ -320,13 +328,15 @@ namespace BackendGameVibes.Controllers {
             return Ok(await _context.ReportedReviews
                 .Include(r => r.ReporterUser)
                 .Include(r => r.Review)
+                .Where(r => r.IsFinished == false)
                 .Select(r => new {
                     r.Id,
                     r.ReporterUserId,
                     ReporterUserName = r.ReporterUser!.UserName,
                     r.ReviewId,
                     r.Review!.Comment,
-                    r.Reason
+                    r.Reason,
+                    r.IsFinished
                 })
                 .ToArrayAsync());
         }
@@ -334,18 +344,40 @@ namespace BackendGameVibes.Controllers {
         [HttpGet("posts/reported")]
         [Authorize(Policy = "modOrAdmin")]
         public async Task<IActionResult> GetReportedPosts() {
-            return Ok(await _context.ReportedPosts
+            return Ok(await _context.ReportedForumPosts
                 .Include(p => p.ReporterUser)
                 .Include(p => p.ForumPost)
+                .Where(r => r.IsFinished == false)
                 .Select(p => new {
                     p.Id,
                     p.ReporterUserId,
                     ReporterUserName = p.ReporterUser!.UserName,
                     p.ForumPostId,
                     p.ForumPost!.Content,
-                    p.Reason
+                    p.Reason,
+                    p.IsFinished
                 })
                 .ToArrayAsync());
+        }
+
+        [HttpPost("post/finish")]
+        [Authorize(Policy = "modOrAdmin")]
+        public async Task<IActionResult> FinishReportedPost([Required] int id, [Required] bool toRemovePost) {
+            var reportedPost = await _forumPostService.FinishReportPostAsync(id, toRemovePost);
+            if (reportedPost == null) {
+                return NotFound();
+            }
+            return Ok(reportedPost);
+        }
+
+        [HttpPost("review/finish")]
+        [Authorize(Policy = "modOrAdmin")]
+        public async Task<IActionResult> FinishReportedReview([Required] int id, [Required] bool toRemoveReview) {
+            var reportedReview = await _reviewService.FinishReportReviewAsync(id, toRemoveReview);
+            if (reportedReview == null) {
+                return NotFound();
+            }
+            return Ok(reportedReview);
         }
     }
 }

@@ -11,5 +11,6 @@ namespace BackendGameVibes.IServices {
         Task DeleteReviewAsync(int id);
         Task<object[]> GetLandingReviewsAsync();
         Task<ReportedReview?> ReportReviewAsync(string userId, ReportReviewDTO reportedReviewDTO);
+        Task<ReportedReview?> FinishReportReviewAsync(int id, bool toRemove);
     }
 }
