@@ -8,14 +8,11 @@ using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
-using System.Linq;
 using System.Text;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 
-namespace BackendGameVibes.Services
-{
+namespace BackendGameVibes.Services {
     public class AccountService : IAccountService, IDisposable {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<UserGameVibes> _userManager;
@@ -39,6 +36,13 @@ namespace BackendGameVibes.Services
 
         public async Task<IdentityResult> RegisterUserAsync(RegisterDTO model) {
             var user = new UserGameVibes { UserName = model.UserName, Email = model.Email };
+            if (user.ProfilePicture == null) {
+                var defaultImagePath = Path.Combine("wwwroot/images", "default-profile.jpg");
+                var newProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultImagePath) };
+
+                user.ProfilePicture = newProfilePicture;
+            }
+
             IdentityResult userResult = await _userManager.CreateAsync(user, model.Password);
 
             if (userResult.Succeeded)
@@ -80,11 +84,13 @@ namespace BackendGameVibes.Services
                 .Where(u => u.Id == userId)
                 .Include(u => u.UserReviews)
                 .Include(u => u.ForumRole)
+                .Include(u => u.ProfilePicture)
                 .Select(u => new {
                     u.Id,
                     u.Email,
-                    u.UserName,
                     u.EmailConfirmed,
+                    u.UserName,
+                    ProfilePictureBlob = u.ProfilePicture != null ? u.ProfilePicture.ImageData : null,
                     ForumRole = new { u.ForumRole!.Id, u.ForumRole.Name, u.ForumRole.Threshold },
                     u.ExperiencePoints,
                     Roles = roles.ToArray(),
@@ -406,6 +412,20 @@ namespace BackendGameVibes.Services
                 .ToArrayAsync();
 
             return friendRequests;
+        }
+
+        public async Task<bool> UpdateProfilePictureAsync(string userId, byte[] imageData) {
+            var user = await _context.Users
+                .Include(u => u.ProfilePicture)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null) {
+                return false;
+            }
+            user.ProfilePicture!.ImageData = imageData;
+
+            var result = await _userManager.UpdateAsync(user);
+            return result.Succeeded;
         }
 
         public void Dispose() {

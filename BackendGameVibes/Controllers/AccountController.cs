@@ -12,8 +12,7 @@ using System.Security.Claims;
 using System.Text.Json;
 
 
-namespace BackendGameVibes.Controllers
-{
+namespace BackendGameVibes.Controllers {
     [ApiController]
     [Route("account")]
     public class AccountController : ControllerBase {
@@ -327,6 +326,25 @@ namespace BackendGameVibes.Controllers
                 return Ok("Usunięto znajomego");
             else
                 return BadRequest("Brak znajomego");
+        }
+
+        [HttpPost("change-profile-picture")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfilePicture(IFormFile profilePicture) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated");
+
+            if (profilePicture == null || profilePicture.Length == 0)
+                return BadRequest("InvalidProfilePicture");
+
+            using (var ms = new MemoryStream()) {
+                await profilePicture.CopyToAsync(ms);
+                var imageData = ms.ToArray();
+
+                var result = await _accountService.UpdateProfilePictureAsync(userId, imageData);
+                return result ? Ok("ProfilePictureUpdated") : BadRequest("FailedToUpdateProfilePicture");
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Friends;
 using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.User;
+using System.Reflection.Emit;
 
 namespace BackendGameVibes.Data {
     public class ApplicationDbContext : IdentityDbContext<UserGameVibes> {
@@ -47,6 +48,10 @@ namespace BackendGameVibes.Data {
         public DbSet<Friend> Friends {
             get; set;
         }
+        public DbSet<ProfilePicture> ProfilePictures {
+            get; set;
+        }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.LogTo(message => Debug.WriteLine(message));
@@ -319,6 +324,15 @@ namespace BackendGameVibes.Data {
                     .HasForeignKey(f => f.FriendId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
+
+            mB.Entity<ProfilePicture>(ent => {
+                ent.HasOne(p => p.User)
+                .WithOne(u => u.ProfilePicture)
+                .HasForeignKey<ProfilePicture>(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            });
+
+
 
             base.OnModelCreating(mB);
         }

@@ -2,11 +2,10 @@
 using BackendGameVibes.Models.Friends;
 using BackendGameVibes.Models.Games;
 using Microsoft.AspNetCore.Identity;
-using System.Data;
 
 namespace BackendGameVibes.Models.User {
     public class UserGameVibes : IdentityUser {
-        public byte[]? ProfilePicture {
+        public ProfilePicture? ProfilePicture {
             get; set;
         }
         public string? Description {
