@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
+using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Requests.Account;
 using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Authorization;
@@ -52,17 +53,115 @@ namespace BackendGameVibes.Controllers {
         [HttpGet("user")]
         [Authorize("admin")]
         public async Task<IActionResult> GetAllUsers() {
-            return Ok(await _context.Users.ToArrayAsync());
+            var users = await _context.Users
+                .Select(u => new {
+                    u.Id,
+                    u.Email,
+                    u.EmailConfirmed,
+                    u.UserName,
+                    ForumRoleName = u.ForumRole!.Name,
+                    u.ExperiencePoints,
+                    u.PhoneNumber,
+                    u.PhoneNumberConfirmed,
+                    u.AccessFailedCount,
+                    u.Description,
+                    roles = _userManager.GetRolesAsync(u).Result.ToArray()
+
+                }).ToArrayAsync();
+
+            return Ok(users);
         }
 
         [HttpGet("user/{id}")]
         [Authorize("admin")]
         public async Task<IActionResult> GetUser(string id) {
             UserGameVibes? userGameVibes = await _userManager.FindByIdAsync(id);
+
             if (userGameVibes == null) {
                 return NotFound();
             }
-            return Ok(userGameVibes);
+
+            var roles = await _userManager.GetRolesAsync(userGameVibes);
+
+            var accountInfo = await _context.Users
+                .Where(u => u.Id == userGameVibes.Id)
+                .Include(u => u.UserReviews)
+                .Include(u => u.ForumRole)
+                .Include(u => u.ProfilePicture)
+                .Select(u => new {
+                    u.Id,
+                    u.Email,
+                    u.EmailConfirmed,
+                    u.UserName,
+                    ProfilePictureBlob = u.ProfilePicture != null ? u.ProfilePicture.ImageData : null,
+                    ForumRole = new { u.ForumRole!.Id, u.ForumRole.Name, u.ForumRole.Threshold },
+                    u.ExperiencePoints,
+                    u.PhoneNumber,
+                    u.PhoneNumberConfirmed,
+                    u.TwoFactorEnabled,
+                    u.LockoutEnd,
+                    u.LockoutEnabled,
+                    u.AccessFailedCount,
+                    u.Description,
+                    Roles = roles.ToArray(),
+                    Reviews = u.UserReviews.Select(r => new {
+                        r.Id,
+                        r.GameId,
+                        r.GeneralScore,
+                        r.GameplayScore,
+                        r.GraphicsScore,
+                        r.AudioScore,
+                        r.Comment,
+                        r.CreatedAt
+                    }).ToArray(),
+                    UserReportedReviews = u.UserReportedReviews.Select(rr => new {
+                        rr.Id,
+                        rr.ReporterUserId,
+                        ReporterUserName = rr.ReporterUser!.UserName,
+                        rr.ReviewId,
+                        rr.Reason
+                    }).ToArray(),
+                    Friends = u.UserFriends.Select(f => new {
+                        f.FriendId,
+                        f.FriendUser!.UserName,
+                        f.FriendsSince
+                    }).ToArray(),
+                    FriendRequestsReceived = u.UserFriendRequestsReceived.Select(fr => new {
+                        fr.Id,
+                        SenderId = fr.SenderUserId,
+                        SenderName = fr.SenderUser!.UserName,
+                        fr.IsAccepted
+                    }).ToArray(),
+                    FriendRequestsSent = u.UserFriendRequestsSent.Select(fr => new {
+                        fr.Id,
+                        ReceiverId = fr.ReceiverUserId,
+                        ReceiverName = fr.ReceiverUser!.UserName,
+                        fr.IsAccepted
+                    }).ToArray(),
+                    UserForumPosts = u.UserForumPosts.Select(p => new {
+                        p.Id,
+                        p.Content,
+                        p.CreatedDateTime,
+                        p.LastUpdatedDateTime,
+                        p.Likes,
+                        p.DisLikes,
+                        p.ThreadId
+                    }).ToArray(),
+                    UserReportedPosts = u.UserReportedPosts.Select(rp => new {
+                        rp.Id,
+                        rp.ReporterUserId,
+                        ReporterUserName = rp.ReporterUser!.UserName,
+                        rp.ForumPostId,
+                        rp.Reason
+                    }).ToArray(),
+                    UserFollowedGames = u.UserFollowedGames.Select(g => new {
+                        g.Id,
+                        g.Title
+                    }).ToArray()
+                })
+                .FirstOrDefaultAsync();
+
+            return Ok(accountInfo);
         }
 
         [HttpPost("user")]
