@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 
+
 namespace BackendGameVibes.Controllers {
-    [Authorize]
     [ApiController]
     [Route("api/administration")]
     [SwaggerTag("Require authorization admin")]

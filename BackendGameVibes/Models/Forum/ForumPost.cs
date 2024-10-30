@@ -1,4 +1,5 @@
 ﻿using BackendGameVibes.Models.User;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BackendGameVibes.Models.Forum {
     public class ForumPost {
