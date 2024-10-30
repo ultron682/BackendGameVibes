@@ -372,6 +372,58 @@ namespace BackendGameVibes.Migrations
                     b.ToTable("SystemRequirements");
                 });
 
+            modelBuilder.Entity("BackendGameVibes.Models.Reported.ReportedPost", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ForumPostId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReporterUserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ForumPostId");
+
+                    b.HasIndex("ReporterUserId");
+
+                    b.ToTable("ReportedPosts");
+                });
+
+            modelBuilder.Entity("BackendGameVibes.Models.Reported.ReportedReview", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReporterUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("ReviewId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReporterUserId");
+
+                    b.HasIndex("ReviewId");
+
+                    b.ToTable("ReportedReviews");
+                });
+
             modelBuilder.Entity("BackendGameVibes.Models.User.Review", b =>
                 {
                     b.Property<int>("Id")
@@ -717,7 +769,7 @@ namespace BackendGameVibes.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "User")
-                        .WithMany("Friends")
+                        .WithMany("UserFriends")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -729,12 +781,12 @@ namespace BackendGameVibes.Migrations
             modelBuilder.Entity("BackendGameVibes.Models.Friends.FriendRequest", b =>
                 {
                     b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "ReceiverUser")
-                        .WithMany("FriendRequestsReceived")
+                        .WithMany("UserFriendRequestsReceived")
                         .HasForeignKey("ReceiverUserId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "SenderUser")
-                        .WithMany("FriendRequestsSent")
+                        .WithMany("UserFriendRequestsSent")
                         .HasForeignKey("SenderUserId")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -762,6 +814,40 @@ namespace BackendGameVibes.Migrations
                         .IsRequired();
 
                     b.Navigation("Game");
+                });
+
+            modelBuilder.Entity("BackendGameVibes.Models.Reported.ReportedPost", b =>
+                {
+                    b.HasOne("BackendGameVibes.Models.Forum.ForumPost", "ForumPost")
+                        .WithMany("ReportedPosts")
+                        .HasForeignKey("ForumPostId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "ReporterUser")
+                        .WithMany("UserReportedPosts")
+                        .HasForeignKey("ReporterUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ForumPost");
+
+                    b.Navigation("ReporterUser");
+                });
+
+            modelBuilder.Entity("BackendGameVibes.Models.Reported.ReportedReview", b =>
+                {
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "ReporterUser")
+                        .WithMany("UserReportedReviews")
+                        .HasForeignKey("ReporterUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("BackendGameVibes.Models.User.Review", "Review")
+                        .WithMany("ReportedReviews")
+                        .HasForeignKey("ReviewId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ReporterUser");
+
+                    b.Navigation("Review");
                 });
 
             modelBuilder.Entity("BackendGameVibes.Models.User.Review", b =>
@@ -887,6 +973,11 @@ namespace BackendGameVibes.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("BackendGameVibes.Models.Forum.ForumPost", b =>
+                {
+                    b.Navigation("ReportedPosts");
+                });
+
             modelBuilder.Entity("BackendGameVibes.Models.Forum.ForumRole", b =>
                 {
                     b.Navigation("Users");
@@ -911,17 +1002,26 @@ namespace BackendGameVibes.Migrations
                     b.Navigation("SystemRequirements");
                 });
 
+            modelBuilder.Entity("BackendGameVibes.Models.User.Review", b =>
+                {
+                    b.Navigation("ReportedReviews");
+                });
+
             modelBuilder.Entity("BackendGameVibes.Models.User.UserGameVibes", b =>
                 {
-                    b.Navigation("FriendRequestsReceived");
-
-                    b.Navigation("FriendRequestsSent");
-
-                    b.Navigation("Friends");
-
                     b.Navigation("UserForumPosts");
 
                     b.Navigation("UserForumThreads");
+
+                    b.Navigation("UserFriendRequestsReceived");
+
+                    b.Navigation("UserFriendRequestsSent");
+
+                    b.Navigation("UserFriends");
+
+                    b.Navigation("UserReportedPosts");
+
+                    b.Navigation("UserReportedReviews");
 
                     b.Navigation("UserReviews");
                 });

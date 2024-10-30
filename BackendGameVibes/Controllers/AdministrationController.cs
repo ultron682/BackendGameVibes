@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 
+
 namespace BackendGameVibes.Controllers {
-    [Authorize]
     [ApiController]
     [Route("api/administration")]
     [SwaggerTag("Require authorization admin")]
@@ -55,7 +55,7 @@ namespace BackendGameVibes.Controllers {
             return Ok(await _context.Users.ToArrayAsync());
         }
 
-        [HttpGet("user:{id}")]
+        [HttpGet("user/{id}")]
         [Authorize("admin")]
         public async Task<IActionResult> GetUser(string id) {
             UserGameVibes? userGameVibes = await _userManager.FindByIdAsync(id);
@@ -95,7 +95,7 @@ namespace BackendGameVibes.Controllers {
             }
         }
 
-        [HttpDelete("review")]
+        [HttpDelete("review/{id}")]
         [Authorize(Policy = "modOrAdmin")]
         public async Task<IActionResult> DeleteReview(int id) {
             var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == id);
@@ -104,6 +104,19 @@ namespace BackendGameVibes.Controllers {
             }
 
             _context.Reviews.Remove(review);
+            await _context.SaveChangesAsync();
+            return Ok("removed");
+        }
+
+        [HttpDelete("post/{id}")]
+        [Authorize(Policy = "modOrAdmin")]
+        public async Task<IActionResult> DeletePost(int id) {
+            var post = await _context.ForumPosts.FirstOrDefaultAsync(p => p.Id == id);
+            if (post == null) {
+                return NotFound();
+            }
+
+            _context.ForumPosts.Remove(post);
             await _context.SaveChangesAsync();
             return Ok("removed");
         }
@@ -200,6 +213,40 @@ namespace BackendGameVibes.Controllers {
                 return Ok(name);
             else
                 return BadRequest(result);
+        }
+
+        [HttpGet("reviews/reported")]
+        [Authorize(Policy = "modOrAdmin")]
+        public async Task<IActionResult> GetReportedReviews() {
+            return Ok(await _context.ReportedReviews
+                .Include(r => r.ReporterUser)
+                .Include(r => r.Review)
+                .Select(r => new {
+                    r.Id,
+                    r.ReporterUserId,
+                    ReporterUserName = r.ReporterUser!.UserName,
+                    r.ReviewId,
+                    r.Review!.Comment,
+                    r.Reason
+                })
+                .ToArrayAsync());
+        }
+
+        [HttpGet("posts/reported")]
+        [Authorize(Policy = "modOrAdmin")]
+        public async Task<IActionResult> GetReportedPosts() {
+            return Ok(await _context.ReportedPosts
+                .Include(p => p.ReporterUser)
+                .Include(p => p.ForumPost)
+                .Select(p => new {
+                    p.Id,
+                    p.ReporterUserId,
+                    ReporterUserName = p.ReporterUser!.UserName,
+                    p.ForumPostId,
+                    p.ForumPost!.Content,
+                    p.Reason
+                })
+                .ToArrayAsync());
         }
     }
 }

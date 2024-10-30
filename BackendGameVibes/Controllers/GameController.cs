@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using BackendGameVibes.Services;
-using System.Threading.Tasks;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Requests;
 using Microsoft.AspNetCore.Authorization;
@@ -10,7 +8,7 @@ using BackendGameVibes.Models.Games;
 
 namespace BackendGameVibes.Controllers {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/game")]
     public class GameController : ControllerBase {
         private readonly IGameService _gameService;
 

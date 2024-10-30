@@ -2,9 +2,12 @@
 using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Forum;
+using BackendGameVibes.Models.Reported;
 using BackendGameVibes.Models.Requests.Forum;
+using BackendGameVibes.Models.Requests.Reported;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace BackendGameVibes.Services.Forum {
     public class ForumPostService : IForumPostService {
@@ -30,6 +33,27 @@ namespace BackendGameVibes.Services.Forum {
             await _context.SaveChangesAsync();
 
             return newForumPost;
+        }
+
+        public async Task<ReportedPost?> ReportPostAsync(string userId, ReportPostDTO reportPostDTO) {
+            var forumPost = await _context.ForumPosts.FindAsync(reportPostDTO.ForumPostId);
+            if (forumPost == null) {
+                return null;
+            }
+
+            var existingReport = await _context.ReportedPosts
+                .FirstOrDefaultAsync(rp => rp.ForumPostId == reportPostDTO.ForumPostId && rp.ReporterUserId == userId);
+
+            if (existingReport != null)
+                return existingReport;
+
+            ReportedPost newReportPost = _mapper.Map<ReportedPost>(reportPostDTO);
+            newReportPost.ReporterUserId = userId;
+
+            _context.ReportedPosts.Add(newReportPost);
+            await _context.SaveChangesAsync();
+
+            return newReportPost;
         }
 
         public void Dispose() {
