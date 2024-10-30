@@ -158,29 +158,43 @@ namespace BackendGameVibes.Helpers {
             await applicationDbContext.SaveChangesAsync();
 
             Console.WriteLine("Adding games");
-            (Game? game, bool isSuccess) createdGame1 = await gameService.CreateGame(292030); // The Witcher 3
-
-            var createdGames = new List<(Game? game, bool isSuccess)>() {
-                await gameService.CreateGame(20900), // The Witcher 1
-                await gameService.CreateGame(20920), // The Witcher 2
-                await gameService.CreateGame(1593500), // God of war 1
-                await gameService.CreateGame(2322010), // God of war 2
-                await gameService.CreateGame(1222670), // The Sims™ 4
-                await gameService.CreateGame(47890), // The Sims™ 3
-                await gameService.CreateGame(256321), // LEGO MARVEL Super Heroes DLC: Asgard Pack
-                await gameService.CreateGame(231430), // Company of Heroes 2
-                await gameService.CreateGame(3035570), // Assassin's Creed Mirage
-                await gameService.CreateGame(934700), //Dead Island 2
-                // Upcoming games:
-                await gameService.CreateGame(3191990), // Tiny House Simulator 2024-11-05
-                await gameService.CreateGame(2651280), // Marvel's Spider-Man 2
-                await gameService.CreateGame(2246340), // Monster Hunter Wilds
-                await gameService.CreateGame(1850050), // Alien: Rogue Incursion
-                //await gameService.CreateGame(2671160), // Galactic Civilizations IV - Megastructures
-                await gameService.CreateGame(2677660), // Indiana Jones i Wielki Krąg
-                await gameService.CreateGame(2767030), // Marvel Rivals
+            HashSet<int> steamGameIds = new() {
+                20900, // The Witcher 1
+                20920, // The Witcher 2
+                1593500, // God of war 1
+                2322010, // God of war 2
+                1222670, // The Sims™ 4
+                47890, // The Sims™ 3
+                256321, // LEGO MARVEL Super Heroes DLC: Asgard Pack
+                231430, // Company of Heroes 2
+                3035570, // Assassin's Creed Mirage
+                934700, //Dead Island 2
+                
+                3191990, // Tiny House Simulator 2024-11-05
+                2651280, // Marvel's Spider-Man 2
+                2246340, // Monster Hunter Wilds
+                1850050, // Alien: Rogue Incursion
+                2671160, // Galactic Civilizations IV - Megastructures
+                2677660, // Indiana Jones i Wielki Krąg
+                2767030, // Marvel Rivals
+                220, // Half-Life 2
+                440, // Team Fortress 2
+                730, // Counter-Strike 2
+                570, // Dota 2
+                8930, // Sid Meier's Civilization® V
+                219640, // Chivalry: Medieval Warfare
+                245620, // Tropico 5
+                43110, // Metro 2033
+                105600, // Terraria
             };
 
+            (Game? game, bool isSuccess) createdGame1 = await gameService.CreateGame(292030); // The Witcher 3
+
+            var createdGames = new List<(Game? game, bool isSuccess)>();
+
+            foreach (var gameId in steamGameIds) {
+                createdGames.Add(await gameService.CreateGame(gameId));
+            }
 
             if (createdGame1.game != null) {
                 await reviewService.AddReviewAsync(new Review {
