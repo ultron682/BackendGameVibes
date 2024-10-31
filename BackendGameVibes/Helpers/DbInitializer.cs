@@ -40,6 +40,7 @@ namespace BackendGameVibes.Helpers {
             if (roleExist)
                 return;
 
+            using var accountService = scope.ServiceProvider.GetRequiredService<IAccountService>();
             using var reviewService = scope.ServiceProvider.GetRequiredService<IReviewService>();
             using var gameService = scope.ServiceProvider.GetRequiredService<IGameService>();
             using var threadService = scope.ServiceProvider.GetService<IForumThreadService>();
@@ -98,32 +99,43 @@ namespace BackendGameVibes.Helpers {
                 role.Name = "user";
                 await roleManager.CreateAsync(role);
 
-                //Normal users    
-                var newUser = new UserGameVibes {
-                    UserName = "test",
-                    Email = "test@test.com",
-                    EmailConfirmed = true
+                HashSet<UserGameVibes> newNotCreatedUsersGameVibes = new() {
+                    new UserGameVibes {
+                        UserName = "test",
+                        Email = "test@test.com",
+                        EmailConfirmed = true
+                    },
+                    new UserGameVibes {
+                        UserName = "test2",
+                        Email = "test2@test.com",
+                        EmailConfirmed = true
+                    }, new UserGameVibes {
+                        UserName = "test3",
+                        Email = "test3@test.com",
+                        EmailConfirmed = true
+                    }, new UserGameVibes {
+                        UserName = "test4",
+                        Email = "test4@test.com",
+                        EmailConfirmed = true
+                    }, new UserGameVibes {
+                        UserName = "test5",
+                        Email = "test5@test.com",
+                        EmailConfirmed = true
+                    },new UserGameVibes {
+                        UserName = "test6",
+                        Email = "test6@test.com",
+                        EmailConfirmed = true
+                    }
                 };
-                var newUser2 = new UserGameVibes {
-                    UserName = "test2",
-                    Email = "test2@test.com",
-                    EmailConfirmed = true
-                };
-                var newUser3 = new UserGameVibes {
-                    UserName = "test3",
-                    Email = "test3@test.com",
-                    EmailConfirmed = true
-                };
+
                 string userPWD = "Test123.";
 
-                IdentityResult chkUser = await userManager.CreateAsync(newUser, userPWD);
-                await userManager.CreateAsync(newUser2, userPWD);
-                await userManager.CreateAsync(newUser3, userPWD);
+                foreach (var user in newNotCreatedUsersGameVibes) {
+                    IdentityResult chkUser = await userManager.CreateAsync(user, userPWD);
 
-                if (chkUser.Succeeded) {
-                    await userManager.AddToRoleAsync(newUser, "user");
-                    await userManager.AddToRoleAsync(newUser2, "user");
-                    await userManager.AddToRoleAsync(newUser3, "user");
+                    if (chkUser.Succeeded) {
+                        await userManager.AddToRoleAsync(user, "user");
+                    }
                 }
             }
 
@@ -133,27 +145,54 @@ namespace BackendGameVibes.Helpers {
                 await userManager.FindByEmailAsync("test@test.com"),
                 await userManager.FindByEmailAsync("test2@test.com"),
                 await userManager.FindByEmailAsync("test3@test.com"),
-                await userManager.FindByEmailAsync("test4@test.com")
+                await userManager.FindByEmailAsync("test4@test.com"),
+                await userManager.FindByEmailAsync("test5@test.com"),
+                await userManager.FindByEmailAsync("test6@test.com"),
             };
 
 
-            var friendRequest = new FriendRequest {
+            var friendRequest1 = new FriendRequest {
                 SenderUserId = testUsers[0]!.Id,
                 ReceiverUserId = testUsers[1]!.Id,
                 IsAccepted = true
             };
-            applicationDbContext.FriendRequests.Add(friendRequest);
+            applicationDbContext.FriendRequests.Add(friendRequest1);
+
+            var friendRequest2 = new FriendRequest {
+                SenderUserId = testUsers[0]!.Id,
+                ReceiverUserId = testUsers[2]!.Id,
+                IsAccepted = true
+            };
+            applicationDbContext.FriendRequests.Add(friendRequest2);
+
+
+            var friendRequest3 = new FriendRequest {
+                SenderUserId = testUsers[0]!.Id,
+                ReceiverUserId = testUsers[3]!.Id,
+                IsAccepted = true
+            };
+            applicationDbContext.FriendRequests.Add(friendRequest3);
+
+
 
             var friend1 = new Friend { UserId = testUsers[0]!.Id, FriendId = testUsers[1]!.Id };
             var friend2 = new Friend { UserId = testUsers[1]!.Id, FriendId = testUsers[0]!.Id };
             applicationDbContext.Friends.AddRange(friend1, friend2);
 
+            var friend3 = new Friend { UserId = testUsers[0]!.Id, FriendId = testUsers[2]!.Id };
+            var friend4 = new Friend { UserId = testUsers[2]!.Id, FriendId = testUsers[0]!.Id };
+            applicationDbContext.Friends.AddRange(friend3, friend4);
+
+            var friend5 = new Friend { UserId = testUsers[0]!.Id, FriendId = testUsers[3]!.Id };
+            var friend6 = new Friend { UserId = testUsers[3]!.Id, FriendId = testUsers[0]!.Id };
+            applicationDbContext.Friends.AddRange(friend5, friend6);
+
             await applicationDbContext.SaveChangesAsync();
 
             Console.WriteLine("Adding games");
-            HashSet<int> steamGameIds = new() {
+            HashSet<int> steamGameIds = [
                 20900, // The Witcher 1
-                20920, // The Witcher 2
+                20920, // The Witcher 2, wither 3 292030 is added below IN SEPARETE CALL
                 1593500, // God of war 1
                 2322010, // God of war 2
                 1222670, // The Sims™ 4
@@ -179,7 +218,7 @@ namespace BackendGameVibes.Helpers {
                 245620, // Tropico 5
                 43110, // Metro 2033
                 105600, // Terraria
-            };
+            ];
 
             (Game? game, bool isSuccess) createdGame1 = await gameService.CreateGame(292030); // The Witcher 3
 

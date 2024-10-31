@@ -4,7 +4,7 @@ using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 
 namespace BackendGameVibes.IServices {
-    public interface IAccountService {
+    public interface IAccountService : IDisposable {
         Task<IdentityResult> ConfirmEmailAsync(string userId, string token);
         Task<string> GenerateJwtTokenAsync(UserGameVibes user);
         Task<object?> GetAccountInfoAsync(string userId);

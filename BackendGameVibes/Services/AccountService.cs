@@ -13,7 +13,7 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 
 namespace BackendGameVibes.Services {
-    public class AccountService : IAccountService, IDisposable {
+    public class AccountService : IAccountService {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<UserGameVibes> _userManager;
         private readonly SignInManager<UserGameVibes> _signInManager;
