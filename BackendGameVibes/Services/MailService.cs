@@ -1,5 +1,4 @@
-﻿using BackendGameVibes.IServices;
-using BackendGameVibes.Models;
+﻿using BackendGameVibes.Models;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
