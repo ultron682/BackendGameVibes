@@ -50,7 +50,6 @@ namespace BackendGameVibes.Services.Forum {
 
         public async Task<IEnumerable<object>> GetLandingThreads() {
             return await _context.ForumThreads
-                .Include(t => t.Posts)
                 .Include(t => t.Section)
                 .Include(t => t.UserOwner)
                 .Select(t => new {
@@ -61,13 +60,6 @@ namespace BackendGameVibes.Services.Forum {
                     t.UserOwnerId,
                     usernameOwner = t.UserOwner!.UserName,
                     section = t.Section!.Name,
-                    //Posts = t.Posts!.Select(p => new {
-                    //    p.Id,
-                    //    p.Content,
-                    //    p.CreatedDateTime,
-                    //    p.UserOwnerId,
-                    //    p.UserOwner
-                    //})
                 })
                 .OrderByDescending(ft => ft.CreatedDateTime)
                 .Take(5)

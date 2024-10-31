@@ -182,18 +182,30 @@ namespace BackendGameVibes.Services {
         }
 
         public async Task<object[]> GetLandingGames() {
-            return await _context.Games
-                            .Include(g => g.Reviews)
+            var games = await _context.Games
                             .Select(g => new {
                                 g.Id,
                                 g.Title,
                                 g.CoverImage,
-                                Rating = g.Reviews!.Where(c => c.GameId == g.Id).Select(c => c.GameplayScore).Average().ToString("0.0")
-
                             })
                             .OrderBy(r => EF.Functions.Random())
                             .Take(5)
                             .ToArrayAsync();
+
+            var gamesWithRatings = new object[games.Length];
+            for (int i = 0; i < games.Length; i++) {
+                var game = games[i];
+                var reviews = await _context.Reviews.Where(r => r.GameId == game.Id).ToArrayAsync();
+                double rating = reviews.Select(r => r.GameplayScore).Average();
+                gamesWithRatings[i] = new {
+                    game.Id,
+                    game.Title,
+                    game.CoverImage,
+                    Rating = rating.ToString("0.0")
+                };
+            }
+
+            return gamesWithRatings;
 
         }
         public void Dispose() {
@@ -202,7 +214,6 @@ namespace BackendGameVibes.Services {
 
         public async Task<object[]> GetUpcomingGames() {
             return await _context.Games
-                 .Include(g => g.Reviews)
                  .Where(g => g.ReleaseDate > DateOnly.FromDateTime(DateTime.Now))
                  .Select(g => new {
                      g.Id,

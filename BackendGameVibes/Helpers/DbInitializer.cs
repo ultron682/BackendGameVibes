@@ -127,32 +127,25 @@ namespace BackendGameVibes.Helpers {
                 }
             }
 
-            // Creating guest role - something like [AllowAnonymous], todo: remove???
-            roleExist = await roleManager.RoleExistsAsync("guest");
-            if (!roleExist) {
-                var role = new IdentityRole();
-                role.Name = "guest";
-                await roleManager.CreateAsync(role);
-            }
-
             Console.WriteLine("Adding friends");
 
-            var usersTest = new UserGameVibes?[] {
+            var testUsers = new UserGameVibes?[] {
                 await userManager.FindByEmailAsync("test@test.com"),
                 await userManager.FindByEmailAsync("test2@test.com"),
-                await userManager.FindByEmailAsync("test3@test.com")
+                await userManager.FindByEmailAsync("test3@test.com"),
+                await userManager.FindByEmailAsync("test4@test.com")
             };
 
 
             var friendRequest = new FriendRequest {
-                SenderUserId = usersTest[0]!.Id,
-                ReceiverUserId = usersTest[1]!.Id,
+                SenderUserId = testUsers[0]!.Id,
+                ReceiverUserId = testUsers[1]!.Id,
                 IsAccepted = true
             };
             applicationDbContext.FriendRequests.Add(friendRequest);
 
-            var friend1 = new Friend { UserId = usersTest[0]!.Id, FriendId = usersTest[1]!.Id };
-            var friend2 = new Friend { UserId = usersTest[1]!.Id, FriendId = usersTest[0]!.Id };
+            var friend1 = new Friend { UserId = testUsers[0]!.Id, FriendId = testUsers[1]!.Id };
+            var friend2 = new Friend { UserId = testUsers[1]!.Id, FriendId = testUsers[0]!.Id };
             applicationDbContext.Friends.AddRange(friend1, friend2);
 
             await applicationDbContext.SaveChangesAsync();
@@ -204,7 +197,7 @@ namespace BackendGameVibes.Helpers {
                     GraphicsScore = 7.5,
                     AudioScore = 6.5,
                     GameplayScore = 8.9,
-                    UserGameVibesId = usersTest[0]!.Id
+                    UserGameVibesId = testUsers[0]!.Id
                 });
 
                 await reviewService.AddReviewAsync(new Review {
@@ -214,7 +207,7 @@ namespace BackendGameVibes.Helpers {
                     GraphicsScore = 7.5,
                     AudioScore = 6.5,
                     GameplayScore = 8.9,
-                    UserGameVibesId = usersTest[1]!.Id
+                    UserGameVibesId = testUsers[1]!.Id
                 });
 
                 for (int i = 0; i < 100; i++) {
@@ -225,7 +218,7 @@ namespace BackendGameVibes.Helpers {
                         GraphicsScore = random.Next(1, 11),
                         AudioScore = random.Next(1, 11),
                         GameplayScore = random.Next(1, 11),
-                        UserGameVibesId = usersTest[random.Next(0, usersTest.Length)]!.Id
+                        UserGameVibesId = testUsers[random.Next(0, testUsers.Length)]!.Id
                     });
                 }
             }
@@ -234,7 +227,7 @@ namespace BackendGameVibes.Helpers {
             for (int i = 0; i < 9; i++) {
                 ForumThread newForumThread = await threadService!.AddThreadAsync(new NewForumThreadDTO {
                     Title = $"Forum Thread {i} " + GenerateRandomSentence(2),
-                    UserOwnerId = usersTest[0]!.Id,
+                    UserOwnerId = testUsers[0]!.Id,
                     SectionId = 1,
                     FirstForumPostContent = GenerateRandomSentence(random.Next(10, 30))
                 });
@@ -244,7 +237,7 @@ namespace BackendGameVibes.Helpers {
                     await postService!.AddForumPost(new ForumPostDTO {
                         Content = $"{postsCount} " + GenerateRandomSentence(random.Next(10, 30)),
                         ThreadId = newForumThread.Id,
-                        UserOwnerId = usersTest[random.Next(0, usersTest.Length)]!.Id
+                        UserOwnerId = testUsers[random.Next(0, testUsers.Length)]!.Id
                     });
                 }
             }
@@ -253,7 +246,7 @@ namespace BackendGameVibes.Helpers {
             for (int i = 0; i < 9; i++) {
                 ForumThread newForumThread = await threadService!.AddThreadAsync(new NewForumThreadDTO {
                     Title = $"Forum Thread {i} " + GenerateRandomSentence(2),
-                    UserOwnerId = usersTest[1]!.Id,
+                    UserOwnerId = testUsers[1]!.Id,
                     SectionId = 1,
                     FirstForumPostContent = GenerateRandomSentence(random.Next(10, 30))
                 });
@@ -263,7 +256,7 @@ namespace BackendGameVibes.Helpers {
                     await postService!.AddForumPost(new ForumPostDTO {
                         Content = $"{postsCount} " + GenerateRandomSentence(random.Next(10, 30)),
                         ThreadId = newForumThread.Id,
-                        UserOwnerId = usersTest[random.Next(0, usersTest.Length)]!.Id
+                        UserOwnerId = testUsers[random.Next(0, testUsers.Length)]!.Id
                     });
                 }
             }
@@ -273,13 +266,13 @@ namespace BackendGameVibes.Helpers {
             var posts = await applicationDbContext.ForumPosts.ToListAsync();
 
             for (int i = 0; i < 10; i++) {
-                await postService!.ReportPostAsync(usersTest[random.Next(0, usersTest.Length)]!.Id!,
+                await postService!.ReportPostAsync(testUsers[random.Next(0, testUsers.Length)]!.Id!,
                     new ReportPostDTO {
                         ForumPostId = posts[random.Next(0, posts.Count)].Id,
                         Reason = "Spam " + GenerateRandomSentence(random.Next(5, 9))
                     });
 
-                await reviewService.ReportReviewAsync(usersTest[random.Next(0, usersTest.Length)]!.Id!,
+                await reviewService.ReportReviewAsync(testUsers[random.Next(0, testUsers.Length)]!.Id!,
                     new ReportReviewDTO {
                         ReviewId = reviews[random.Next(0, reviews.Count)].Id,
                         Reason = "Spam " + GenerateRandomSentence(random.Next(5, 9))

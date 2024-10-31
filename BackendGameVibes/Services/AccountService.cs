@@ -77,7 +77,11 @@ namespace BackendGameVibes.Services {
             await _context.SaveChangesAsync();
         }
 
-        public async Task<object> GetAccountInfoAsync(string userId, UserGameVibes userGameVibes) {
+        public async Task<object?> GetAccountInfoAsync(string userId) {
+            var userGameVibes = await GetUserByIdAsync(userId);
+            if (userGameVibes == null)
+                return null;
+
             var roles = await _userManager.GetRolesAsync(userGameVibes);
 
             var accountInfo = await _context.Users
@@ -104,6 +108,13 @@ namespace BackendGameVibes.Services {
                         r.Comment,
                         r.CreatedAt
                     }).ToArray(),
+                    UserReportedReviews = u.UserReportedReviews.Select(rr => new {
+                        rr.Id,
+                        rr.ReporterUserId,
+                        ReporterUserName = rr.ReporterUser!.UserName,
+                        rr.ReviewId,
+                        rr.Reason
+                    }).ToArray(),
                     Friends = u.UserFriends.Select(f => new {
                         f.FriendId,
                         f.FriendUser!.UserName,
@@ -120,6 +131,78 @@ namespace BackendGameVibes.Services {
                         ReceiverId = fr.ReceiverUserId,
                         ReceiverName = fr.ReceiverUser!.UserName,
                         fr.IsAccepted
+                    }).ToArray(),
+                    UserForumPosts = u.UserForumPosts!.Select(p => new {
+                        p.Id,
+                        p.Content,
+                        p.CreatedDateTime,
+                        p.LastUpdatedDateTime,
+                        p.Likes,
+                        p.DisLikes,
+                        p.ThreadId
+                    }).ToArray(),
+                    UserReportedPosts = u.UserReportedPosts!.Select(rp => new {
+                        rp.Id,
+                        rp.ReporterUserId,
+                        ReporterUserName = rp.ReporterUser!.UserName,
+                        rp.ForumPostId,
+                        rp.Reason
+                    }).ToArray(),
+                    UserFollowedGames = u.UserFollowedGames!.Select(g => new {
+                        g.Id,
+                        g.Title
+                    }).ToArray()
+                })
+                .FirstOrDefaultAsync();
+
+            return accountInfo!;
+        }
+
+        public async Task<object?> GetPublicAccountInfoAsync(string userId) {
+            var userGameVibes = await GetUserByIdAsync(userId);
+            if (userGameVibes == null)
+                return null;
+
+            var roles = await _userManager.GetRolesAsync(userGameVibes);
+
+            var accountInfo = await _context.Users
+                .Where(u => u.Id == userId)
+                .Include(u => u.UserReviews)
+                .Include(u => u.ForumRole)
+                .Include(u => u.ProfilePicture)
+                .Select(u => new {
+                    u.Id,
+                    u.UserName,
+                    ProfilePictureBlob = u.ProfilePicture != null ? u.ProfilePicture.ImageData : null,
+                    ForumRole = new { u.ForumRole!.Id, u.ForumRole.Name, u.ForumRole.Threshold },
+                    u.ExperiencePoints,
+                    Reviews = u.UserReviews.Select(r => new {
+                        r.Id,
+                        r.GameId,
+                        r.GeneralScore,
+                        r.GameplayScore,
+                        r.GraphicsScore,
+                        r.AudioScore,
+                        r.Comment,
+                        r.CreatedAt
+                    }).ToArray(),
+                    Friends = u.UserFriends.Select(f => new {
+                        f.FriendId,
+                        f.FriendUser!.UserName,
+                        f.FriendsSince
+                    }).ToArray(),
+                    UserForumPosts = u.UserForumPosts!.Select(p => new {
+                        p.Id,
+                        p.Content,
+                        p.CreatedDateTime,
+                        p.LastUpdatedDateTime,
+                        p.Likes,
+                        p.DisLikes,
+                        p.ThreadId
+                    }).ToArray(),
+                    UserFollowedGames = u.UserFollowedGames!.Select(g => new {
+                        g.Id,
+                        g.Title
                     }).ToArray()
                 })
                 .FirstOrDefaultAsync();

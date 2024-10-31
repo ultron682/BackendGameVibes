@@ -3,12 +3,12 @@ using BackendGameVibes.Models.Requests.Account;
 using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 
-namespace BackendGameVibes.IServices
-{
+namespace BackendGameVibes.IServices {
     public interface IAccountService {
         Task<IdentityResult> ConfirmEmailAsync(string userId, string token);
         Task<string> GenerateJwtTokenAsync(UserGameVibes user);
-        Task<object> GetAccountInfoAsync(string userId, UserGameVibes userGameVibes);
+        Task<object?> GetAccountInfoAsync(string userId);
+        Task<object?> GetPublicAccountInfoAsync(string userId);
         Task<UserGameVibes?> GetUserByEmailAsync(string email);
         Task<UserGameVibes?> GetUserByIdAsync(string userId);
         Task<SignInResult?> LoginUserAsync(UserGameVibes user, string password);

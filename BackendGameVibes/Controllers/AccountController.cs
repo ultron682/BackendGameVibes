@@ -95,16 +95,15 @@ namespace BackendGameVibes.Controllers {
         [Authorize]
         [SwaggerOperation("Zwraca informacje o uzytkowniku")]
         public async Task<IActionResult> GetAccountInfo() {
-            var email = User.FindFirstValue(ClaimTypes.Email);
-            if (email == null)
-                return Unauthorized("User not authenticated");
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
 
-            var user = await _accountService.GetUserByEmailAsync(email);
-            if (user == null)
-                return NotFound("User not found");
-
-            var accountInfo = await _accountService.GetAccountInfoAsync(user.Id, user);
-            return Ok(accountInfo);
+            var accountInfo = await _accountService.GetAccountInfoAsync(userId);
+            if (accountInfo != null)
+                return Ok(accountInfo);
+            else
+                return BadRequest("User not found");
         }
 
         [HttpPatch("change-username")]
@@ -207,15 +206,15 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpGet("user/:id")]
-        [Authorize]
-        [SwaggerOperation("podstawowe info o uzytkowniku. do publicznego profilu gracza. na razie zwraca wszystkie dane o user")]
-        public async Task<ActionResult<object>> GetUserAsync(string id) {
-            var user = await _accountService.GetUserByIdAsync(id);
+        [AllowAnonymous]
+        [SwaggerOperation("publiczne dane o profilu gracza")]
+        public async Task<ActionResult<object>> GetUserAsync(string userId) {
+            var user = await _accountService.GetUserByIdAsync(userId);
             if (user == null) {
                 return NotFound();
             }
             else {
-                var accountInfo = await _accountService.GetAccountInfoAsync(user.Id, user);
+                var accountInfo = await _accountService.GetPublicAccountInfoAsync(user.Id);
                 return Ok(accountInfo);
             }
         }
