@@ -29,6 +29,10 @@ namespace BackendGameVibes.Services {
             return await IncreaseExperiencePointsForUserAsync(userId, _pointsSettings.OnAddReviewPoints);
         }
 
+        public async Task<int?> AddNewFriendPoints(string userId) {
+            return await IncreaseExperiencePointsForUserAsync(userId, _pointsSettings.OnAddNewFriendPoints);
+        }
+
         private async Task<int?> IncreaseExperiencePointsForUserAsync(string userId, int count) {
             var user = await _context.Users
                 .Include(u => u.ForumRole)
