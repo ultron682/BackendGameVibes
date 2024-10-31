@@ -119,6 +119,7 @@ builder.Services.AddSingleton<SteamService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IForumThreadService, ForumThreadService>();
 builder.Services.AddScoped<IForumPostService, ForumPostService>();
+builder.Services.AddScoped<IForumExperienceService, ForumExperienceService>();
 builder.Services.AddHttpClient();
 
 

@@ -516,35 +516,6 @@ namespace BackendGameVibes.Services {
             return result.Succeeded;
         }
 
-
-        /*          new ForumRole() { Id = 1, Name = "beginner", Threshold = 0 },
-                    new ForumRole() { Id = 2, Name = "experienced", Threshold = 100 },
-                    new ForumRole() { Id = 3, Name = "powerful", Threshold = 1000 },
-                    new ForumRole() { Id = 4, Name = "superhero", Threshold = 10000 });*/
-        public async Task<int?> IncreaseExperiencePointsForUserAsync(string userId, int count) {
-            var user = await _context.Users
-                .Include(u => u.ForumRole)
-                .FirstOrDefaultAsync(u => u.Id == userId);
-
-            if (user == null) {
-                return -1;
-            }
-
-            user.ExperiencePoints += count;
-
-            if (user.ForumRole == null) {
-                var forumRole = await _context.ForumRoles
-                    .FirstOrDefaultAsync(fr => fr.Threshold <= user.ExperiencePoints);
-
-                if (forumRole != null) {
-                    user.ForumRole = forumRole;
-                }
-            }
-
-            await _context.SaveChangesAsync();
-            return user.ExperiencePoints;
-        }
-
         public void Dispose() {
             _context.Dispose();
             _userManager.Dispose();
