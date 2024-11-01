@@ -9,6 +9,7 @@ namespace BackendGameVibes.IServices {
         Task<ForumPost> AddForumPost(ForumPostDTO forumPostDTO);
         Task<ReportedPost?> FinishReportPostAsync(int id, bool toRemovePost);
         Task<ActionResult<IEnumerable<ForumPost>>> GetAllPosts(int idThread);
+        Task<IEnumerable<object>> GetAllUserPosts(string userId);
         Task<ReportedPost?> ReportPostAsync(string userId, ReportPostDTO reportPostDTO);
     }
 }

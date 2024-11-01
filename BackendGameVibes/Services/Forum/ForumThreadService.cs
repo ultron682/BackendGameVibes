@@ -84,6 +84,19 @@ namespace BackendGameVibes.Services.Forum {
              .ToListAsync();
         }
 
+        public async Task<IEnumerable<object>> GetAllUserThreads(string userId) {
+            return await _context.ForumThreads
+                .Where(t => t.UserOwnerId == userId)
+                .Select(t => new {
+                    t.Id,
+                    t.Title,
+                    t.CreatedDateTime,
+                    t.LastUpdatedDateTime
+                })
+                .OrderByDescending(p => p.CreatedDateTime)
+                .ToArrayAsync();
+        }
+
         public void Dispose() {
             _context.Dispose();
         }

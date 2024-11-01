@@ -218,13 +218,13 @@ namespace BackendGameVibes.Services {
                         f.FriendUser!.UserName,
                         f.FriendsSince
                     }).ToArray(),
-                    UserForumThreads = u.UserForumThreads!.Select(t => new {
+                    UserForumLast5Threads = u.UserForumThreads != null ? u.UserForumThreads.Select(t => new {
                         t.Id,
                         t.Title,
                         t.CreatedDateTime,
                         t.LastUpdatedDateTime
-                    }).ToArray(),
-                    UserForumPosts = u.UserForumPosts!.Select(p => new {
+                    }).OrderByDescending(p => p.LastUpdatedDateTime).Take(5).ToArray() : Array.Empty<object>(),
+                    UserForumLast5Posts = u.UserForumPosts != null ? u.UserForumPosts.Select(p => new {
                         p.Id,
                         p.Content,
                         p.CreatedDateTime,
@@ -232,11 +232,11 @@ namespace BackendGameVibes.Services {
                         p.Likes,
                         p.DisLikes,
                         p.ThreadId
-                    }).ToArray(),
-                    UserFollowedGames = u.UserFollowedGames!.Select(g => new {
+                    }).OrderByDescending(p => p.LastUpdatedDateTime).Take(5).ToArray() : Array.Empty<object>(),
+                    UserFollowedGames = u.UserFollowedGames != null ? u.UserFollowedGames.Select(g => new {
                         g.Id,
                         g.Title
-                    }).ToArray()
+                    }).ToArray() : Array.Empty<object>(),
                 })
                 .FirstOrDefaultAsync();
 

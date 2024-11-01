@@ -12,7 +12,6 @@ using System.Security.Claims;
 namespace BackendGameVibes.Controllers {
     [Route("api/forum")]
     [ApiController]
-    //[Authorize]
     public class ForumController : ControllerBase {
         private readonly IForumPostService _postService;
         private readonly IForumThreadService _threadService;
@@ -87,6 +86,17 @@ namespace BackendGameVibes.Controllers {
             else {
                 return BadRequest("ErrorOnReportPost");
             }
+        }
+
+        [HttpGet("{userId}/threads")]
+        public async Task<ActionResult<IEnumerable<object>>> GetUserThreads(string userId) {
+            return Ok(await _threadService.GetAllUserThreads(userId));
+        }
+
+
+        [HttpGet("{userId}/posts")]
+        public async Task<ActionResult<IEnumerable<object>>> GetUserPosts(string userId) {
+            return Ok(await _postService.GetAllUserPosts(userId));
         }
     }
 }
