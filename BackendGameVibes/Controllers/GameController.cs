@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BackendGameVibes.IServices;
-using BackendGameVibes.Models.Requests;
+using BackendGameVibes.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using BackendGameVibes.Models.Steam;
 using Swashbuckle.AspNetCore.Annotations;

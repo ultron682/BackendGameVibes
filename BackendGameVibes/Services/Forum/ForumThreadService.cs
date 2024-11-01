@@ -2,7 +2,7 @@
 using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Forum;
-using BackendGameVibes.Models.Requests.Forum;
+using BackendGameVibes.Models.DTOs.Forum;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendGameVibes.Services.Forum {

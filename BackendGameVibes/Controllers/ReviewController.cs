@@ -2,12 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
-using BackendGameVibes.Models.Requests;
+using BackendGameVibes.Models.DTOs;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Swashbuckle.AspNetCore.Annotations;
-using BackendGameVibes.Models.Requests.Reported;
+using BackendGameVibes.Models.DTOs.Reported;
 using BackendGameVibes.Models.Reported;
 using BackendGameVibes.Models.Reviews;
 

@@ -1,7 +1,6 @@
-﻿namespace BackendGameVibes.Models.Requests.Account;
+﻿namespace BackendGameVibes.Models.DTOs.Account;
 
-public class RegisterDTO
-{
+public class RegisterDTO {
     public required string Email { get; init; }
     public required string Password { get; init; }
     public required string UserName { get; init; }

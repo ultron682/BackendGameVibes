@@ -3,7 +3,7 @@ using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.Reported;
-using BackendGameVibes.Models.Requests.Reported;
+using BackendGameVibes.Models.DTOs.Reported;
 using BackendGameVibes.Models.Reviews;
 using Microsoft.EntityFrameworkCore;
 

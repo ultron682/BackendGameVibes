@@ -1,7 +1,7 @@
 ﻿using BackendGameVibes.Models.Forum;
 using System.ComponentModel.DataAnnotations;
 
-namespace BackendGameVibes.Models.Requests.Forum {
+namespace BackendGameVibes.Models.DTOs.Forum {
     public class ForumPostDTO {
         [Required]
         public string? Content {

@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel;
 
-namespace BackendGameVibes.Models.Requests.Account;
+namespace BackendGameVibes.Models.DTOs.Account;
 
-public class LoginDTO
-{
+public class LoginDTO {
     [DefaultValue("test@test.com")]
     public required string Email { get; init; }
     [DefaultValue("Test123.")]

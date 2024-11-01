@@ -1,5 +1,5 @@
 ﻿using BackendGameVibes.Models.Reported;
-using BackendGameVibes.Models.Requests.Reported;
+using BackendGameVibes.Models.DTOs.Reported;
 using BackendGameVibes.Models.Reviews;
 
 namespace BackendGameVibes.IServices

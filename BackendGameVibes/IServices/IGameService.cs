@@ -1,5 +1,5 @@
 ﻿using BackendGameVibes.Models.Games;
-using BackendGameVibes.Models.Requests;
+using BackendGameVibes.Models.DTOs;
 using BackendGameVibes.Models.Steam;
 
 namespace BackendGameVibes.IServices {

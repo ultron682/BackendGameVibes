@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace BackendGameVibes.Models.Requests {
+namespace BackendGameVibes.Models.DTOs {
     public class ReviewDTO {
         //[DefaultValue("long required userID")]
         //public string? UserGameVibesId { get; set; }

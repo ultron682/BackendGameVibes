@@ -1,7 +1,7 @@
 ﻿using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Forum;
-using BackendGameVibes.Models.Requests.Forum;
-using BackendGameVibes.Models.Requests.Reported;
+using BackendGameVibes.Models.DTOs.Forum;
+using BackendGameVibes.Models.DTOs.Reported;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

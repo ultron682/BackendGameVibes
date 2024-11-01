@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BackendGameVibes.Models.Requests {
+namespace BackendGameVibes.Models.DTOs {
     public class FiltersGamesDTO {
         [Required]
         public int[]? GenresIds { get; set; } // category ids

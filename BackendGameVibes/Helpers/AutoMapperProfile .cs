@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Reported;
-using BackendGameVibes.Models.Requests;
-using BackendGameVibes.Models.Requests.Account;
-using BackendGameVibes.Models.Requests.Forum;
-using BackendGameVibes.Models.Requests.Reported;
+using BackendGameVibes.Models.DTOs;
+using BackendGameVibes.Models.DTOs.Account;
+using BackendGameVibes.Models.DTOs.Forum;
+using BackendGameVibes.Models.DTOs.Reported;
 using BackendGameVibes.Models.Reviews;
 using BackendGameVibes.Models.User;
 

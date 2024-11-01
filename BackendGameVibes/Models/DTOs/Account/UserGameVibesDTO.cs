@@ -1,11 +1,7 @@
-﻿using BackendGameVibes.Models.Forum;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
-namespace BackendGameVibes.Models.Requests.Account {
+namespace BackendGameVibes.Models.DTOs.Account {
     public class UserGameVibesDTO : IdentityUser {
-        private byte[]? ProfilePicture {
-            get; set;
-        }
         public string? Description {
             get; set;
         }

@@ -4,7 +4,7 @@ using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
 using BackendGameVibes.Models.Friends;
 using BackendGameVibes.Models.Points;
-using BackendGameVibes.Models.Requests.Account;
+using BackendGameVibes.Models.DTOs.Account;
 using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

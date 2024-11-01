@@ -1,5 +1,5 @@
 ﻿using BackendGameVibes.Models.Friends;
-using BackendGameVibes.Models.Requests.Account;
+using BackendGameVibes.Models.DTOs.Account;
 using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 

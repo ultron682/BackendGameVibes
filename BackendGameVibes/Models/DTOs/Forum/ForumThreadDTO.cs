@@ -1,6 +1,6 @@
 ﻿using BackendGameVibes.Models.Forum;
 
-namespace BackendGameVibes.Models.Requests.Forum {
+namespace BackendGameVibes.Models.DTOs.Forum {
     public class ForumThreadDTO {
         public string? Title {
             get; set;

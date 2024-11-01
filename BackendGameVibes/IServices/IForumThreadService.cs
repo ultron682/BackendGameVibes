@@ -1,5 +1,5 @@
 ﻿using BackendGameVibes.Models.Forum;
-using BackendGameVibes.Models.Requests.Forum;
+using BackendGameVibes.Models.DTOs.Forum;
 
 namespace BackendGameVibes.IServices {
     public interface IForumThreadService : IDisposable {

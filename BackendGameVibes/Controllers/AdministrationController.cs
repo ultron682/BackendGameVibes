@@ -2,7 +2,7 @@
 using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Forum;
-using BackendGameVibes.Models.Requests.Account;
+using BackendGameVibes.Models.DTOs.Account;
 using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
 
 
 namespace BackendGameVibes.Controllers {
@@ -164,8 +166,6 @@ namespace BackendGameVibes.Controllers {
                 userGameVibes.UserName = userDTO.UserName;
             if (userDTO.Description != null)
                 userGameVibes.Description = userDTO.Description;
-            //if (userDTO.ProfilePicture != null)
-            //    userGameVibes.ProfilePicture = userDTO.ProfilePicture;
             if (userDTO.ExperiencePoints != null)
                 userGameVibes.ExperiencePoints = userDTO.ExperiencePoints;
             if (userDTO.ForumRoleId != null)
@@ -214,8 +214,6 @@ namespace BackendGameVibes.Controllers {
                 userGameVibes.AccessFailedCount = (int)userDTO.AccessFailedCount;
             }
 
-
-
             await _userManager.UpdateAsync(userGameVibes);
 
             var currentRoles = await _userManager.GetRolesAsync(userGameVibes);
@@ -224,6 +222,25 @@ namespace BackendGameVibes.Controllers {
                 userGameVibes,
                 roles = currentRoles.ToArray()
             });
+        }
+
+
+        [HttpPost("user/change-profile-picture")]
+        [Authorize(Policy = "modOrAdmin")]
+        public async Task<IActionResult> UpdateUserProfilePicture(string userId, IFormFile profilePicture) {
+            if (userId.IsNullOrEmpty())
+                return Unauthorized("User not authenticated");
+
+            if (profilePicture == null || profilePicture.Length == 0)
+                return BadRequest("InvalidProfilePicture");
+
+            using (var ms = new MemoryStream()) {
+                await profilePicture.CopyToAsync(ms);
+                var imageData = ms.ToArray();
+
+                var result = await _accountService.UpdateProfilePictureAsync(userId, imageData);
+                return result ? Ok("ProfilePictureUpdated") : BadRequest("FailedToUpdateProfilePicture");
+            }
         }
 
         [HttpGet("role")]

@@ -2,7 +2,7 @@
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
 using BackendGameVibes.Models.Games;
-using BackendGameVibes.Models.Requests;
+using BackendGameVibes.Models.DTOs;
 using BackendGameVibes.Models.Steam;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;

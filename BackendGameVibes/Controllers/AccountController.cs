@@ -1,7 +1,7 @@
 ﻿using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Friends;
-using BackendGameVibes.Models.Requests;
-using BackendGameVibes.Models.Requests.Account;
+using BackendGameVibes.Models.DTOs;
+using BackendGameVibes.Models.DTOs.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
