@@ -196,7 +196,10 @@ namespace BackendGameVibes.Services {
             for (int i = 0; i < games.Length; i++) {
                 var game = games[i];
                 var reviews = await _context.Reviews.Where(r => r.GameId == game.Id).ToArrayAsync();
-                double rating = reviews.Select(r => r.GameplayScore).Average();
+                double rating = 0.0;
+                if (reviews.Count() > 0)
+                    rating = reviews.Select(r => r.GameplayScore).Average();
+
                 gamesWithRatings[i] = new {
                     game.Id,
                     game.Title,

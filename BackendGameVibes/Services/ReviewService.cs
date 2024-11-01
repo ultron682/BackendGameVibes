@@ -94,6 +94,7 @@ namespace BackendGameVibes.Services {
             return await _context.Reviews
                 .Include(r => r.Game)
                 .Include(r => r.UserGameVibes)
+                .AsSplitQuery()
                 .Select(r => new {
                     r.UserGameVibesId,
                     r.GameId,

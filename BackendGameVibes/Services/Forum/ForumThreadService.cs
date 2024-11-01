@@ -51,6 +51,7 @@ namespace BackendGameVibes.Services.Forum {
             return await _context.ForumThreads
                 .Include(t => t.Section)
                 .Include(t => t.UserOwner)
+                .AsSplitQuery()
                 .Select(t => new {
                     t.Id,
                     t.Title,

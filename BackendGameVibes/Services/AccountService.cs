@@ -94,6 +94,14 @@ namespace BackendGameVibes.Services {
                 .Include(u => u.UserReviews)
                 .Include(u => u.ForumRole)
                 .Include(u => u.ProfilePicture)
+                .Include(u => u.UserReportedReviews)
+                .Include(u => u.UserFriendRequestsReceived)
+                .Include(u => u.UserFriendRequestsSent)
+                .Include(u => u.UserForumThreads)
+                .Include(u => u.UserForumPosts)
+                .Include(u => u.UserReportedPosts)
+                .Include(u => u.UserFollowedGames)
+                .AsSplitQuery()
                 .Select(u => new {
                     u.Id,
                     u.Email,
@@ -144,13 +152,13 @@ namespace BackendGameVibes.Services {
                         ReceiverName = fr.ReceiverUser!.UserName,
                         fr.IsAccepted
                     }).ToArray(),
-                    UserForumThreads = u.UserForumThreads!.Select(t => new {
+                    UserForumLast5Threads = u.UserForumThreads != null ? u.UserForumThreads.Select(t => new {
                         t.Id,
                         t.Title,
                         t.CreatedDateTime,
                         t.LastUpdatedDateTime
-                    }).ToArray(),
-                    UserForumPosts = u.UserForumPosts!.Select(p => new {
+                    }).OrderByDescending(p => p.LastUpdatedDateTime).Take(5).ToArray() : Array.Empty<object>(),
+                    UserForumLast5Posts = u.UserForumPosts != null ? u.UserForumPosts.Select(p => new {
                         p.Id,
                         p.Content,
                         p.CreatedDateTime,
@@ -158,18 +166,18 @@ namespace BackendGameVibes.Services {
                         p.Likes,
                         p.DisLikes,
                         p.ThreadId
-                    }).ToArray(),
-                    UserReportedPosts = u.UserReportedPosts!.Select(rp => new {
+                    }).OrderByDescending(p => p.LastUpdatedDateTime).Take(5).ToArray() : Array.Empty<object>(),
+                    UserReportedPosts = u.UserReportedPosts.Select(rp => new {
                         rp.Id,
                         rp.ReporterUserId,
                         ReporterUserName = rp.ReporterUser!.UserName,
                         rp.ForumPostId,
                         rp.Reason
                     }).ToArray(),
-                    UserFollowedGames = u.UserFollowedGames!.Select(g => new {
+                    UserFollowedGames = u.UserFollowedGames != null ? u.UserFollowedGames.Select(g => new {
                         g.Id,
                         g.Title
-                    }).ToArray()
+                    }).ToArray() : Array.Empty<object>(),
                 })
                 .FirstOrDefaultAsync();
 
@@ -188,6 +196,7 @@ namespace BackendGameVibes.Services {
                 .Include(u => u.UserReviews)
                 .Include(u => u.ForumRole)
                 .Include(u => u.ProfilePicture)
+                .AsSplitQuery()
                 .Select(u => new {
                     u.Id,
                     u.UserName,

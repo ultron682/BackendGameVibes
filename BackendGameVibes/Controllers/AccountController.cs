@@ -157,12 +157,17 @@ namespace BackendGameVibes.Controllers {
             if (profilePicture == null || profilePicture.Length == 0)
                 return BadRequest("InvalidProfilePicture");
 
-            using (var ms = new MemoryStream()) {
-                await profilePicture.CopyToAsync(ms);
-                var imageData = ms.ToArray();
+            if (profilePicture.FileName.EndsWith("png") || profilePicture.FileName.EndsWith("jpg")) {
+                using (var ms = new MemoryStream()) {
+                    await profilePicture.CopyToAsync(ms);
+                    var imageData = ms.ToArray();
 
-                var result = await _accountService.UpdateProfilePictureAsync(userId, imageData);
-                return result ? Ok("ProfilePictureUpdated") : BadRequest("FailedToUpdateProfilePicture");
+                    var result = await _accountService.UpdateProfilePictureAsync(userId, imageData);
+                    return result ? Ok("ProfilePictureUpdated") : BadRequest("FailedToUpdateProfilePicture");
+                }
+            }
+            else {
+                return BadRequest("InvalidProfilePictureType");
             }
         }
 
