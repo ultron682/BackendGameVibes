@@ -1,37 +1,36 @@
 ﻿using AutoMapper;
 using BackendGameVibes.Data;
-using BackendGameVibes.Helpers;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Requests.Forum;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Collections;
-using System.Threading;
 
 namespace BackendGameVibes.Services.Forum {
     public class ForumThreadService : IForumThreadService {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IForumExperienceService _forumExperienceService;
 
-        public ForumThreadService(ApplicationDbContext context, IMapper mapper) {
+        public ForumThreadService(ApplicationDbContext context, IMapper mapper, IForumExperienceService forumExperienceService) {
             _context = context;
             _mapper = mapper;
+            _forumExperienceService = forumExperienceService;
         }
 
-        public async Task<ForumThread> AddThreadAsync(NewForumThreadDTO newThread) {
-            ForumThread? newForumThread = _mapper.Map<ForumThread>(newThread);
+        public async Task<ForumThread> AddThreadAsync(NewForumThreadDTO newForumThreadDTO) {
+            ForumThread? newForumThread = _mapper.Map<ForumThread>(newForumThreadDTO);
 
             ForumPost newForumPost = new() {
-                Content = newThread.FirstForumPostContent,
+                Content = newForumThreadDTO.FirstForumPostContent,
                 ThreadId = newForumThread.Id,
-                UserOwnerId = newThread.UserOwnerId
+                UserOwnerId = newForumThreadDTO.UserOwnerId
             };
             newForumThread.Posts!.Add(newForumPost);
 
             _context.ForumThreads.Add(newForumThread);
             await _context.SaveChangesAsync();
+
+            await _forumExperienceService.AddThreadPoints(newForumThreadDTO.UserOwnerId!);
 
             return newForumThread;
         }

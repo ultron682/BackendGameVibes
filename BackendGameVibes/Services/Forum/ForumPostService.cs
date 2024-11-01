@@ -13,11 +13,12 @@ namespace BackendGameVibes.Services.Forum {
     public class ForumPostService : IForumPostService {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IForumExperienceService _forumExperienceService;
 
-
-        public ForumPostService(ApplicationDbContext context, IMapper mapper) {
+        public ForumPostService(ApplicationDbContext context, IMapper mapper, IForumExperienceService forumExperienceService) {
             _context = context;
             _mapper = mapper;
+            _forumExperienceService = forumExperienceService;
         }
 
         public async Task<ActionResult<IEnumerable<ForumPost>>> GetAllPosts(int idThread) {
@@ -26,11 +27,13 @@ namespace BackendGameVibes.Services.Forum {
                 .ToListAsync();
         }
 
-        public async Task<ForumPost> AddForumPost(ForumPostDTO forumPostDTO) {
-            ForumPost newForumPost = _mapper.Map<ForumPost>(forumPostDTO);
+        public async Task<ForumPost> AddForumPost(ForumPostDTO newForumPostDTO) {
+            ForumPost newForumPost = _mapper.Map<ForumPost>(newForumPostDTO);
 
             _context.ForumPosts.Add(newForumPost);
             await _context.SaveChangesAsync();
+
+            await _forumExperienceService.AddPostPoints(newForumPostDTO.UserOwnerId!);
 
             return newForumPost;
         }

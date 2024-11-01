@@ -5,6 +5,7 @@ using BackendGameVibes.Models.Friends;
 using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.Requests.Forum;
 using BackendGameVibes.Models.Requests.Reported;
+using BackendGameVibes.Models.Reviews;
 using BackendGameVibes.Models.User;
 using BackendGameVibes.Services.Forum;
 using Microsoft.AspNetCore.Identity;

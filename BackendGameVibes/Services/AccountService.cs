@@ -23,10 +23,12 @@ namespace BackendGameVibes.Services {
         private readonly IConfiguration _configuration;
         private readonly MailService _mail_Service;
         private readonly HtmlTemplateService _htmlTemplateService;
+        private readonly IForumExperienceService _forumExperienceService;
+
 
         public AccountService(ApplicationDbContext context, UserManager<UserGameVibes> userManager,
             SignInManager<UserGameVibes> signInManager, IConfiguration configuration, MailService mail_Service,
-            HtmlTemplateService htmlTemplateService, RoleManager<IdentityRole> roleManager) {
+            HtmlTemplateService htmlTemplateService, RoleManager<IdentityRole> roleManager, IForumExperienceService forumExperienceService) {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
@@ -34,6 +36,7 @@ namespace BackendGameVibes.Services {
             _mail_Service = mail_Service;
             _htmlTemplateService = htmlTemplateService;
             _roleManager = roleManager;
+            _forumExperienceService = forumExperienceService;
         }
 
         public async Task<IdentityResult> RegisterUserAsync(RegisterDTO model) {
@@ -285,7 +288,6 @@ namespace BackendGameVibes.Services {
             return true;
         }
 
-
         public async Task<IdentityResult> ConfirmEmailAsync(string userId, string token) {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) {
@@ -458,6 +460,9 @@ namespace BackendGameVibes.Services {
                 _context.FriendRequests.Update(friendRequest);
                 _context.Friends.AddRange(friend1, friend2);
                 await _context.SaveChangesAsync();
+
+                await _forumExperienceService.AddNewFriendPoints(userId);
+
                 return true;
             }
             return false;

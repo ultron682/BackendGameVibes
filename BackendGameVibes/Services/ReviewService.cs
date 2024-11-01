@@ -4,17 +4,19 @@ using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.Reported;
 using BackendGameVibes.Models.Requests.Reported;
-using BackendGameVibes.Models.User;
+using BackendGameVibes.Models.Reviews;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendGameVibes.Services {
     public class ReviewService : IReviewService {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IForumExperienceService _forumExperienceService;
 
-        public ReviewService(ApplicationDbContext context, IMapper mapper) {
+        public ReviewService(ApplicationDbContext context, IMapper mapper, IForumExperienceService forumExperienceService) {
             _context = context;
             _mapper = mapper;
+            _forumExperienceService = forumExperienceService;
         }
 
         public async Task<IEnumerable<object>> GetAllReviewsAsync() {
@@ -64,6 +66,9 @@ namespace BackendGameVibes.Services {
             if (foundGame != null) {
                 _context.Reviews.Add(review);
                 await _context.SaveChangesAsync();
+
+                await _forumExperienceService.AddReviewPoints(review.UserGameVibesId!);
+
                 return review;
             }
             else {

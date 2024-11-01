@@ -7,8 +7,10 @@ using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.User;
 using BackendGameVibes.Models.Reported;
 using System.Reflection.Emit;
+using BackendGameVibes.Models.Reviews;
 
-namespace BackendGameVibes.Data {
+namespace BackendGameVibes.Data
+{
     public class ApplicationDbContext : IdentityDbContext<UserGameVibes> {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {
         }

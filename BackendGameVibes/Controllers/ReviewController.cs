@@ -7,11 +7,12 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Swashbuckle.AspNetCore.Annotations;
-using BackendGameVibes.Models.User;
 using BackendGameVibes.Models.Requests.Reported;
 using BackendGameVibes.Models.Reported;
+using BackendGameVibes.Models.Reviews;
 
-namespace BackendGameVibes.Controllers {
+namespace BackendGameVibes.Controllers
+{
     [ApiController]
     [Route("api/review")]
     public class ReviewController : ControllerBase {

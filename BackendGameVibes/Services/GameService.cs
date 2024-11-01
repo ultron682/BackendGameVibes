@@ -206,10 +206,6 @@ namespace BackendGameVibes.Services {
             }
 
             return gamesWithRatings;
-
-        }
-        public void Dispose() {
-            _context.Dispose();
         }
 
         public async Task<object[]> GetUpcomingGames() {
@@ -224,6 +220,10 @@ namespace BackendGameVibes.Services {
                 .OrderBy(r => EF.Functions.Random())
                 .Take(5)
                 .ToArrayAsync();
+        }
+
+        public void Dispose() {
+            _context.Dispose();
         }
     }
 }

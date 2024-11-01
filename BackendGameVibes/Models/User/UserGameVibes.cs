@@ -2,9 +2,11 @@
 using BackendGameVibes.Models.Friends;
 using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.Reported;
+using BackendGameVibes.Models.Reviews;
 using Microsoft.AspNetCore.Identity;
 
-namespace BackendGameVibes.Models.User {
+namespace BackendGameVibes.Models.User
+{
     public class UserGameVibes : IdentityUser {
         public ProfilePicture? ProfilePicture {
             get; set;

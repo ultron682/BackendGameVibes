@@ -4,33 +4,34 @@ using BackendGameVibes.Models.Points;
 using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace BackendGameVibes.Services {
     public class ForumExperienceService : IForumExperienceService {
-        private readonly PointsSettings _pointsSettings;
+        private readonly IOptions<ExperiencePointsSettings> _pointsSettings;
         private readonly UserManager<UserGameVibes> _userManager;
         private readonly ApplicationDbContext _context;
 
-        public ForumExperienceService(PointsSettings pointsSettings, UserManager<UserGameVibes> userManager, ApplicationDbContext context) {
+        public ForumExperienceService(IOptions<ExperiencePointsSettings> pointsSettings, UserManager<UserGameVibes> userManager, ApplicationDbContext context) {
             _pointsSettings = pointsSettings;
             _userManager = userManager;
             _context = context;
         }
 
         public async Task<int?> AddThreadPoints(string userId) {
-            return await IncreaseExperiencePointsForUserAsync(userId, _pointsSettings.OnAddThreadPoints);
+            return await IncreaseExperiencePointsForUserAsync(userId, _pointsSettings.Value.OnAddThreadPoints);
         }
 
         public async Task<int?> AddPostPoints(string userId) {
-            return await IncreaseExperiencePointsForUserAsync(userId, _pointsSettings.OnAddPostPoints);
+            return await IncreaseExperiencePointsForUserAsync(userId, _pointsSettings.Value.OnAddPostPoints);
         }
 
         public async Task<int?> AddReviewPoints(string userId) {
-            return await IncreaseExperiencePointsForUserAsync(userId, _pointsSettings.OnAddReviewPoints);
+            return await IncreaseExperiencePointsForUserAsync(userId, _pointsSettings.Value.OnAddReviewPoints);
         }
 
         public async Task<int?> AddNewFriendPoints(string userId) {
-            return await IncreaseExperiencePointsForUserAsync(userId, _pointsSettings.OnAddNewFriendPoints);
+            return await IncreaseExperiencePointsForUserAsync(userId, _pointsSettings.Value.OnAddNewFriendPoints);
         }
 
         private async Task<int?> IncreaseExperiencePointsForUserAsync(string userId, int count) {

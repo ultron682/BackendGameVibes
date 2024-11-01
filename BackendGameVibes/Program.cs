@@ -2,6 +2,7 @@ using BackendGameVibes.Data;
 using BackendGameVibes.Helpers;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
+using BackendGameVibes.Models.Points;
 using BackendGameVibes.Models.User;
 using BackendGameVibes.Services;
 using BackendGameVibes.Services.Forum;
@@ -102,6 +103,7 @@ builder.Services.Configure<IdentityOptions>(options => {
 });
 
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.Configure<ExperiencePointsSettings>(builder.Configuration.GetSection("ExperiencePointsSettings"));
 
 builder.Services.AddControllers()
     .AddJsonOptions(options => {
@@ -119,7 +121,7 @@ builder.Services.AddSingleton<SteamService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IForumThreadService, ForumThreadService>();
 builder.Services.AddScoped<IForumPostService, ForumPostService>();
-builder.Services.AddScoped<IForumExperienceService, ForumExperienceService>();
+builder.Services.AddTransient<IForumExperienceService, ForumExperienceService>();
 builder.Services.AddHttpClient();
 
 
