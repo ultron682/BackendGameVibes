@@ -23,12 +23,10 @@ namespace BackendGameVibes.Services {
         private readonly IConfiguration _configuration;
         private readonly MailService _mail_Service;
         private readonly HtmlTemplateService _htmlTemplateService;
-        private readonly PointsSettings _pointsSettings;
 
         public AccountService(ApplicationDbContext context, UserManager<UserGameVibes> userManager,
             SignInManager<UserGameVibes> signInManager, IConfiguration configuration, MailService mail_Service,
-            HtmlTemplateService htmlTemplateService, RoleManager<IdentityRole> roleManager,
-            IOptions<PointsSettings> pointsSettings) {
+            HtmlTemplateService htmlTemplateService, RoleManager<IdentityRole> roleManager) {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
@@ -36,7 +34,6 @@ namespace BackendGameVibes.Services {
             _mail_Service = mail_Service;
             _htmlTemplateService = htmlTemplateService;
             _roleManager = roleManager;
-            _pointsSettings = pointsSettings.Value;
         }
 
         public async Task<IdentityResult> RegisterUserAsync(RegisterDTO model) {
@@ -60,6 +57,10 @@ namespace BackendGameVibes.Services {
             return await _userManager.FindByEmailAsync(email);
         }
 
+        public async Task<UserGameVibes?> GetUserByIdAsync(string userId) {
+            return await _userManager.FindByIdAsync(userId);
+        }
+
         public async Task<string> GenerateJwtTokenAsync(UserGameVibes user) {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var roles = await _userManager.GetRolesAsync(user);
@@ -70,10 +71,6 @@ namespace BackendGameVibes.Services {
 
         public async Task<SignInResult?> LoginUserAsync(UserGameVibes user, string password) {
             return await _signInManager.PasswordSignInAsync(user.UserName!, password, true, true);
-        }
-
-        public async Task<UserGameVibes?> GetUserByIdAsync(string userId) {
-            return await _userManager.FindByIdAsync(userId);
         }
 
         // unused method todo: remove?
@@ -137,6 +134,12 @@ namespace BackendGameVibes.Services {
                         ReceiverName = fr.ReceiverUser!.UserName,
                         fr.IsAccepted
                     }).ToArray(),
+                    UserForumThreads = u.UserForumThreads.Select(t => new {
+                        t.Id,
+                        t.Title,
+                        t.CreatedDateTime,
+                        t.LastUpdatedDateTime
+                    }).ToArray(),
                     UserForumPosts = u.UserForumPosts!.Select(p => new {
                         p.Id,
                         p.Content,
@@ -195,6 +198,12 @@ namespace BackendGameVibes.Services {
                         f.FriendId,
                         f.FriendUser!.UserName,
                         f.FriendsSince
+                    }).ToArray(),
+                    UserForumThreads = u.UserForumThreads.Select(t => new {
+                        t.Id,
+                        t.Title,
+                        t.CreatedDateTime,
+                        t.LastUpdatedDateTime
                     }).ToArray(),
                     UserForumPosts = u.UserForumPosts!.Select(p => new {
                         p.Id,

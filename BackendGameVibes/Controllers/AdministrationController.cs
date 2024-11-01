@@ -165,6 +165,12 @@ namespace BackendGameVibes.Controllers {
                     UserFollowedGames = u.UserFollowedGames.Select(g => new {
                         g.Id,
                         g.Title
+                    }).ToArray(),
+                    UserForumThreads = u.UserForumThreads.Select(t => new {
+                        t.Id,
+                        t.Title,
+                        t.CreatedDateTime,
+                        t.LastUpdatedDateTime
                     }).ToArray()
                 })
                 .FirstOrDefaultAsync();
