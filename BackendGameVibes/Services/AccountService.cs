@@ -84,10 +84,10 @@ namespace BackendGameVibes.Services {
             if (userGameVibes == null)
                 return null;
 
-            var roles = await _userManager.GetRolesAsync(userGameVibes);
+            var userRoles = await _userManager.GetRolesAsync(userGameVibes);
 
             var accountInfo = await _context.Users
-                .Where(u => u.Id == userId)
+                .Where(u => u.Id == userGameVibes.Id)
                 .Include(u => u.UserReviews)
                 .Include(u => u.ForumRole)
                 .Include(u => u.ProfilePicture)
@@ -99,7 +99,14 @@ namespace BackendGameVibes.Services {
                     ProfilePictureBlob = u.ProfilePicture != null ? u.ProfilePicture.ImageData : null,
                     ForumRole = new { u.ForumRole!.Id, u.ForumRole.Name, u.ForumRole.Threshold },
                     u.ExperiencePoints,
-                    Roles = roles.ToArray(),
+                    u.PhoneNumber,
+                    u.PhoneNumberConfirmed,
+                    u.TwoFactorEnabled,
+                    u.LockoutEnd,
+                    u.LockoutEnabled,
+                    u.AccessFailedCount,
+                    u.Description,
+                    Roles = userRoles.ToArray(),
                     Reviews = u.UserReviews.Select(r => new {
                         r.Id,
                         r.GameId,
@@ -134,7 +141,7 @@ namespace BackendGameVibes.Services {
                         ReceiverName = fr.ReceiverUser!.UserName,
                         fr.IsAccepted
                     }).ToArray(),
-                    UserForumThreads = u.UserForumThreads.Select(t => new {
+                    UserForumThreads = u.UserForumThreads!.Select(t => new {
                         t.Id,
                         t.Title,
                         t.CreatedDateTime,
@@ -199,7 +206,7 @@ namespace BackendGameVibes.Services {
                         f.FriendUser!.UserName,
                         f.FriendsSince
                     }).ToArray(),
-                    UserForumThreads = u.UserForumThreads.Select(t => new {
+                    UserForumThreads = u.UserForumThreads!.Select(t => new {
                         t.Id,
                         t.Title,
                         t.CreatedDateTime,
