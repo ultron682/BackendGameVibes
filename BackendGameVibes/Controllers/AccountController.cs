@@ -3,10 +3,7 @@ using BackendGameVibes.Models.Friends;
 using BackendGameVibes.Models.Requests;
 using BackendGameVibes.Models.Requests.Account;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 
@@ -125,6 +122,65 @@ namespace BackendGameVibes.Controllers {
             return isUpdated ? Ok() : BadRequest("Failed to update username");
         }
 
+        [HttpPost("change-password")]
+        [Authorize]
+        [SwaggerOperation("Require authorization")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO model) {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (model.NewPassword != model.ConfirmNewPassword)
+                return BadRequest("New password and confirmation do not match");
+
+            //Console.WriteLine(JsonDocument.Parse(User).ToString());
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return NotFound("User not found");
+
+            var (succeeded, errors) = await _accountService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
+
+            if (!succeeded) {
+                return BadRequest(new { Errors = errors });
+            }
+
+            return Ok("Password changed successfully");
+        }
+
+        [HttpPost("change-profile-picture")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfilePicture(IFormFile profilePicture) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated");
+
+            if (profilePicture == null || profilePicture.Length == 0)
+                return BadRequest("InvalidProfilePicture");
+
+            using (var ms = new MemoryStream()) {
+                await profilePicture.CopyToAsync(ms);
+                var imageData = ms.ToArray();
+
+                var result = await _accountService.UpdateProfilePictureAsync(userId, imageData);
+                return result ? Ok("ProfilePictureUpdated") : BadRequest("FailedToUpdateProfilePicture");
+            }
+        }
+
+        [HttpPost("change-profile-desc")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfileDescription([FromBody] ValueModel valueModel) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated");
+
+            if (string.IsNullOrWhiteSpace(valueModel.Value))
+                return BadRequest("InvalidNewDescription");
+
+            var result = await _accountService.UpdateProfileDescriptionAsync(userId, valueModel.Value);
+            return result ? Ok("ProfileDescriptionUpdated") : BadRequest("FailedToUpdateProfileDescription");
+
+        }
+
         [HttpPost("send-confirmation-email")]
         [AllowAnonymous]
         public async Task<IActionResult> SendConfirmationEmail([FromForm] string email) {
@@ -160,31 +216,6 @@ namespace BackendGameVibes.Controllers {
 
                 return BadRequest("Error");
             }
-        }
-
-        [HttpPost("change-password")]
-        [Authorize]
-        [SwaggerOperation("Require authorization")]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO model) {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            if (model.NewPassword != model.ConfirmNewPassword)
-                return BadRequest("New password and confirmation do not match");
-
-            //Console.WriteLine(JsonDocument.Parse(User).ToString());
-
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return NotFound("User not found");
-
-            var (succeeded, errors) = await _accountService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
-
-            if (!succeeded) {
-                return BadRequest(new { Errors = errors });
-            }
-
-            return Ok("Password changed successfully");
         }
 
         [HttpPost]
@@ -324,25 +355,6 @@ namespace BackendGameVibes.Controllers {
                 return Ok("Usunięto znajomego");
             else
                 return BadRequest("Brak znajomego");
-        }
-
-        [HttpPost("change-profile-picture")]
-        [Authorize]
-        public async Task<IActionResult> UpdateProfilePicture(IFormFile profilePicture) {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User not authenticated");
-
-            if (profilePicture == null || profilePicture.Length == 0)
-                return BadRequest("InvalidProfilePicture");
-
-            using (var ms = new MemoryStream()) {
-                await profilePicture.CopyToAsync(ms);
-                var imageData = ms.ToArray();
-
-                var result = await _accountService.UpdateProfilePictureAsync(userId, imageData);
-                return result ? Ok("ProfilePictureUpdated") : BadRequest("FailedToUpdateProfilePicture");
-            }
         }
     }
 }

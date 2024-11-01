@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using BackendGameVibes.IServices;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackendGameVibes.Controllers {
-    [Route("api/[controller]")]
+    [Route("api/landing")]
     [ApiController]
     public class LandingController : ControllerBase {
         private readonly IGameService _gameService;

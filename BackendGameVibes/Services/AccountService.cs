@@ -537,6 +537,19 @@ namespace BackendGameVibes.Services {
             return result.Succeeded;
         }
 
+        public async Task<bool> UpdateProfileDescriptionAsync(string userId, string description) {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null) {
+                return false;
+            }
+            user.Description = description;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         public void Dispose() {
             _context.Dispose();
             _userManager.Dispose();

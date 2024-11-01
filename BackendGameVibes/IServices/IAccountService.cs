@@ -28,5 +28,6 @@ namespace BackendGameVibes.IServices {
         Task<IEnumerable<object>> GetFriendRequestsForUser(string userId);
         Task<bool> SendLockedOutAccountEmailAsync(string email, UserGameVibes user);
         Task<bool> UpdateProfilePictureAsync(string userId, byte[] imageData);
+        Task<bool> UpdateProfileDescriptionAsync(string userId, string description);
     }
 }
