@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -25,6 +23,17 @@ public static class GameVibesAuthService {
                     ValidAudience = configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!))
                 };
+            });
+    }
+
+    public static void AddAuthorizationGameVibes(this IServiceCollection services) {
+        services
+            .AddAuthorization(options => {
+                options.AddPolicy("admin", policy => policy.RequireRole("admin"));
+                options.AddPolicy("mod", policy => policy.RequireRole("mod"));
+                options.AddPolicy("user", policy => policy.RequireRole("user"));
+                options.AddPolicy("guest", policy => policy.RequireRole("guest"));
+                options.AddPolicy("modOrAdmin", policy => policy.RequireRole("mod", "admin"));
             });
     }
 }

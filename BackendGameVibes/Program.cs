@@ -7,7 +7,6 @@ using BackendGameVibes.Models.User;
 using BackendGameVibes.Services;
 using BackendGameVibes.Services.Forum;
 
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -55,13 +54,7 @@ builder.Services
 // JWT authentication
 builder.Services.AddAuthenticationGameVibesJwt(builder.Configuration);
 
-builder.Services.AddAuthorization(options => {
-    options.AddPolicy("admin", policy => policy.RequireRole("admin"));
-    options.AddPolicy("mod", policy => policy.RequireRole("mod"));
-    options.AddPolicy("user", policy => policy.RequireRole("user"));
-    options.AddPolicy("guest", policy => policy.RequireRole("guest"));
-    options.AddPolicy("modOrAdmin", policy => policy.RequireRole("mod", "admin"));
-});
+builder.Services.AddAuthorizationGameVibes();
 
 builder.Services.Configure<IdentityOptions>(options => {
     // Password settings.
