@@ -9,6 +9,7 @@ using BackendGameVibes.Services.Forum;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 
@@ -41,7 +42,7 @@ builder.Services.AddSwaggerGen(c => {
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => {
     //options.UseMySql(builder.Configuration.GetConnectionString("GameVibesDbConnection"), new MySqlServerVersion(new Version(8, 0, 35)));
-    options.UseSqlite("Data Source=GameVibesDatabase.db;Cache=Shared");
+    options.UseSqlite("Data Source=GameVibesDatabase.db;Cache=Shared", o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
     options.EnableSensitiveDataLogging(false);
 }
 );
