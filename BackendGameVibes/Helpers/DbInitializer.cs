@@ -7,11 +7,8 @@ using BackendGameVibes.Models.Requests.Forum;
 using BackendGameVibes.Models.Requests.Reported;
 using BackendGameVibes.Models.Reviews;
 using BackendGameVibes.Models.User;
-using BackendGameVibes.Services.Forum;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MimeKit;
-using System.Runtime.CompilerServices;
 
 namespace BackendGameVibes.Helpers {
     public class DbInitializer {
@@ -51,6 +48,9 @@ namespace BackendGameVibes.Helpers {
             Console.WriteLine("Start Init DB");
 
             Console.WriteLine("Adding users with roles");
+            List<UserGameVibes?> testUsers = [];
+
+
             if (!roleExist) {
                 var role = new IdentityRole();
                 role.Name = "admin";
@@ -100,34 +100,23 @@ namespace BackendGameVibes.Helpers {
                 role.Name = "user";
                 await roleManager.CreateAsync(role);
 
-                HashSet<UserGameVibes> newNotCreatedUsersGameVibes = new() {
+                HashSet<UserGameVibes> newNotCreatedUsersGameVibes = [
                     new UserGameVibes {
                         UserName = "test",
                         Email = "test@test.com",
-                        EmailConfirmed = true
-                    },
-                    new UserGameVibes {
-                        UserName = "test2",
-                        Email = "test2@test.com",
-                        EmailConfirmed = true
-                    }, new UserGameVibes {
-                        UserName = "test3",
-                        Email = "test3@test.com",
-                        EmailConfirmed = true
-                    }, new UserGameVibes {
-                        UserName = "test4",
-                        Email = "test4@test.com",
-                        EmailConfirmed = true
-                    }, new UserGameVibes {
-                        UserName = "test5",
-                        Email = "test5@test.com",
-                        EmailConfirmed = true
-                    },new UserGameVibes {
-                        UserName = "test6",
-                        Email = "test6@test.com",
-                        EmailConfirmed = true
+                        EmailConfirmed = true,
+                        Description = "Hello, I'am GOD of the INNYCH GRACZY"
                     }
-                };
+                ];
+
+                for (int i = 2; i <= 10; i++) {
+                    newNotCreatedUsersGameVibes.Add(new UserGameVibes {
+                        UserName = $"test{i}",
+                        Email = $"test{i}@test.com",
+                        EmailConfirmed = true,
+                        Description = "Hello, I'am good player. Test description"
+                    });
+                }
 
                 string userPWD = "Test123.";
 
@@ -138,19 +127,13 @@ namespace BackendGameVibes.Helpers {
                         await userManager.AddToRoleAsync(user, "user");
                     }
                 }
+
+                foreach (var user in newNotCreatedUsersGameVibes) {
+                    testUsers.Add(await userManager.FindByEmailAsync(user.Email!));
+                }
             }
 
             Console.WriteLine("Adding friends");
-
-            var testUsers = new UserGameVibes?[] {
-                await userManager.FindByEmailAsync("test@test.com"),
-                await userManager.FindByEmailAsync("test2@test.com"),
-                await userManager.FindByEmailAsync("test3@test.com"),
-                await userManager.FindByEmailAsync("test4@test.com"),
-                await userManager.FindByEmailAsync("test5@test.com"),
-                await userManager.FindByEmailAsync("test6@test.com"),
-            };
-
 
             var friendRequest1 = new FriendRequest {
                 SenderUserId = testUsers[0]!.Id,
@@ -229,6 +212,8 @@ namespace BackendGameVibes.Helpers {
                 createdGames.Add(await gameService.CreateGame(gameId));
             }
 
+            Console.WriteLine("Adding reviews for games");
+
             if (createdGame1.game != null) {
                 await reviewService.AddReviewAsync(new Review {
                     GameId = createdGame1!.game.Id,
@@ -258,7 +243,7 @@ namespace BackendGameVibes.Helpers {
                         GraphicsScore = random.Next(1, 11),
                         AudioScore = random.Next(1, 11),
                         GameplayScore = random.Next(1, 11),
-                        UserGameVibesId = testUsers[random.Next(0, testUsers.Length)]!.Id
+                        UserGameVibesId = testUsers[random.Next(0, testUsers.Count)]!.Id
                     });
                 }
             }
@@ -277,7 +262,7 @@ namespace BackendGameVibes.Helpers {
                     await postService!.AddForumPost(new ForumPostDTO {
                         Content = $"{postsCount} " + GenerateRandomSentence(random.Next(10, 30)),
                         ThreadId = newForumThread.Id,
-                        UserOwnerId = testUsers[random.Next(0, testUsers.Length)]!.Id
+                        UserOwnerId = testUsers[random.Next(0, testUsers.Count)]!.Id
                     });
                 }
             }
@@ -296,7 +281,7 @@ namespace BackendGameVibes.Helpers {
                     await postService!.AddForumPost(new ForumPostDTO {
                         Content = $"{postsCount} " + GenerateRandomSentence(random.Next(10, 30)),
                         ThreadId = newForumThread.Id,
-                        UserOwnerId = testUsers[random.Next(0, testUsers.Length)]!.Id
+                        UserOwnerId = testUsers[random.Next(0, testUsers.Count)]!.Id
                     });
                 }
             }
@@ -306,13 +291,13 @@ namespace BackendGameVibes.Helpers {
             var posts = await applicationDbContext.ForumPosts.ToListAsync();
 
             for (int i = 0; i < 10; i++) {
-                await postService!.ReportPostAsync(testUsers[random.Next(0, testUsers.Length)]!.Id!,
+                await postService!.ReportPostAsync(testUsers[random.Next(0, testUsers.Count)]!.Id!,
                     new ReportPostDTO {
                         ForumPostId = posts[random.Next(0, posts.Count)].Id,
                         Reason = "Spam " + GenerateRandomSentence(random.Next(5, 9))
                     });
 
-                await reviewService.ReportReviewAsync(testUsers[random.Next(0, testUsers.Length)]!.Id!,
+                await reviewService.ReportReviewAsync(testUsers[random.Next(0, testUsers.Count)]!.Id!,
                     new ReportReviewDTO {
                         ReviewId = reviews[random.Next(0, reviews.Count)].Id,
                         Reason = "Spam " + GenerateRandomSentence(random.Next(5, 9))
