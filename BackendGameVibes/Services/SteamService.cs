@@ -54,21 +54,25 @@ namespace BackendGameVibes.Services {
         }
 
         public async Task<GameData?> GetInfoGame(int id) {
-            var response = await _httpClient.GetAsync($"https://store.steampowered.com/api/appdetails?appids={id}");
+            try {
+                var response = await _httpClient.GetAsync($"https://store.steampowered.com/api/appdetails?appids={id}");
 
-            if (response.IsSuccessStatusCode) {
-                var jsonString = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode) {
+                    var jsonString = await response.Content.ReadAsStringAsync();
 
-                var options = new JsonSerializerOptions {
-                    PropertyNameCaseInsensitive = true
-                };
+                    var options = new JsonSerializerOptions {
+                        PropertyNameCaseInsensitive = true
+                    };
 
-                var result = JsonSerializer.Deserialize<Dictionary<string, SteamAppData>>(jsonString, options);
+                    var result = JsonSerializer.Deserialize<Dictionary<string, SteamAppData>>(jsonString, options);
 
-                if (result[id.ToString()].Success)
-                    return result[id.ToString()].Data;
-                else
-                    return null;
+                    if (result[id.ToString()].Success)
+                        return result[id.ToString()].Data;
+                }
+            }
+            catch {
+                Console.WriteLine("Error when downloading steam id = " + id);
+                return null;
             }
 
             return null;

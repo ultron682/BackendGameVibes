@@ -100,21 +100,27 @@ namespace BackendGameVibes.Helpers {
                 role.Name = "user";
                 await roleManager.CreateAsync(role);
 
+                var defaultImagePath = Path.Combine("wwwroot/Images", "default-profile.jpg");
+
                 HashSet<UserGameVibes> newNotCreatedUsersGameVibes = [
                     new UserGameVibes {
                         UserName = "test",
                         Email = "test@test.com",
                         EmailConfirmed = true,
-                        Description = "Hello, I'am GOD of the INNYCH GRACZY"
+                        Description = "Hello, I'am GOD of the INNYCH GRACZY",
+                        ProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultImagePath) }
                     }
                 ];
 
                 for (int i = 2; i <= 10; i++) {
+                    var newProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultImagePath) };
+
                     newNotCreatedUsersGameVibes.Add(new UserGameVibes {
                         UserName = $"test{i}",
                         Email = $"test{i}@test.com",
                         EmailConfirmed = true,
-                        Description = "Hello, I'am good player. Test description"
+                        Description = "Hello, I'am good player. Test description",
+                        ProfilePicture = newProfilePicture
                     });
                 }
 
