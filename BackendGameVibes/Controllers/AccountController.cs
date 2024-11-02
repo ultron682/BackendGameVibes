@@ -366,28 +366,39 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPost("send-close-account-request")]
         [Authorize]
+        [SwaggerResponse(200, "git")]
+        [SwaggerResponse(400, "already sent and valid for <1 hour")]
+        [SwaggerResponse(401, "not authenticated")]
+        [SwaggerResponse(404, "no user")]
         public async Task<IActionResult> SendCloseAccountRequest() {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
                 return Unauthorized("User not authenticated, claim not found");
 
             (ActionCode? actionCode, bool isAlreadyExistValidExpiryDate) = await _accountService.SendCloseAccountRequestAsync(userId);
-            if (isAlreadyExistValidExpiryDate == false)
+            if (isAlreadyExistValidExpiryDate == false && actionCode != null)
                 return Ok(actionCode);
-            else
+            else if (isAlreadyExistValidExpiryDate && actionCode != null)
                 return BadRequest("Already sent and valid for <1 hour");
+            else {
+                return NotFound();
+            }
         }
 
         [HttpPost("confirm-close-account-request")]
         [Authorize]
+        [SwaggerResponse(200, "account deleted")]
+        [SwaggerResponse(400, "invalid code or user doesnt already exist")]
         public async Task<IActionResult> ConfirmCloseAccountRequest([Required] ValueModel confirmationCode) {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
                 return Unauthorized("User not authenticated, claim not found");
 
             bool isSuccess = await _accountService.ConfirmCloseAccountRequest(userId, confirmationCode.Value!);
-
-            return Ok(isSuccess);
+            if (isSuccess)
+                return Ok();
+            else
+                return BadRequest("Invalid code or user doesnt already exist");
         }
     }
 }
