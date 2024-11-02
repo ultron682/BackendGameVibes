@@ -2,6 +2,7 @@
 using BackendGameVibes.Models.DTOs.Account;
 using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
+using BackendGameVibes.Models;
 
 namespace BackendGameVibes.IServices {
     public interface IAccountService : IDisposable {
@@ -30,7 +31,7 @@ namespace BackendGameVibes.IServices {
         Task<bool> UpdateProfilePictureAsync(string userId, byte[] imageData);
         Task<bool> UpdateProfileDescriptionAsync(string userId, string description);
         Task<bool> SendGeneralEmailToUserAsync(UserGameVibes user, string subject, string message);
-        Task<bool> SendCloseAccountRequestAsync(string userId);
+        Task<(ActionCode? actionCode, bool isAlreadyExistValidExpiryDate)> SendCloseAccountRequestAsync(string userId);
         Task<bool> ConfirmCloseAccountRequest(string userId, string confirmationCode);
     }
 }

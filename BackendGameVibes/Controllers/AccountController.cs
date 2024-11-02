@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
+using BackendGameVibes.Models;
 
 
 namespace BackendGameVibes.Controllers {
@@ -370,9 +371,11 @@ namespace BackendGameVibes.Controllers {
             if (userId == null)
                 return Unauthorized("User not authenticated, claim not found");
 
-            bool isSuccess = await _accountService.SendCloseAccountRequestAsync(userId);
-
-            return Ok(isSuccess);
+            (ActionCode? actionCode, bool isAlreadyExistValidExpiryDate) = await _accountService.SendCloseAccountRequestAsync(userId);
+            if (isAlreadyExistValidExpiryDate == false)
+                return Ok(actionCode);
+            else
+                return BadRequest("Already sent and valid for <1 hour");
         }
 
         [HttpPost("confirm-close-account-request")]

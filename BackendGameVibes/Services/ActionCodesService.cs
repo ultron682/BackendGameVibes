@@ -15,12 +15,21 @@ namespace BackendGameVibes.Services {
         }
 
 
-        public async Task<ActionCode?> GenerateUniqueActionCode(string userId) {
+        public async Task<(ActionCode, bool)> GenerateUniqueActionCode(string userId) {
             string? GenerateUniqueActionCode() {
                 return RandomNumberGenerator.GetString(
                     choices: "0123456789",
                     length: 6
                 );
+            }
+
+            var existValidExpiryDate = await _context.ActiveActionCodes.FirstOrDefaultAsync(c => c.UserId == userId);
+            if (existValidExpiryDate != null) {
+                if (DateTime.Now < existValidExpiryDate.ExpirationDateTime)
+                    return (existValidExpiryDate, true);
+                else {
+                    _context.ActiveActionCodes.Remove(existValidExpiryDate);
+                }
             }
 
             ActionCode? newActionCode;
@@ -33,13 +42,12 @@ namespace BackendGameVibes.Services {
             };
 
             while (await _context.ActiveActionCodes.AnyAsync(c => c.Code == newActionCode.Code)) {
-                Console.WriteLine("Action code already exists, generating new one" + newActionCode.Code);
                 newActionCode.Code = GenerateUniqueActionCode();
             }
 
             _context.ActiveActionCodes.Add(newActionCode);
             await _context.SaveChangesAsync();
-            return newActionCode;
+            return (newActionCode, false);
         }
 
         public async Task<bool> RemoveActionCode(string actionCode) {

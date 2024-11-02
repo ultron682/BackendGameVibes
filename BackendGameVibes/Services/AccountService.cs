@@ -584,16 +584,16 @@ namespace BackendGameVibes.Services {
             return true;
         }
 
-        public async Task<bool> SendCloseAccountRequestAsync(string userId) {
+        public async Task<(ActionCode? actionCode, bool isAlreadyExistValidExpiryDate)> SendCloseAccountRequestAsync(string userId) {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null) {
-                return false;
+                return (null, false);
             }
 
-            ActionCode? actionCode = await _actionCodesService.GenerateUniqueActionCode(user.Id);
+            (ActionCode? actionCode, bool isAlreadyExistValidExpiryDate) = await _actionCodesService.GenerateUniqueActionCode(user.Id);
 
-            if (actionCode != null) {
+            if (isAlreadyExistValidExpiryDate == false) {
                 string emailBody = await _htmlTemplateService.GetEmailTemplateAsync("wwwroot/EmailTemplates/close_account.html",
                 new Dictionary<string, string>
                 {
@@ -607,10 +607,10 @@ namespace BackendGameVibes.Services {
                     EmailToId = user.Email!,
                     EmailToName = user.UserName!
                 });
-                return true;
+                return (actionCode, false);
             }
             else {
-                return false;
+                return (actionCode, true);
             }
         }
 
