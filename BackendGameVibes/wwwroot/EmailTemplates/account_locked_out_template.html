@@ -3,9 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account locked out</title>
+    <title>Account Locked</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #d9534f;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <h2>Your account {{UserName}}! is locked</h2>
+    <div class="container">
+        <h2>Your account, {{UserName}}, is locked</h2>
+        <p>If you believe this is an error, please contact support.</p>
+        <div class="footer">© 2024 GameVibes. All rights reserved.</div>
+    </div>
 </body>
 </html>

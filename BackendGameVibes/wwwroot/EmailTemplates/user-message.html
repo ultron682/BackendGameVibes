@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Friend Request</title>
+    <title>New Message</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,6 +22,10 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
+        h2 {
+            color: #5bc0de;
+        }
+
         .footer {
             margin-top: 20px;
             font-size: 12px;
@@ -32,8 +36,8 @@
 </head>
 <body>
     <div class="container">
-        <h2>You have a new friend request from {{UserName}}!</h2>
-        <p>Log in to your panel to view the request and connect with {{UserName}}.</p>
+        <h2>{{subject}}</h2>
+        <p>{{message}}</p>
         <div class="footer">© 2024 GameVibes. All rights reserved.</div>
     </div>
 </body>
