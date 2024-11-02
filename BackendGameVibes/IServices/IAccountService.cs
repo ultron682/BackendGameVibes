@@ -30,5 +30,7 @@ namespace BackendGameVibes.IServices {
         Task<bool> UpdateProfilePictureAsync(string userId, byte[] imageData);
         Task<bool> UpdateProfileDescriptionAsync(string userId, string description);
         Task<bool> SendGeneralEmailToUserAsync(UserGameVibes user, string subject, string message);
+        Task<bool> SendCloseAccountRequestAsync(string userId);
+        Task<bool> ConfirmCloseAccountRequest(string userId, string confirmationCode);
     }
 }

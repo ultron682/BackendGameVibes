@@ -9,8 +9,10 @@ using BackendGameVibes.Models.Reviews;
 using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using BackendGameVibes.IServices.Forum;
 
-namespace BackendGameVibes.Helpers {
+namespace BackendGameVibes.Helpers
+{
     public class DbInitializer {
         private static readonly string[] LoremIpsumWords = {
         "lorem", "ipsum", "dolor", "sit", "amet", "consectetur",

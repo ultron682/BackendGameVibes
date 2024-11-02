@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.IdentityModel.Tokens;
+using BackendGameVibes.IServices.Forum;
 
 
 namespace BackendGameVibes.Controllers {
@@ -26,6 +27,8 @@ namespace BackendGameVibes.Controllers {
         private readonly IForumPostService _forumPostService;
         private readonly IForumThreadService _forumThreadService;
         private readonly IReviewService _reviewService;
+
+
         public AdministrationController(ApplicationDbContext context,
             UserManager<UserGameVibes> userManager,
             IHostApplicationLifetime applicationLifetime,

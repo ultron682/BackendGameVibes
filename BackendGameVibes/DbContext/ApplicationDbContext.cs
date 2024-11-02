@@ -8,9 +8,9 @@ using BackendGameVibes.Models.User;
 using BackendGameVibes.Models.Reported;
 using System.Reflection.Emit;
 using BackendGameVibes.Models.Reviews;
+using BackendGameVibes.Models;
 
-namespace BackendGameVibes.Data
-{
+namespace BackendGameVibes.Data {
     public class ApplicationDbContext : IdentityDbContext<UserGameVibes> {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {
         }
@@ -60,7 +60,9 @@ namespace BackendGameVibes.Data
         public DbSet<ProfilePicture> ProfilePictures {
             get; set;
         }
-
+        public DbSet<ActionCode> ActiveActionCodes {
+            get; set;
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.LogTo(message => Debug.WriteLine(message));

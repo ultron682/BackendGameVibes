@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace BackendGameVibes.Controllers {
@@ -360,6 +361,30 @@ namespace BackendGameVibes.Controllers {
                 return Ok("Usunięto znajomego");
             else
                 return BadRequest("Brak znajomego");
+        }
+
+        [HttpPost("send-close-account-request")]
+        [Authorize]
+        public async Task<IActionResult> SendCloseAccountRequest() {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            bool isSuccess = await _accountService.SendCloseAccountRequestAsync(userId);
+
+            return Ok(isSuccess);
+        }
+
+        [HttpPost("confirm-close-account-request")]
+        [Authorize]
+        public async Task<IActionResult> ConfirmCloseAccountRequest([Required] ValueModel confirmationCode) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            bool isSuccess = await _accountService.ConfirmCloseAccountRequest(userId, confirmationCode.Value!);
+
+            return Ok(isSuccess);
         }
     }
 }

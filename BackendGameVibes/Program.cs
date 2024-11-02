@@ -1,6 +1,7 @@
 using BackendGameVibes.Data;
 using BackendGameVibes.Helpers;
 using BackendGameVibes.IServices;
+using BackendGameVibes.IServices.Forum;
 using BackendGameVibes.Models;
 using BackendGameVibes.Models.Points;
 using BackendGameVibes.Models.User;
@@ -95,6 +96,7 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IForumThreadService, ForumThreadService>();
 builder.Services.AddScoped<IForumPostService, ForumPostService>();
 builder.Services.AddTransient<IForumExperienceService, ForumExperienceService>();
+builder.Services.AddScoped<ActionCodesService>();
 builder.Services.AddHttpClient();
 
 

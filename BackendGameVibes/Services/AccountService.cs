@@ -24,11 +24,12 @@ namespace BackendGameVibes.Services {
         private readonly MailService _mail_Service;
         private readonly HtmlTemplateService _htmlTemplateService;
         private readonly IForumExperienceService _forumExperienceService;
-
+        private readonly ActionCodesService _actionCodesService;
 
         public AccountService(ApplicationDbContext context, UserManager<UserGameVibes> userManager,
             SignInManager<UserGameVibes> signInManager, IConfiguration configuration, MailService mail_Service,
-            HtmlTemplateService htmlTemplateService, RoleManager<IdentityRole> roleManager, IForumExperienceService forumExperienceService) {
+            HtmlTemplateService htmlTemplateService, RoleManager<IdentityRole> roleManager,
+            IForumExperienceService forumExperienceService, ActionCodesService actionCodesService) {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
@@ -37,6 +38,7 @@ namespace BackendGameVibes.Services {
             _htmlTemplateService = htmlTemplateService;
             _roleManager = roleManager;
             _forumExperienceService = forumExperienceService;
+            _actionCodesService = actionCodesService;
         }
 
         public async Task<IdentityResult> RegisterUserAsync(RegisterDTO model) {
@@ -580,6 +582,48 @@ namespace BackendGameVibes.Services {
                 EmailToName = user.UserName!
             });
             return true;
+        }
+
+        public async Task<bool> SendCloseAccountRequestAsync(string userId) {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null) {
+                return false;
+            }
+
+            ActionCode actionCode = await _actionCodesService.GenerateUniqueActionCode(user.Id);
+
+            string emailBody = await _htmlTemplateService.GetEmailTemplateAsync("wwwroot/EmailTemplates/close_account.html",
+            new Dictionary<string, string>
+            {
+                { "UserName", user.UserName! },
+                { "ConfirmationCode", actionCode.Code! }
+            });
+
+            _mail_Service.SendMail(new MailData() {
+                EmailBody = emailBody,
+                EmailSubject = "Close account request",
+                EmailToId = user.Email!,
+                EmailToName = user.UserName!
+            });
+            return true;
+        }
+
+        public async Task<bool> ConfirmCloseAccountRequest(string userId, string confirmationCode) {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var actionCode = await _context.ActiveActionCodes.FirstOrDefaultAsync(ac => ac.Code == confirmationCode);
+
+            if (user == null || actionCode == null) {
+                return false;
+            }
+
+            var deleteResult = await _userManager.DeleteAsync(user);
+
+            if (deleteResult.Succeeded) {
+                await _actionCodesService.RemoveActionCode(actionCode.Code!);
+            }
+
+            return deleteResult.Succeeded;
         }
 
         public void Dispose() {

@@ -10,6 +10,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using BackendGameVibes.Models.DTOs.Reported;
 using BackendGameVibes.Models.Reported;
 using BackendGameVibes.Models.Reviews;
+using System.ComponentModel.DataAnnotations;
 
 namespace BackendGameVibes.Controllers {
     [ApiController]
@@ -29,9 +30,9 @@ namespace BackendGameVibes.Controllers {
             return Ok(reviews);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetFilteredReviews(string searchPhrase) {
-            var reviews = await _reviewService.GetFilteredReviews(searchPhrase);
+        [HttpPost("search-phrase")]
+        public async Task<IActionResult> GetFilteredReviews([Required] ValueModel searchPhrase) {
+            var reviews = await _reviewService.GetFilteredReviewsAsync(searchPhrase.Value!);
             if (reviews == null) {
                 return NotFound();
             }
@@ -95,6 +96,7 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteReview(int id) {
             await _reviewService.DeleteReviewAsync(id);
             return NoContent();

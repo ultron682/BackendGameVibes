@@ -144,11 +144,22 @@ namespace BackendGameVibes.Services {
             return reportedReview;
         }
 
-        public async Task<ReportedReview[]?> GetFilteredReviews(string searchPhrase) {
-            return await _context.ReportedReviews
-                .Include(rr => rr.Review)
-                .Include(rr => rr.ReporterUser)
-                .Where(rr => rr.Review!.Comment!.Contains(searchPhrase) || rr.ReporterUser!.UserName!.Contains(searchPhrase))
+        public async Task<object[]?> GetFilteredReviewsAsync(string searchPhrase) {
+            searchPhrase = searchPhrase.ToLower();
+
+            return await _context.Reviews
+                .Select(r => new {
+                    r.Id,
+                    r.GeneralScore,
+                    r.GameplayScore,
+                    r.GraphicsScore,
+                    r.AudioScore,
+                    r.Comment,
+                    Username = r.UserGameVibes != null ? r.UserGameVibes.UserName : "NoUsername",
+                    GameTitle = r.Game != null ? r.Game.Title : "NoData",
+                    r.CreatedAt,
+                })
+                .Where(r => r.Comment!.ToLower().Contains(searchPhrase))
                 .ToArrayAsync();
         }
 
