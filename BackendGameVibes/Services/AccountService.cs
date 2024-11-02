@@ -561,6 +561,27 @@ namespace BackendGameVibes.Services {
             return true;
         }
 
+        public async Task<bool> SendGeneralEmailToUserAsync(UserGameVibes user, string subject, string message) {
+
+            if (user == null || subject == null || message == null || user.Email == null)
+                return false;
+
+            string emailBody = await _htmlTemplateService.GetEmailTemplateAsync("wwwroot/EmailTemplates/user-message.html",
+            new Dictionary<string, string>
+            {
+                { "message", message },
+                 { "subject", subject }
+            });
+
+            _mail_Service.SendMail(new MailData() {
+                EmailBody = emailBody,
+                EmailSubject = "New friend request",
+                EmailToId = user.Email!,
+                EmailToName = user.UserName!
+            });
+            return true;
+        }
+
         public void Dispose() {
             _context.Dispose();
             _userManager.Dispose();

@@ -60,6 +60,11 @@ namespace BackendGameVibes.Services.Forum {
                     t.UserOwnerId,
                     usernameOwner = t.UserOwner!.UserName,
                     section = t.Section!.Name,
+                    LastPostContent = t.Posts!
+                        .OrderByDescending(p => p.CreatedDateTime)
+                        .Select(p => p.Content)
+                        .FirstOrDefault()
+                        ?? "NoLastPost",
                 })
                 .OrderByDescending(ft => ft.CreatedDateTime)
                 .Take(5)

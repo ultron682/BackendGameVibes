@@ -74,7 +74,6 @@ namespace BackendGameVibes.Controllers {
                     u.AccessFailedCount,
                     u.Description,
                     roles = _userManager.GetRolesAsync(u).Result.ToArray()
-
                 }).ToArrayAsync();
 
             return Ok(users);
@@ -315,6 +314,18 @@ namespace BackendGameVibes.Controllers {
                 return NotFound();
             }
             return Ok(reportedReview);
+        }
+
+        [HttpPost("send-email-to/{userEmail}")]
+        [Authorize(Policy = "modOrAdmin")]
+        public async Task<IActionResult> SendEmailToUser(string userEmail, [Required] string subject, [Required] string message) {
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            if (user == null) {
+                return NotFound();
+            }
+
+            bool isSuccess = await _accountService.SendGeneralEmailToUserAsync(user, subject, message);
+            return Ok(isSuccess);
         }
     }
 }
