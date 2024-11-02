@@ -17,6 +17,29 @@ namespace BackendGameVibes.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
 
+            modelBuilder.Entity("BackendGameVibes.Models.ActionCode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ExpirationDateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ActiveActionCodes");
+                });
+
             modelBuilder.Entity("BackendGameVibes.Models.Forum.ForumPost", b =>
                 {
                     b.Property<int>("Id")
@@ -430,33 +453,7 @@ namespace BackendGameVibes.Migrations
                     b.ToTable("ReportedReviews");
                 });
 
-            modelBuilder.Entity("BackendGameVibes.Models.User.ProfilePicture", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<byte[]>("ImageData")
-                        .HasColumnType("BLOB");
-
-                    b.Property<string>("ImageFormat")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("UploadedDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("ProfilePictures");
-                });
-
-            modelBuilder.Entity("BackendGameVibes.Models.User.Review", b =>
+            modelBuilder.Entity("BackendGameVibes.Models.Reviews.Review", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -501,6 +498,32 @@ namespace BackendGameVibes.Migrations
                     b.HasIndex("UserGameVibesId");
 
                     b.ToTable("Reviews");
+                });
+
+            modelBuilder.Entity("BackendGameVibes.Models.User.ProfilePicture", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("ImageFormat")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("UploadedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("ProfilePictures");
                 });
 
             modelBuilder.Entity("BackendGameVibes.Models.User.UserGameVibes", b =>
@@ -869,7 +892,7 @@ namespace BackendGameVibes.Migrations
                         .HasForeignKey("ReporterUserId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("BackendGameVibes.Models.User.Review", "Review")
+                    b.HasOne("BackendGameVibes.Models.Reviews.Review", "Review")
                         .WithMany("ReportedReviews")
                         .HasForeignKey("ReviewId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -879,17 +902,7 @@ namespace BackendGameVibes.Migrations
                     b.Navigation("Review");
                 });
 
-            modelBuilder.Entity("BackendGameVibes.Models.User.ProfilePicture", b =>
-                {
-                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "User")
-                        .WithOne("ProfilePicture")
-                        .HasForeignKey("BackendGameVibes.Models.User.ProfilePicture", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BackendGameVibes.Models.User.Review", b =>
+            modelBuilder.Entity("BackendGameVibes.Models.Reviews.Review", b =>
                 {
                     b.HasOne("BackendGameVibes.Models.Games.Game", "Game")
                         .WithMany("Reviews")
@@ -904,6 +917,16 @@ namespace BackendGameVibes.Migrations
                     b.Navigation("Game");
 
                     b.Navigation("UserGameVibes");
+                });
+
+            modelBuilder.Entity("BackendGameVibes.Models.User.ProfilePicture", b =>
+                {
+                    b.HasOne("BackendGameVibes.Models.User.UserGameVibes", "User")
+                        .WithOne("ProfilePicture")
+                        .HasForeignKey("BackendGameVibes.Models.User.ProfilePicture", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BackendGameVibes.Models.User.UserGameVibes", b =>
@@ -1041,7 +1064,7 @@ namespace BackendGameVibes.Migrations
                     b.Navigation("SystemRequirements");
                 });
 
-            modelBuilder.Entity("BackendGameVibes.Models.User.Review", b =>
+            modelBuilder.Entity("BackendGameVibes.Models.Reviews.Review", b =>
                 {
                     b.Navigation("ReportedReviews");
                 });

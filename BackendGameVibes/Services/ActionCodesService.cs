@@ -3,6 +3,7 @@ using BackendGameVibes.Models;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Security.Cryptography;
 
 namespace BackendGameVibes.Services {
     public class ActionCodesService {
@@ -14,22 +15,30 @@ namespace BackendGameVibes.Services {
         }
 
 
-        public async Task<ActionCode> GenerateUniqueActionCode(string userId) {
-            ActionCode? newActionCode;
-            do {
-                newActionCode = new ActionCode() {
-                    Code = ValidChars.OrderBy(x => EF.Functions.Random()).Take(6).ToString(),
-                    CreatedDateTime = DateTime.Now,
-                    ExpirationDateTime = DateTime.Now.AddHours(1),
-                    UserId = userId
-                };
-
-                newActionCode = await _context.ActiveActionCodes.FirstOrDefaultAsync(c => c.Code == newActionCode.Code) != null ? null : newActionCode;
+        public async Task<ActionCode?> GenerateUniqueActionCode(string userId) {
+            string? GenerateUniqueActionCode() {
+                return RandomNumberGenerator.GetString(
+                    choices: "0123456789",
+                    length: 6
+                );
             }
-            while (newActionCode == null);
+
+            ActionCode? newActionCode;
+
+            newActionCode = new ActionCode() {
+                Code = GenerateUniqueActionCode(),
+                CreatedDateTime = DateTime.Now,
+                ExpirationDateTime = DateTime.Now.AddHours(1),
+                UserId = userId
+            };
+
+            while (await _context.ActiveActionCodes.AnyAsync(c => c.Code == newActionCode.Code)) {
+                Console.WriteLine("Action code already exists, generating new one" + newActionCode.Code);
+                newActionCode.Code = GenerateUniqueActionCode();
+            }
 
             _context.ActiveActionCodes.Add(newActionCode);
-
+            await _context.SaveChangesAsync();
             return newActionCode;
         }
 

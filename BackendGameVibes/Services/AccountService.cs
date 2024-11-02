@@ -591,27 +591,32 @@ namespace BackendGameVibes.Services {
                 return false;
             }
 
-            ActionCode actionCode = await _actionCodesService.GenerateUniqueActionCode(user.Id);
+            ActionCode? actionCode = await _actionCodesService.GenerateUniqueActionCode(user.Id);
 
-            string emailBody = await _htmlTemplateService.GetEmailTemplateAsync("wwwroot/EmailTemplates/close_account.html",
-            new Dictionary<string, string>
-            {
+            if (actionCode != null) {
+                string emailBody = await _htmlTemplateService.GetEmailTemplateAsync("wwwroot/EmailTemplates/close_account.html",
+                new Dictionary<string, string>
+                {
                 { "UserName", user.UserName! },
-                { "ConfirmationCode", actionCode.Code! }
-            });
+                { "ConfirmationCode", actionCode!.Code! }
+                });
 
-            _mail_Service.SendMail(new MailData() {
-                EmailBody = emailBody,
-                EmailSubject = "Close account request",
-                EmailToId = user.Email!,
-                EmailToName = user.UserName!
-            });
-            return true;
+                _mail_Service.SendMail(new MailData() {
+                    EmailBody = emailBody,
+                    EmailSubject = "Close account request",
+                    EmailToId = user.Email!,
+                    EmailToName = user.UserName!
+                });
+                return true;
+            }
+            else {
+                return false;
+            }
         }
 
         public async Task<bool> ConfirmCloseAccountRequest(string userId, string confirmationCode) {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            var actionCode = await _context.ActiveActionCodes.FirstOrDefaultAsync(ac => ac.Code == confirmationCode);
+            var actionCode = await _context.ActiveActionCodes.FirstOrDefaultAsync(ac => ac.Code == confirmationCode && ac.UserId == userId);
 
             if (user == null || actionCode == null) {
                 return false;
