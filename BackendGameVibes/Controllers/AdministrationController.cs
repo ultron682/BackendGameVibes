@@ -316,10 +316,10 @@ namespace BackendGameVibes.Controllers {
             return Ok(reportedReview);
         }
 
-        [HttpPost("send-email-to/{userEmail}")]
+        [HttpPost("send-email-to/{userId}")]
         [Authorize(Policy = "modOrAdmin")]
-        public async Task<IActionResult> SendEmailToUser(string userEmail, [Required] string subject, [Required] string message) {
-            var user = await _userManager.FindByEmailAsync(userEmail);
+        public async Task<IActionResult> SendEmailToUser(string userId, [Required] string subject, [Required] string message) {
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null) {
                 return NotFound();
             }
