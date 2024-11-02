@@ -1,5 +1,4 @@
-﻿using BackendGameVibes.IServices;
-using BackendGameVibes.Models.Forum;
+﻿using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.DTOs.Forum;
 using BackendGameVibes.Models.DTOs.Reported;
 using Microsoft.AspNetCore.Authorization;
@@ -8,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.Security.Claims;
+using BackendGameVibes.IServices.Forum;
+using System.ComponentModel.DataAnnotations;
 
 namespace BackendGameVibes.Controllers {
     [Route("api/forum")]
@@ -102,6 +103,18 @@ namespace BackendGameVibes.Controllers {
         [HttpGet("{userId}/posts")]
         public async Task<ActionResult<IEnumerable<object>>> GetUserPosts(string userId) {
             return Ok(await _postService.GetAllUserPosts(userId));
+        }
+
+        [HttpGet("search-phrase")]
+        public async Task<ActionResult> SearchForumByPhrase([Required] string phrase) {
+            phrase = phrase.ToLower();
+
+            var result = new {
+                threads = await _threadService.GetThreadsByPhrase(phrase),
+                posts = await _postService.GetPostsByPhrase(phrase)
+            };
+
+            return Ok(result);
         }
     }
 }

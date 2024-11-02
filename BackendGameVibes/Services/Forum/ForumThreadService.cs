@@ -4,6 +4,7 @@ using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.DTOs.Forum;
 using Microsoft.EntityFrameworkCore;
+using BackendGameVibes.IServices.Forum;
 
 namespace BackendGameVibes.Services.Forum {
     public class ForumThreadService : IForumThreadService {
@@ -101,6 +102,20 @@ namespace BackendGameVibes.Services.Forum {
                 .OrderByDescending(p => p.CreatedDateTime)
                 .ToArrayAsync();
         }
+
+        public async Task<object[]?> GetThreadsByPhrase(string phrase) {
+            return await _context.ForumThreads
+                .Where(t => t.Title!.ToLower().Contains(phrase))
+                .Select(t => new {
+                    t.Id,
+                    t.Title,
+                    t.CreatedDateTime,
+                    t.LastUpdatedDateTime
+                })
+                .OrderByDescending(p => p.CreatedDateTime)
+                .ToArrayAsync();
+        }
+
 
         public void Dispose() {
             _context.Dispose();

@@ -8,6 +8,7 @@ using BackendGameVibes.Models.DTOs.Reported;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using BackendGameVibes.IServices.Forum;
 
 namespace BackendGameVibes.Services.Forum {
     public class ForumPostService : IForumPostService {
@@ -97,6 +98,19 @@ namespace BackendGameVibes.Services.Forum {
             return await _context.ForumPosts
                 .Include(p => p.UserOwner)
                 .FirstOrDefaultAsync(p => p.Id == postId);
+        }
+
+        public async Task<object[]?> GetPostsByPhrase(string phrase) {
+            return await _context.ForumPosts
+                .Where(t => t.Content!.ToLower().Contains(phrase))
+                .Select(t => new {
+                    t.Id,
+                    t.Content,
+                    t.CreatedDateTime,
+                    t.LastUpdatedDateTime
+                })
+                .OrderByDescending(p => p.CreatedDateTime)
+                .ToArrayAsync();
         }
 
         public void Dispose() {
