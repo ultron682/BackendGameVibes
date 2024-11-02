@@ -121,6 +121,7 @@ namespace BackendGameVibes.Services {
                     Reviews = u.UserReviews.Select(r => new {
                         r.Id,
                         r.GameId,
+                        GameTitle = r.Game != null ? r.Game.Title : "NoData",
                         r.GeneralScore,
                         r.GameplayScore,
                         r.GraphicsScore,
@@ -206,6 +207,7 @@ namespace BackendGameVibes.Services {
                     Reviews = u.UserReviews.Select(r => new {
                         r.Id,
                         r.GameId,
+                        GameTitle = r.Game != null ? r.Game.Title : "NoData",
                         r.GeneralScore,
                         r.GameplayScore,
                         r.GraphicsScore,

@@ -240,7 +240,7 @@ namespace BackendGameVibes.Controllers {
             return result.Succeeded ? Ok("Password reset successfully") : BadRequest("Failed to reset password");
         }
 
-        [HttpGet("user/:id")]
+        [HttpGet("user/{userId}")]
         [AllowAnonymous]
         [SwaggerOperation("publiczne dane o profilu gracza")]
         public async Task<ActionResult<object>> GetUserAsync(string userId) {

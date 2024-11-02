@@ -93,6 +93,12 @@ namespace BackendGameVibes.Services.Forum {
              .ToArrayAsync();
         }
 
+        public async Task<object?> GetPostByIdAsync(int postId) {
+            return await _context.ForumPosts
+                .Include(p => p.UserOwner)
+                .FirstOrDefaultAsync(p => p.Id == postId);
+        }
+
         public void Dispose() {
             _context.Dispose();
         }

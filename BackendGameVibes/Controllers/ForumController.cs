@@ -67,6 +67,11 @@ namespace BackendGameVibes.Controllers {
             return Ok(await _threadService.GetForumRoles());
         }
 
+        [HttpGet("post/:id")]
+        public async Task<ActionResult<object>> GetPostById(int id) {
+            return Ok(await _postService.GetPostByIdAsync(id));
+        }
+
         [HttpPost("post/report")]
         [Authorize]
         public async Task<ActionResult<object>> ReportPost(ReportPostDTO reportPostDTO) {
