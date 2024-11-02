@@ -144,6 +144,14 @@ namespace BackendGameVibes.Services {
             return reportedReview;
         }
 
+        public async Task<ReportedReview[]?> GetFilteredReviews(string searchPhrase) {
+            return await _context.ReportedReviews
+                .Include(rr => rr.Review)
+                .Include(rr => rr.ReporterUser)
+                .Where(rr => rr.Review!.Comment!.Contains(searchPhrase) || rr.ReporterUser!.UserName!.Contains(searchPhrase))
+                .ToArrayAsync();
+        }
+
         public void Dispose() {
             _context?.Dispose();
         }

@@ -11,8 +11,7 @@ using BackendGameVibes.Models.DTOs.Reported;
 using BackendGameVibes.Models.Reported;
 using BackendGameVibes.Models.Reviews;
 
-namespace BackendGameVibes.Controllers
-{
+namespace BackendGameVibes.Controllers {
     [ApiController]
     [Route("api/review")]
     public class ReviewController : ControllerBase {
@@ -27,6 +26,15 @@ namespace BackendGameVibes.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllReviews() {
             var reviews = await _reviewService.GetAllReviewsAsync();
+            return Ok(reviews);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetFilteredReviews(string searchPhrase) {
+            var reviews = await _reviewService.GetFilteredReviews(searchPhrase);
+            if (reviews == null) {
+                return NotFound();
+            }
             return Ok(reviews);
         }
 

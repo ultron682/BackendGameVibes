@@ -2,8 +2,7 @@
 using BackendGameVibes.Models.DTOs.Reported;
 using BackendGameVibes.Models.Reviews;
 
-namespace BackendGameVibes.IServices
-{
+namespace BackendGameVibes.IServices {
     public interface IReviewService : IDisposable {
         Task<IEnumerable<object>> GetAllReviewsAsync();
         Task<object?> GetReviewByIdAsync(int id);
@@ -13,5 +12,6 @@ namespace BackendGameVibes.IServices
         Task<object[]> GetLandingReviewsAsync();
         Task<ReportedReview?> ReportReviewAsync(string userId, ReportReviewDTO reportedReviewDTO);
         Task<ReportedReview?> FinishReportReviewAsync(int id, bool toRemove);
+        Task<ReportedReview[]?> GetFilteredReviews(string searchPhrase);
     }
 }
