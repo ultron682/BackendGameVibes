@@ -47,7 +47,7 @@ namespace BackendGameVibes.Services.Forum {
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
 
-        public async Task<IEnumerable<object>> GetLandingThreads() {
+        public async Task<object[]> GetLandingThreads() {
             return await _context.ForumThreads
                 .Include(t => t.Section)
                 .Include(t => t.UserOwner)
@@ -68,7 +68,7 @@ namespace BackendGameVibes.Services.Forum {
                 })
                 .OrderByDescending(ft => ft.CreatedDateTime)
                 .Take(5)
-                .ToListAsync();
+                .ToArrayAsync();
         }
 
         public async Task<IEnumerable<object>> GetSections() {

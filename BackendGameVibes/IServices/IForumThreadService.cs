@@ -8,7 +8,7 @@ namespace BackendGameVibes.IServices {
         Task<IEnumerable<object>> GetAllUserThreads(string userId);
         Task<IEnumerable<object>> GetForumRoles();
         Task<ForumThread?> GetForumThread(int id);
-        Task<IEnumerable<object>> GetLandingThreads();
+        Task<object[]> GetLandingThreads();
         Task<IEnumerable<object>> GetSections();
     }
 }
