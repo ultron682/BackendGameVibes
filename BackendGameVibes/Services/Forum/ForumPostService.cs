@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using BackendGameVibes.IServices.Forum;
+using BackendGameVibes.Models.DTOs;
+using BackendGameVibes.Models.Reviews;
+using Microsoft.Extensions.Hosting;
 
 namespace BackendGameVibes.Services.Forum {
     public class ForumPostService : IForumPostService {
@@ -110,7 +113,18 @@ namespace BackendGameVibes.Services.Forum {
                     t.LastUpdatedDateTime
                 })
                 .OrderByDescending(p => p.CreatedDateTime)
-                .ToArrayAsync();
+            .ToArrayAsync();
+        }
+
+        public async Task<ForumPost?> UpdatePostByIdAsync(int postId, string userId, ForumPostUpdateDTO postUpdateDTO) {
+            var post = await _context.ForumPosts
+               .FirstOrDefaultAsync(p => p.Id == postId && p.UserOwnerId == userId);
+
+            if (post != null) {
+                post.Content = postUpdateDTO.Content ?? post.Content;
+            }
+
+            return post;
         }
 
         public void Dispose() {

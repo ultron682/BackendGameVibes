@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.Security.Claims;
 using BackendGameVibes.IServices.Forum;
 using System.ComponentModel.DataAnnotations;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace BackendGameVibes.Controllers {
     [Route("api/forum")]
@@ -115,6 +116,23 @@ namespace BackendGameVibes.Controllers {
             };
 
             return Ok(result);
+        }
+
+        [HttpPatch("{postId}")]
+        [Authorize]
+        [SwaggerResponse(404, "no post or post doesnt belong to user")]
+        [SwaggerResponse(200, "updated")]
+        public async Task<IActionResult> UpdatePost(int postId, ForumPostUpdateDTO postUpdateDTO) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            ForumPost? post = await _postService.UpdatePostByIdAsync(postId, userId, postUpdateDTO);
+            if (post == null) {
+                return NotFound();
+            }
+
+            return Ok(post);
         }
     }
 }

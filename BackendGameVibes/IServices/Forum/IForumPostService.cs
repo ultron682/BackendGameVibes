@@ -13,5 +13,6 @@ namespace BackendGameVibes.IServices.Forum {
         Task<object?> GetPostByIdAsync(int id);
         Task<object[]?> GetPostsByPhrase(string phrase);
         Task<ReportedPost?> ReportPostAsync(string userId, ReportPostDTO reportPostDTO);
+        Task<ForumPost?> UpdatePostByIdAsync(int postId, string userId, ForumPostUpdateDTO postUpdateDTO);
     }
 }
