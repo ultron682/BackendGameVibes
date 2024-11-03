@@ -228,7 +228,6 @@ namespace BackendGameVibes.Services {
                 .Include(u => u.UserReviews)
                 .Include(u => u.ForumRole)
                 .Include(u => u.ProfilePicture)
-                .AsSplitQuery()
                 .Select(u => new {
                     u.Id,
                     u.UserName,
@@ -251,15 +250,13 @@ namespace BackendGameVibes.Services {
                         f.FriendUser!.UserName,
                         f.FriendsSince
                     }).ToArray(),
-                    UserForumLast5Threads = u.UserForumThreads != null ? u.UserForumThreads.Select(t => new {
+                    UserForumThreads = u.UserForumThreads != null ? u.UserForumThreads.Select(t => new {
                         t.Id,
                         t.Title,
                         t.CreatedDateTime,
                         t.LastUpdatedDateTime
                     }).OrderByDescending(p => p.LastUpdatedDateTime).Take(5).ToArray() : Array.Empty<object>(),
-                    UserForumLast5Posts = u.UserForumPosts != null ? u.UserForumPosts
-                    //.OrderByDescending(p => p.LastUpdatedDateTime)
-                    //.Take(5)
+                    UserForumPosts = u.UserForumPosts != null ? u.UserForumPosts
                     .ToList()
                     .Select(p => new {
                         p.Id,
