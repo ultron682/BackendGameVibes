@@ -1,57 +1,46 @@
 ﻿using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.User;
 
-namespace BackendGameVibes.Models.Reviews
-{
-    public class Review
-    {
-        public int Id
-        {
+namespace BackendGameVibes.Models.Reviews {
+    public class Review {
+        public int Id {
             get; set;
         }
-        public string? UserGameVibesId
-        {
+        public string? UserGameVibesId {
             get; set;
         }
-        public int? GameId
-        {
+        public int? GameId {
             get; set;
         }
-        public double GeneralScore
-        {
+        public double GeneralScore {
             get; set;
         }
-        public double GraphicsScore
-        {
+        public double GraphicsScore {
             get; set;
         }
-        public double AudioScore
-        {
+        public double AudioScore {
             get; set;
         }
-        public double GameplayScore
-        {
+        public double GameplayScore {
             get; set;
         }
-        public string? Comment
-        {
+        public string? Comment {
             get; set;
         } // change property name from "Comment" to "Content"
-        public DateTime? CreatedAt
-        {
+        public DateTime? CreatedAt {
+            get; set;
+        }
+        public DateTime? UpdatedAt {
             get; set;
         }
 
-        public UserGameVibes? UserGameVibes
-        {
+        public UserGameVibes? UserGameVibes {
             get; set;
         }
-        public Game? Game
-        {
+        public Game? Game {
             get; set;
         }
-        public ICollection<Reported.ReportedReview>? ReportedReviews
-        {
+        public ICollection<Reported.ReportedReview>? ReportedReviews {
             get; set;
         } = [];
     }

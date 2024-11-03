@@ -2,8 +2,6 @@
 
 namespace BackendGameVibes.Models.DTOs {
     public class ReviewDTO {
-        //[DefaultValue("long required userID")]
-        //public string? UserGameVibesId { get; set; }
         [DefaultValue("1")]
         public int? GameId { get; set; }
         public double GeneralScore { get; set; }
@@ -14,6 +12,6 @@ namespace BackendGameVibes.Models.DTOs {
         [DefaultValue("9")]
         public double GameplayScore { get; set; }
         [DefaultValue("Empty comment")]
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
     }
 }

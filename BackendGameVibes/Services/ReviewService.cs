@@ -6,6 +6,7 @@ using BackendGameVibes.Models.Reported;
 using BackendGameVibes.Models.DTOs.Reported;
 using BackendGameVibes.Models.Reviews;
 using Microsoft.EntityFrameworkCore;
+using BackendGameVibes.Models.DTOs;
 
 namespace BackendGameVibes.Services {
     public class ReviewService : IReviewService {
@@ -75,11 +76,6 @@ namespace BackendGameVibes.Services {
                 return null;
             }
 
-        }
-
-        public async Task UpdateReviewAsync(Review review) {
-            _context.Reviews.Update(review);
-            await _context.SaveChangesAsync();
         }
 
         public async Task<bool> DeleteReviewAsync(string userId, int id) {
@@ -166,6 +162,25 @@ namespace BackendGameVibes.Services {
                 })
                 .Where(r => r.Comment!.ToLower().Contains(searchPhrase))
                 .ToArrayAsync();
+        }
+
+        public async Task<Review?> UpdateReviewByIdAsync(int reviewId, string userId, ReviewUpdateDTO reviewUpdateDTO) {
+            var review = await _context.Reviews
+               .FirstOrDefaultAsync(r => r.Id == reviewId && r.UserGameVibesId == userId);
+
+            if (review != null) {
+                review.GeneralScore = reviewUpdateDTO.GeneralScore ?? review.GeneralScore;
+                review.GraphicsScore = reviewUpdateDTO.GraphicsScore ?? review.GraphicsScore;
+                review.AudioScore = reviewUpdateDTO.AudioScore ?? review.AudioScore;
+                review.GameplayScore = reviewUpdateDTO.GameplayScore ?? review.GameplayScore;
+                review.Comment = reviewUpdateDTO.Comment ?? review.Comment;
+
+                review.UpdatedAt = DateTime.Now;
+                _context.Reviews.Update(review);
+                await _context.SaveChangesAsync();
+            }
+
+            return review;
         }
 
         public void Dispose() {

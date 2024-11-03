@@ -237,6 +237,10 @@ namespace BackendGameVibes.Data {
                     .HasDefaultValueSql("CURRENT_TIMESTAMP")
                     .IsRequired();
 
+                ent.Property(r => r.UpdatedAt)
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .IsRequired();
+
                 ent.HasOne(r => r.Game)
                     .WithMany(g => g.Reviews)
                     .HasForeignKey(r => r.GameId)

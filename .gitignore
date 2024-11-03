@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /BackendGameVibes/GameVibesDatabase.db-wal
 /BackendGameVibes/GameVibesDatabase.db-shm
 /BackendGameVibes/Migrations/*
+/BackendGameVibes/Migrations/ApplicationDbContextModelSnapshot.cs

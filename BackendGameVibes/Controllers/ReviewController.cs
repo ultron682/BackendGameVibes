@@ -108,5 +108,22 @@ namespace BackendGameVibes.Controllers {
             else
                 return NotFound();
         }
+
+        [HttpPatch("{reviewId}")]
+        [Authorize]
+        [SwaggerResponse(404, "no review or review doesnt belong to user")]
+        [SwaggerResponse(200, "updated")]
+        public async Task<IActionResult> UpdateReview(int reviewId, ReviewUpdateDTO reviewUpdateDTO) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            Review? review = await _reviewService.UpdateReviewByIdAsync(reviewId, userId, reviewUpdateDTO);
+            if (review == null) {
+                return NotFound();
+            }
+
+            return Ok(review);
+        }
     }
 }
