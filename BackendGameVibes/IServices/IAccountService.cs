@@ -8,7 +8,7 @@ namespace BackendGameVibes.IServices {
     public interface IAccountService : IDisposable {
         Task<IdentityResult> ConfirmEmailAsync(string userId, string token);
         Task<string> GenerateJwtTokenAsync(UserGameVibes user);
-        Task<object?> GetAccountInfoAsync(string userId);
+        Task<object?> GetBasicAccountInfoAsync(string userId);
         Task<object?> GetPublicAccountInfoAsync(string userId);
         Task<UserGameVibes?> GetUserByEmailAsync(string email);
         Task<UserGameVibes?> GetUserByIdAsync(string userId);
@@ -33,5 +33,6 @@ namespace BackendGameVibes.IServices {
         Task<bool> SendGeneralEmailToUserAsync(UserGameVibes user, string subject, string message);
         Task<(ActionCode? actionCode, bool isAlreadyExistValidExpiryDate)> SendCloseAccountRequestAsync(string userId);
         Task<bool> ConfirmCloseAccountRequest(string userId, string confirmationCode);
+        Task<object?> GetDetailedAccountInfoAsync(string userId);
     }
 }

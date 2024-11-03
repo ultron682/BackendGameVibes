@@ -91,7 +91,7 @@ namespace BackendGameVibes.Controllers {
                 return NotFound();
             }
 
-            var accountInfo = _accountService.GetAccountInfoAsync(userGameVibes.Id);
+            var accountInfo = _accountService.GetBasicAccountInfoAsync(userGameVibes.Id);
 
             return Ok(accountInfo);
         }

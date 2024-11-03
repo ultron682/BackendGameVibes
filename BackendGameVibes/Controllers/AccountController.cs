@@ -89,15 +89,30 @@ namespace BackendGameVibes.Controllers {
             return Unauthorized("Invalid login attempt");
         }
 
-        [HttpGet]
+        [HttpGet("basic")]
         [Authorize]
-        [SwaggerOperation("Zwraca informacje o uzytkowniku")]
-        public async Task<IActionResult> GetAccountInfo() {
+        [SwaggerOperation("Zwraca podstawowe informacje o uzytkowniku")]
+        public async Task<IActionResult> GetBasicAccountInfo() {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
                 return Unauthorized("User not authenticated, claim not found");
 
-            var accountInfo = await _accountService.GetAccountInfoAsync(userId);
+            var accountInfo = await _accountService.GetBasicAccountInfoAsync(userId);
+            if (accountInfo != null)
+                return Ok(accountInfo);
+            else
+                return BadRequest("User not found");
+        }
+
+        [HttpGet("detailed")]
+        [Authorize]
+        [SwaggerOperation("Zwraca wszystkie powiązane dane o uzytkowniku")]
+        public async Task<IActionResult> GetDetailedAccountInfo() {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            var accountInfo = await _accountService.GetDetailedAccountInfoAsync(userId);
             if (accountInfo != null)
                 return Ok(accountInfo);
             else

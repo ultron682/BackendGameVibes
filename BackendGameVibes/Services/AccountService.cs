@@ -84,7 +84,7 @@ namespace BackendGameVibes.Services {
             await _context.SaveChangesAsync();
         }
 
-        public async Task<object?> GetAccountInfoAsync(string userId) {
+        public async Task<object?> GetBasicAccountInfoAsync(string userId) {
             var userGameVibes = await GetUserByIdAsync(userId);
             if (userGameVibes == null)
                 return null;
@@ -119,6 +119,32 @@ namespace BackendGameVibes.Services {
                     u.AccessFailedCount,
                     u.Description,
                     Roles = userRoles.ToArray(),
+                })
+                .FirstOrDefaultAsync();
+
+            return accountInfo!;
+        }
+
+        public async Task<object?> GetDetailedAccountInfoAsync(string userId) {
+            var userGameVibes = await GetUserByIdAsync(userId);
+            if (userGameVibes == null)
+                return null;
+
+            var userRoles = await _userManager.GetRolesAsync(userGameVibes);
+
+            var accountInfo = await _context.Users
+                .Where(u => u.Id == userGameVibes.Id)
+                .Include(u => u.UserReviews)
+                .Include(u => u.ForumRole)
+                .Include(u => u.UserReportedReviews)
+                .Include(u => u.UserFriendRequestsReceived)
+                .Include(u => u.UserFriendRequestsSent)
+                .Include(u => u.UserForumThreads)
+                .Include(u => u.UserForumPosts)
+                .Include(u => u.UserReportedPosts)
+                .Include(u => u.UserFollowedGames)
+                .Select(u => new {
+                    u.Id,
                     Reviews = u.UserReviews.Select(r => new {
                         r.Id,
                         r.GameId,
@@ -154,19 +180,15 @@ namespace BackendGameVibes.Services {
                         ReceiverName = fr.ReceiverUser!.UserName,
                         fr.IsAccepted
                     }).ToArray(),
-                    UserForumLast5Threads = u.UserForumThreads != null ? u.UserForumThreads.Select(t => new {
+                    UserForumThreads = u.UserForumThreads != null ? u.UserForumThreads.Select(t => new {
                         t.Id,
                         t.Title,
                         t.CreatedDateTime,
                         t.LastUpdatedDateTime
                     })
-                    .OrderByDescending(p => p.LastUpdatedDateTime)
-                    .Take(5)
                     .ToArray()
                     : Array.Empty<object>(),
-                    UserForumLast5Posts = u.UserForumPosts!
-                        //.OrderByDescending(p => p.Id)
-                        //.Take(5)
+                    UserForumPosts = u.UserForumPosts!
                         .Select(p => new {
                             p.Id,
                             p.Content,
