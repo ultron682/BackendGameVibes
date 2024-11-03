@@ -34,5 +34,7 @@ namespace BackendGameVibes.IServices {
         Task<(ActionCode? actionCode, bool isAlreadyExistValidExpiryDate)> SendCloseAccountRequestAsync(string userId);
         Task<bool> ConfirmCloseAccountRequest(string userId, string confirmationCode);
         Task<object?> GetDetailedAccountInfoAsync(string userId);
+        Task<bool> FollowGameAsync(string userId, int gameId);
+        Task<bool> UnfollowGameAsync(string userId, int gameId);
     }
 }

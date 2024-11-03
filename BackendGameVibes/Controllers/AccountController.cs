@@ -415,5 +415,37 @@ namespace BackendGameVibes.Controllers {
             else
                 return BadRequest("Invalid code or user doesnt already exist");
         }
+
+        [HttpPost("follow/{gameId}")]
+        [Authorize]
+        [SwaggerResponse(200, "game added or already to followed game")]
+        [SwaggerResponse(404, "no game exist or user doesnt exist")]
+        public async Task<IActionResult> FollowGame([Required] int gameId) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            bool isSuccess = await _accountService.FollowGameAsync(userId, gameId);
+            if (isSuccess)
+                return Ok();
+            else
+                return NotFound("No game exist or user doesnt exist");
+        }
+
+        [HttpPost("unfollow/{gameId}")]
+        [Authorize]
+        [SwaggerResponse(200, "game unfollowed or already unfollowed game")]
+        [SwaggerResponse(404, "no game exist or user doesnt exist")]
+        public async Task<IActionResult> UnfollowGame([Required] int gameId) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            bool isSuccess = await _accountService.UnfollowGameAsync(userId, gameId);
+            if (isSuccess)
+                return Ok();
+            else
+                return NotFound("No game exist or user doesnt exist");
+        }
     }
 }

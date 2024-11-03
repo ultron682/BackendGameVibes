@@ -665,6 +665,42 @@ namespace BackendGameVibes.Services {
             return deleteResult.Succeeded;
         }
 
+        public async Task<bool> FollowGameAsync(string userId, int gameId) {
+            var user = await _context.Users
+                .Include(u => u.UserFollowedGames)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            var game = await _context.Games.FirstOrDefaultAsync(g => g.Id == gameId);
+
+            if (user != null && game != null) {
+                if (user.UserFollowedGames!.FirstOrDefault(g => g.Id == gameId) == null) {
+                    user.UserFollowedGames!.Add(game);
+                    _context.Users.Update(user);
+                    await _context.SaveChangesAsync();
+                }
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> UnfollowGameAsync(string userId, int gameId) {
+            var user = await _context.Users
+                .Include(u => u.UserFollowedGames)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            var game = await _context.Games.FirstOrDefaultAsync(g => g.Id == gameId);
+
+            if (user != null && game != null) {
+                user.UserFollowedGames!.Remove(game);
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
+        }
+
         public void Dispose() {
             _context.Dispose();
             _userManager.Dispose();
