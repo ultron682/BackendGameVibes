@@ -10,6 +10,7 @@ using System.Security.Claims;
 using BackendGameVibes.IServices.Forum;
 using System.ComponentModel.DataAnnotations;
 using Swashbuckle.AspNetCore.Annotations;
+using Microsoft.Extensions.Hosting;
 
 namespace BackendGameVibes.Controllers {
     [Route("api/forum")]
@@ -133,6 +134,23 @@ namespace BackendGameVibes.Controllers {
             }
 
             return Ok(post);
+        }
+
+        [HttpDelete("{postId}")]
+        [Authorize]
+        [SwaggerResponse(404, "no post or post doesnt belong to user")]
+        [SwaggerResponse(200, "deleted")]
+        public async Task<IActionResult> DeletePost(int postId) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            bool isSuccess = await _postService.DeletePostByIdAsync(postId, userId);
+            if (isSuccess) {
+                return Ok();
+            }
+
+            return NotFound();
         }
     }
 }

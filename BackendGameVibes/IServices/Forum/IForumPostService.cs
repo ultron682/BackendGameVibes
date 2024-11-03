@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BackendGameVibes.IServices.Forum {
     public interface IForumPostService : IDisposable {
         Task<ForumPost> AddForumPost(ForumPostDTO forumPostDTO);
+        Task<bool> DeletePostByIdAsync(int postId, string userId);
         Task<ReportedPost?> FinishReportPostAsync(int id, bool toRemovePost);
         Task<ActionResult<IEnumerable<ForumPost>>> GetAllPosts(int idThread);
         Task<IEnumerable<object>> GetAllUserPosts(string userId);

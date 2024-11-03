@@ -7,11 +7,8 @@ using BackendGameVibes.Models.DTOs.Forum;
 using BackendGameVibes.Models.DTOs.Reported;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
 using BackendGameVibes.IServices.Forum;
-using BackendGameVibes.Models.DTOs;
-using BackendGameVibes.Models.Reviews;
-using Microsoft.Extensions.Hosting;
+
 
 namespace BackendGameVibes.Services.Forum {
     public class ForumPostService : IForumPostService {
@@ -129,6 +126,19 @@ namespace BackendGameVibes.Services.Forum {
             }
 
             return post;
+        }
+
+        public async Task<bool> DeletePostByIdAsync(int postId, string userId) {
+            var post = await _context.ForumPosts
+               .FirstOrDefaultAsync(p => p.Id == postId && p.UserOwnerId == userId);
+
+            if (post != null) {
+                _context.ForumPosts.Remove(post);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
         }
 
         public void Dispose() {
