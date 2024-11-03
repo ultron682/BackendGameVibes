@@ -82,12 +82,17 @@ namespace BackendGameVibes.Services {
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteReviewAsync(int id) {
+        public async Task<bool> DeleteReviewAsync(string userId, int id) {
             var review = await _context.Reviews.FindAsync(id);
             if (review != null) {
-                _context.Reviews.Remove(review);
-                await _context.SaveChangesAsync();
+                if (review.UserGameVibesId == userId) {
+                    _context.Reviews.Remove(review);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
             }
+
+            return false;
         }
 
         public async Task<object[]> GetLandingReviewsAsync() {

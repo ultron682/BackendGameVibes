@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.DTOs;
 using AutoMapper;
@@ -97,9 +95,18 @@ namespace BackendGameVibes.Controllers {
 
         [HttpDelete("{id}")]
         [Authorize]
+        [SwaggerResponse(200, "deleted")]
+        [SwaggerResponse(404, "no review or review not belongs to user")]
         public async Task<IActionResult> DeleteReview(int id) {
-            await _reviewService.DeleteReviewAsync(id);
-            return NoContent();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            bool isSuccess = await _reviewService.DeleteReviewAsync(userId, id);
+            if (isSuccess)
+                return Ok();
+            else
+                return NotFound();
         }
     }
 }
