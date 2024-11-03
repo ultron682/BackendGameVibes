@@ -122,6 +122,10 @@ namespace BackendGameVibes.Services.Forum {
 
             if (post != null) {
                 post.Content = postUpdateDTO.Content ?? post.Content;
+
+                post.LastUpdatedDateTime = DateTime.Now;
+                _context.ForumPosts.Update(post);
+                await _context.SaveChangesAsync();
             }
 
             return post;
