@@ -68,7 +68,7 @@ namespace BackendGameVibes.Services {
                     var result = JsonSerializer.Deserialize<Dictionary<string, SteamAppData>>(jsonString, options);
 
                     if (result[id.ToString()].Success) {
-                        Console.WriteLine("Downloaded game: ");
+                        Console.WriteLine("Downloaded game: " + id);
                         return result[id.ToString()].Data;
                     }
                 }
