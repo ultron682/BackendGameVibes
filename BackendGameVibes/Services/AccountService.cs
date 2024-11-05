@@ -194,8 +194,8 @@ namespace BackendGameVibes.Services {
                             p.Content,
                             p.CreatedDateTime,
                             p.LastUpdatedDateTime,
-                            p.Likes,
-                            p.DisLikes,
+                            p.LikesCount,
+                            p.DisLikesCount,
                             p.ThreadId,
                             threadTitle = p.Thread != null ? p.Thread.Title : "NoData"
                         }).ToArray(),
@@ -265,8 +265,8 @@ namespace BackendGameVibes.Services {
                         p.Content,
                         p.CreatedDateTime,
                         p.LastUpdatedDateTime,
-                        p.Likes,
-                        p.DisLikes,
+                        p.LikesCount,
+                        p.DisLikesCount,
                         p.ThreadId,
                         threadTitle = p.Thread != null ? p.Thread.Title : "NoData"
                     }).ToArray() : Array.Empty<object>(),

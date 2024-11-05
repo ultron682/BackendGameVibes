@@ -173,10 +173,11 @@ namespace BackendGameVibes.Services.Forum {
                         post.LikesCount++;
                     }
 
+                    postInteraction.IsLike = isToLike;
                     _context.ForumPostInteractions.Update(postInteraction);
                 }
                 else if (isToLike == false) {
-                    if (postInteraction.IsLike == false) {
+                    if (postInteraction.IsLike == true) {
                         post.LikesCount--;
                         post.DisLikesCount++;
                     }
@@ -184,6 +185,7 @@ namespace BackendGameVibes.Services.Forum {
                         post.DisLikesCount++;
                     }
 
+                    postInteraction.IsLike = isToLike;
                     _context.ForumPostInteractions.Update(postInteraction);
                 }
             }
@@ -206,7 +208,7 @@ namespace BackendGameVibes.Services.Forum {
 
             await _context.SaveChangesAsync();
 
-            return new object[] { post, post.LikesCount, post.DisLikesCount };
+            return post;
         }
 
 
