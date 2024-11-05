@@ -11,8 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.IServices.Forum;
 
-namespace BackendGameVibes.Helpers
-{
+namespace BackendGameVibes.Helpers {
     public class DbInitializer {
         private static readonly string[] LoremIpsumWords = {
         "lorem", "ipsum", "dolor", "sit", "amet", "consectetur",
@@ -216,9 +215,7 @@ namespace BackendGameVibes.Helpers
 
             var createdGames = new List<(Game? game, bool isSuccess)>();
 
-            foreach (var gameId in steamGameIds) {
-                createdGames.Add(await gameService.CreateGame(gameId));
-            }
+            createdGames.AddRange(await gameService.InitGamesBySteamIds(applicationDbContext, steamGameIds));
 
             Console.WriteLine("Adding reviews for games");
 
@@ -255,32 +252,14 @@ namespace BackendGameVibes.Helpers
                     });
                 }
             }
+
+
             Console.WriteLine("Adding threads with posts");
-            // user #1 threads
-            for (int i = 0; i < 9; i++) {
+            for (int i = 0; i < 50; i++) {
                 ForumThread newForumThread = await threadService!.AddThreadAsync(new NewForumThreadDTO {
                     Title = $"Forum Thread {i} " + GenerateRandomSentence(2),
-                    UserOwnerId = testUsers[0]!.Id,
-                    SectionId = 1,
-                    FirstForumPostContent = GenerateRandomSentence(random.Next(10, 30))
-                });
-
-                int postsCount = random.Next(0, 10);
-                for (int j = 0; j < postsCount; j++) {
-                    await postService!.AddForumPost(new ForumPostDTO {
-                        Content = $"{postsCount} " + GenerateRandomSentence(random.Next(10, 30)),
-                        ThreadId = newForumThread.Id,
-                        UserOwnerId = testUsers[random.Next(0, testUsers.Count)]!.Id
-                    });
-                }
-            }
-
-            // user #2 threads 
-            for (int i = 0; i < 9; i++) {
-                ForumThread newForumThread = await threadService!.AddThreadAsync(new NewForumThreadDTO {
-                    Title = $"Forum Thread {i} " + GenerateRandomSentence(2),
-                    UserOwnerId = testUsers[1]!.Id,
-                    SectionId = 1,
+                    UserOwnerId = testUsers[random.Next(0, testUsers.Count)]!.Id!,
+                    SectionId = random.Next(1, 5),
                     FirstForumPostContent = GenerateRandomSentence(random.Next(10, 30))
                 });
 
