@@ -167,5 +167,21 @@ namespace BackendGameVibes.Controllers {
         public async Task<ActionResult<IEnumerable<object>>> GetForumRoles() {
             return Ok(await _threadService.GetForumRoles());
         }
+
+        [HttpPost("interact/{postId}")]
+        [Authorize]
+        [SwaggerOperation("isLike = true,false, null- noInteraction(remove Like/Dislike)")]
+        public async Task<ActionResult> LikePost(int postId, bool? isLike) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            object? post = await _postService.InteractPostAsync(userId, postId, isLike);
+            if (post == null) {
+                return NotFound();
+            }
+
+            return Ok(post);
+        }
     }
 }

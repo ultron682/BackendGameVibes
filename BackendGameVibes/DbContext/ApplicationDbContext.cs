@@ -63,6 +63,9 @@ namespace BackendGameVibes.Data {
         public DbSet<ActionCode> ActiveActionCodes {
             get; set;
         }
+        public DbSet<ForumPostInteraction> ForumPostInteractions {
+            get; set;
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.LogTo(message => Debug.WriteLine(message));
@@ -297,10 +300,10 @@ namespace BackendGameVibes.Data {
                     .IsRequired()
                     .ValueGeneratedOnAddOrUpdate();
 
-                ent.Property(p => p.Likes)
+                ent.Property(p => p.LikesCount)
                     .HasDefaultValue(0);
 
-                ent.Property(p => p.DisLikes)
+                ent.Property(p => p.DisLikesCount)
                     .HasDefaultValue(0);
 
                 ent.HasOne(p => p.UserOwner)
@@ -377,6 +380,24 @@ namespace BackendGameVibes.Data {
                 ent.Property(rr => rr.Reason)
                     .HasMaxLength(255)
                     .IsRequired();
+            });
+
+            mB.Entity<ForumPostInteraction>(ent => {
+                ent.HasOne(fpi => fpi.UserGameVibes)
+                    .WithMany(u => u.UserPostInteractions)
+                    .HasForeignKey(fpi => fpi.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                ent.HasOne(fpi => fpi.ForumPost)
+                    .WithMany(p => p.PostInteractions)
+                    .HasForeignKey(fpi => fpi.PostId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                ent.Property(fpi => fpi.IsLike)
+                    .HasDefaultValue(null);
+
+
+
             });
 
             base.OnModelCreating(mB);

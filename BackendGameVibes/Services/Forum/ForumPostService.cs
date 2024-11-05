@@ -141,6 +141,75 @@ namespace BackendGameVibes.Services.Forum {
             return false;
         }
 
+
+        public async Task<object?> InteractPostAsync(string userId, int postId, bool? isToLike) {
+            ForumPost? post = await _context.ForumPosts
+                .FirstOrDefaultAsync(p => p.Id == postId);
+
+            if (post == null) {
+                return null;
+            }
+
+            ForumPostInteraction? postInteraction = await _context.ForumPostInteractions
+                .FirstOrDefaultAsync(pl => pl.UserId == userId && pl.PostId == postId);
+
+            if (postInteraction != null) {
+                if (isToLike == null) {
+                    if (postInteraction.IsLike == true) {
+                        post.LikesCount--;
+                    }
+                    else if (postInteraction.IsLike == false) {
+                        post.DisLikesCount--;
+                    }
+
+                    _context.ForumPostInteractions.Remove(postInteraction);
+                }
+                else if (isToLike == true) {
+                    if (postInteraction.IsLike == false) {
+                        post.LikesCount++;
+                        post.DisLikesCount--;
+                    }
+                    else if (postInteraction.IsLike == null) {
+                        post.LikesCount++;
+                    }
+
+                    _context.ForumPostInteractions.Update(postInteraction);
+                }
+                else if (isToLike == false) {
+                    if (postInteraction.IsLike == false) {
+                        post.LikesCount--;
+                        post.DisLikesCount++;
+                    }
+                    else if (postInteraction.IsLike == null) {
+                        post.DisLikesCount++;
+                    }
+
+                    _context.ForumPostInteractions.Update(postInteraction);
+                }
+            }
+            else {
+                if (isToLike != null) {
+                    _context.ForumPostInteractions.Add(new ForumPostInteraction {
+                        UserId = userId,
+                        PostId = postId,
+                        IsLike = isToLike
+                    });
+
+                    if (isToLike == true) {
+                        post.LikesCount++;
+                    }
+                    else {
+                        post.DisLikesCount++;
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return new object[] { post, post.LikesCount, post.DisLikesCount };
+        }
+
+
         public void Dispose() {
             _context.Dispose();
         }
