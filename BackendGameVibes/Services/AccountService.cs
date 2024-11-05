@@ -234,6 +234,7 @@ namespace BackendGameVibes.Services {
                     ProfilePictureBlob = u.ProfilePicture != null ? u.ProfilePicture.ImageData : null,
                     ForumRole = new { u.ForumRole!.Id, u.ForumRole.Name, u.ForumRole.Threshold },
                     u.ExperiencePoints,
+                    u.Description,
                     Reviews = u.UserReviews.Select(r => new {
                         r.Id,
                         r.GameId,
@@ -243,7 +244,8 @@ namespace BackendGameVibes.Services {
                         r.GraphicsScore,
                         r.AudioScore,
                         r.Comment,
-                        r.CreatedAt
+                        r.CreatedAt,
+
                     }).ToArray(),
                     Friends = u.UserFriends.Select(f => new {
                         f.FriendId,

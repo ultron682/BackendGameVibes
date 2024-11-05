@@ -105,18 +105,48 @@ namespace BackendGameVibes.Services.Forum {
 
         public async Task<object[]?> GetThreadsByPhrase(string phrase) {
             return await _context.ForumThreads
+                .Include(t => t.Section)
                 .Where(t => t.Title!.ToLower().Contains(phrase))
                 .Select(t => new {
                     t.Id,
                     t.Title,
                     t.CreatedDateTime,
-                    t.LastUpdatedDateTime
+                    t.LastUpdatedDateTime,
+                    section = t.Section!.Name
                 })
                 .OrderByDescending(p => p.CreatedDateTime)
                 .ToArrayAsync();
         }
 
 
+        public async Task<object[]> GetThreadsGroupBySectionsAsync() {
+            return await _context.ForumThreads
+                .Include(t => t.Section)
+                .Select(t => new {
+                    t.Id,
+                    t.Title,
+                    t.CreatedDateTime,
+                    t.LastUpdatedDateTime,
+                    section = t.Section!.Name
+                })
+                .OrderByDescending(p => p.CreatedDateTime)
+                .ToArrayAsync();
+        }
+
+        public async Task<object[]> GetThreadsInSectionAsync(int sectionId) {
+            return await _context.ForumThreads
+                .Include(t => t.Section)
+                .Where(t => t.SectionId == sectionId)
+                .Select(t => new {
+                    t.Id,
+                    t.Title,
+                    t.CreatedDateTime,
+                    t.LastUpdatedDateTime,
+                    section = t.Section!.Name
+                })
+                .OrderByDescending(p => p.CreatedDateTime)
+                .ToArrayAsync();
+        }
         public void Dispose() {
             _context.Dispose();
         }

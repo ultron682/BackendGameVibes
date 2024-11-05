@@ -11,5 +11,7 @@ namespace BackendGameVibes.IServices.Forum {
         Task<object[]> GetLandingThreads();
         Task<object[]?> GetThreadsByPhrase(string phrase);
         Task<IEnumerable<object>> GetSections();
+        Task<object[]> GetThreadsGroupBySectionsAsync();
+        Task<object[]> GetThreadsInSectionAsync(int sectionId);
     }
 }

@@ -25,17 +25,27 @@ namespace BackendGameVibes.Controllers {
         }
 
 
-        [HttpGet("thread")]
+        [HttpGet("threads")]
         public async Task<ActionResult<IEnumerable<Thread>>> GetThreads() {
             return Ok(await _threadService.GetAllThreads());
         }
 
-        [HttpGet("thread/:id")]
+        [HttpGet("threads/:id")]
         public async Task<ActionResult<IEnumerable<ForumPost>>> GetPosts(int id) {
             return Ok(await _threadService.GetForumThread(id));
         }
 
-        [HttpPost("thread")]
+        [HttpGet("threads/sections")]
+        public async Task<ActionResult<IEnumerable<ForumPost>>> GetThreadsGroupBySections() {
+            return Ok(await _threadService.GetThreadsGroupBySectionsAsync());
+        }
+
+        [HttpGet("threads/sections/{sectionId:int}")]
+        public async Task<ActionResult<IEnumerable<ForumPost>>> GetThreadsInSections(int sectionId) {
+            return Ok(await _threadService.GetThreadsInSectionAsync(sectionId));
+        }
+
+        [HttpPost("threads")]
         public async Task<ActionResult<Thread>> CreateThread(NewForumThreadDTO forumThreadDTO) {
             if (ModelState.IsValid) {
                 ForumThread forumThread = await _threadService.AddThreadAsync(forumThreadDTO);
@@ -47,7 +57,7 @@ namespace BackendGameVibes.Controllers {
             }
         }
 
-        [HttpPost("post")]
+        [HttpPost("posts")]
         [Authorize]
         public async Task<ActionResult<Thread>> CreatePost(ForumPostDTO forumPostDTO) {
             if (ModelState.IsValid) {
@@ -70,12 +80,12 @@ namespace BackendGameVibes.Controllers {
             return Ok(await _threadService.GetForumRoles());
         }
 
-        [HttpGet("post/:id")]
+        [HttpGet("posts/:id")]
         public async Task<ActionResult<object>> GetPostById(int id) {
             return Ok(await _postService.GetPostByIdAsync(id));
         }
 
-        [HttpPost("post/report")]
+        [HttpPost("posts/report")]
         [Authorize]
         public async Task<ActionResult<object>> ReportPost(ReportPostDTO reportPostDTO) {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
