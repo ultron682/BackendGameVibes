@@ -104,7 +104,11 @@ var app = builder.Build();
 
 // Always available Swagger
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(o => {
+    o.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
+    o.HeadContent = "<style> .topbar { display: none; } </style>";
+    o.EnablePersistAuthorization();
+});
 
 app.UseCors();
 app.UseRouting();

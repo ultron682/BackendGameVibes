@@ -16,7 +16,6 @@ using BackendGameVibes.IServices.Forum;
 namespace BackendGameVibes.Controllers {
     [ApiController]
     [Route("api/administration")]
-    [SwaggerTag("Require authorization admin")]
     public class AdministrationController : ControllerBase {
         private readonly UserManager<UserGameVibes> _userManager;
         private readonly ApplicationDbContext _context;

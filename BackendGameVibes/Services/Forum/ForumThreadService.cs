@@ -36,15 +36,23 @@ namespace BackendGameVibes.Services.Forum {
             return newForumThread;
         }
 
-        public async Task<IEnumerable<ForumThread>> GetAllThreads() {
+        public async Task<object?> GetForumThread(int id) {
             return await _context.ForumThreads
                 .Include(t => t.Posts)
-                .ToListAsync();
-        }
-
-        public async Task<ForumThread?> GetForumThread(int id) {
-            return await _context.ForumThreads
-                .Include(t => t.Posts)
+                .Select(t => new {
+                    t.Id,
+                    t.Title,
+                    t.CreatedDateTime,
+                    t.LastUpdatedDateTime,
+                    t.UserOwnerId,
+                    usernameOwner = t.UserOwner!.UserName,
+                    section = t.Section!.Name,
+                    LastPostContent = t.Posts!
+                        .OrderByDescending(p => p.CreatedDateTime)
+                        .Select(p => p.Content)
+                        .FirstOrDefault()
+                        ?? "NoLastPost",
+                })
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
 
@@ -97,7 +105,12 @@ namespace BackendGameVibes.Services.Forum {
                     t.Id,
                     t.Title,
                     t.CreatedDateTime,
-                    t.LastUpdatedDateTime
+                    t.LastUpdatedDateTime,
+                    LastPostContent = t.Posts!
+                        .OrderByDescending(p => p.CreatedDateTime)
+                        .Select(p => p.Content)
+                        .FirstOrDefault()
+                        ?? "NoLastPost",
                 })
                 .OrderByDescending(p => p.CreatedDateTime)
                 .ToArrayAsync();
@@ -112,7 +125,12 @@ namespace BackendGameVibes.Services.Forum {
                     t.Title,
                     t.CreatedDateTime,
                     t.LastUpdatedDateTime,
-                    section = t.Section!.Name
+                    section = t.Section!.Name,
+                    LastPostContent = t.Posts!
+                        .OrderByDescending(p => p.CreatedDateTime)
+                        .Select(p => p.Content)
+                        .FirstOrDefault()
+                        ?? "NoLastPost",
                 })
                 .OrderByDescending(p => p.CreatedDateTime)
                 .ToArrayAsync();
@@ -122,14 +140,24 @@ namespace BackendGameVibes.Services.Forum {
         public async Task<object[]> GetThreadsGroupBySectionsAsync() {
             return await _context.ForumThreads
                 .Include(t => t.Section)
-                .Select(t => new {
-                    t.Id,
-                    t.Title,
-                    t.CreatedDateTime,
-                    t.LastUpdatedDateTime,
-                    section = t.Section!.Name
+                .GroupBy(t => t.Section!.Name)
+                .Select(g => new {
+                    SectionName = g.Key,
+                    ThreadsCount = g.Count(),
+                    Threads = g.Select(t => new {
+                        t.Id,
+                        t.Title,
+                        t.CreatedDateTime,
+                        t.LastUpdatedDateTime,
+                        LastPostContent = t.Posts!
+                        .OrderByDescending(p => p.CreatedDateTime)
+                        .Select(p => p.Content)
+                        .FirstOrDefault()
+                        ?? "NoLastPost",
+                    })
+                    .OrderByDescending(p => p.CreatedDateTime)
+                    .ToArray()
                 })
-                .OrderByDescending(p => p.CreatedDateTime)
                 .ToArrayAsync();
         }
 
@@ -142,7 +170,12 @@ namespace BackendGameVibes.Services.Forum {
                     t.Title,
                     t.CreatedDateTime,
                     t.LastUpdatedDateTime,
-                    section = t.Section!.Name
+                    section = t.Section!.Name,
+                    LastPostContent = t.Posts!
+                        .OrderByDescending(p => p.CreatedDateTime)
+                        .Select(p => p.Content)
+                        .FirstOrDefault()
+                        ?? "NoLastPost",
                 })
                 .OrderByDescending(p => p.CreatedDateTime)
                 .ToArrayAsync();

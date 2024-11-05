@@ -95,20 +95,21 @@ namespace BackendGameVibes.Services {
 
 
         public async Task<(Game?, bool)[]> InitGamesBySteamIds(ApplicationDbContext applicationDbContext, HashSet<int> steamGamesToInitID) {
-            var tasks = steamGamesToInitID.Select(gameId => _steamService.GetInfoGame(gameId)).ToArray();
+            var tasks = steamGamesToInitID
+                .Select(_steamService.GetInfoGame)
+                .ToArray();
+
             var combinedResults = await Task.WhenAll(tasks);
 
-            // Pobranie istniejących gier i gatunków z bazy
             var existingGames = applicationDbContext.Games
                 .Where(g => steamGamesToInitID.Contains(g.SteamId))
                 .ToDictionary(g => g.SteamId);
+
             var dbGenres = applicationDbContext.Genres.ToList();
 
             var resultsGames = new List<(Game?, bool)>();
 
             foreach (var (steamGameId, steamGameData) in steamGamesToInitID.Zip(combinedResults, (id, data) => (id, data))) {
-                Console.WriteLine("Start: " + steamGameId);
-
                 Game? foundGame = existingGames.TryGetValue(steamGameId, out var gameInDb) ? gameInDb : null;
 
                 if (foundGame != null) {
@@ -150,7 +151,6 @@ namespace BackendGameVibes.Services {
                 applicationDbContext.Games.Add(newGame);
                 resultsGames.Add((newGame, true));
                 Console.WriteLine("Added game: " + newGame.Title);
-
             }
 
             // Zapisanie zmian w bazie, aby zapewnić, że `Genres` są dodane przed `Games`.
