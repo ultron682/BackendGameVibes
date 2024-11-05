@@ -180,5 +180,9 @@ namespace BackendGameVibes.Services.Forum {
                 .OrderByDescending(p => p.CreatedDateTime)
                 .ToArrayAsync();
         }
+
+        public void Dispose() {
+            _context.Dispose();
+        }
     }
 }
