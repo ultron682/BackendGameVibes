@@ -96,8 +96,13 @@ namespace BackendGameVibes.Services.Forum {
              .Select(p => new {
                  p.Id,
                  p.Content,
+                 p.ThreadId,
                  p.CreatedDateTime,
-                 p.ThreadId
+                 p.LikesCount,
+                 p.DisLikesCount,
+                 p.UserOwnerId,
+                 username = p.UserOwner!.UserName,
+                 userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
              })
              .OrderByDescending(p => p.CreatedDateTime)
              .ToArrayAsync();
@@ -109,8 +114,13 @@ namespace BackendGameVibes.Services.Forum {
                 .Select(p => new {
                     p.Id,
                     p.Content,
+                    p.ThreadId,
                     p.CreatedDateTime,
-                    p.ThreadId
+                    p.LikesCount,
+                    p.DisLikesCount,
+                    p.UserOwnerId,
+                    username = p.UserOwner!.UserName,
+                    userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
                 })
                 .FirstOrDefaultAsync(p => p.Id == postId);
         }
@@ -118,11 +128,16 @@ namespace BackendGameVibes.Services.Forum {
         public async Task<object[]?> GetPostsByPhrase(string phrase) {
             return await _context.ForumPosts
                 .Where(t => t.Content!.ToLower().Contains(phrase))
-                .Select(t => new {
-                    t.Id,
-                    t.Content,
-                    t.CreatedDateTime,
-                    t.LastUpdatedDateTime
+                .Select(p => new {
+                    p.Id,
+                    p.Content,
+                    p.ThreadId,
+                    p.CreatedDateTime,
+                    p.LikesCount,
+                    p.DisLikesCount,
+                    p.UserOwnerId,
+                    username = p.UserOwner!.UserName,
+                    userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
                 })
                 .OrderByDescending(p => p.CreatedDateTime)
             .ToArrayAsync();
