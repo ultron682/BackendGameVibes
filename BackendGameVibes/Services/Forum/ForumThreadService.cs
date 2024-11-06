@@ -91,9 +91,44 @@ namespace BackendGameVibes.Services.Forum {
             return await _context.ForumSections
                 .Select(s => new {
                     s.Id,
-                    s.Name
+                    s.Name,
+                    s.HexColor
                 })
                 .ToListAsync();
+        }
+
+        public async Task<IEnumerable<object>> AddSection(AddSectionDTO addSectionDTO) {
+            ForumSection newSection = _mapper.Map<ForumSection>(addSectionDTO);
+
+            _context.ForumSections.Add(newSection);
+            await _context.SaveChangesAsync();
+
+            return await GetSections();
+        }
+
+        public async Task<IEnumerable<object>> UpdateSection(int idSection, AddSectionDTO addSectionDTO) {
+            ForumSection? section = await _context.ForumSections.FindAsync(idSection);
+            if (section == null)
+                return null!;
+
+            section.Name = addSectionDTO.Name;
+            section.HexColor = addSectionDTO.HexColor;
+            _context.ForumSections.Update(section);
+
+            await _context.SaveChangesAsync();
+
+            return await GetSections();
+        }
+
+        public async Task<IEnumerable<object>> RemoveSection(int idSection) {
+            ForumSection? section = await _context.ForumSections.FindAsync(idSection);
+            if (section == null)
+                return null!;
+
+            _context.ForumSections.Remove(section);
+            await _context.SaveChangesAsync();
+
+            return await GetSections();
         }
 
         public async Task<IEnumerable<object>> GetForumRoles() {

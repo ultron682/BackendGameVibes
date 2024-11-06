@@ -252,10 +252,10 @@ namespace BackendGameVibes.Data {
 
             mB.Entity<ForumSection>(ent => {
                 ent.HasData(
-                    new ForumSection() { Id = 1, Name = "general" },
-                    new ForumSection() { Id = 2, Name = "technologies" },
-                    new ForumSection() { Id = 3, Name = "offtopic" },
-                    new ForumSection() { Id = 4, Name = "advices" });
+                    new ForumSection() { Id = 1, Name = "general", HexColor = "#d98600" },
+                    new ForumSection() { Id = 2, Name = "technologies", HexColor = "#00b1d9" },
+                    new ForumSection() { Id = 3, Name = "offtopic", HexColor = "#1cad0c" },
+                    new ForumSection() { Id = 4, Name = "advices", HexColor = "#91248e" });
             });
 
             mB.Entity<ForumThread>(ent => {

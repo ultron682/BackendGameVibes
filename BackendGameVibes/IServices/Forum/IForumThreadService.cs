@@ -12,5 +12,8 @@ namespace BackendGameVibes.IServices.Forum {
         Task<IEnumerable<object>> GetSections();
         Task<object[]> GetThreadsGroupBySectionsAsync();
         Task<object[]> GetThreadsInSectionAsync(int sectionId);
+        Task<IEnumerable<object>> RemoveSection(int idSection);
+        Task<IEnumerable<object>> UpdateSection(int idSection, AddSectionDTO addSectionDTO);
+        Task<IEnumerable<object>> AddSection(AddSectionDTO addSectionDTO);
     }
 }

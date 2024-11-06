@@ -11,6 +11,7 @@ using BackendGameVibes.Services.Forum;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 
@@ -108,6 +109,7 @@ app.UseSwaggerUI(o => {
     o.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
     o.HeadContent = "<style> .topbar { display: none; } </style>";
     o.EnablePersistAuthorization();
+    o.EnableTryItOutByDefault();
 });
 
 app.UseCors();

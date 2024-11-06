@@ -1,15 +1,9 @@
 ﻿namespace BackendGameVibes.Models.Forum {
-    public class ForumSection {
-        public int Id {
-            get; set;
-        }
+    public class AddSectionDTO {
         public string? Name {
             get; set;
         }
         public string? HexColor {
-            get; set;
-        }
-        public ICollection<ForumThread>? Threads {
             get; set;
         }
     }
