@@ -97,12 +97,16 @@ namespace BackendGameVibes.Services.Forum {
         }
 
         public async Task<IEnumerable<object>> GetForumRoles() {
-            return await _context.ForumRoles
+            var forumRoles = await _context.ForumRoles
              .Select(fr => new {
                  fr.Id,
-                 fr.Name
+                 fr.Name,
+                 currentThreshold = fr.Threshold,
+
              })
-             .ToListAsync();
+             .ToArrayAsync();
+
+            return forumRoles;
         }
 
         public async Task<IEnumerable<object>> GetAllUserThreads(string userId) {
@@ -113,6 +117,9 @@ namespace BackendGameVibes.Services.Forum {
                     t.Title,
                     t.CreatedDateTime,
                     t.LastUpdatedDateTime,
+                    userIdOwner = t.UserOwnerId,
+                    usernameOwner = t.UserOwner!.UserName,
+                    section = t.Section!.Name,
                     LastPostContent = t.Posts!
                         .OrderByDescending(p => p.CreatedDateTime)
                         .Select(p => p.Content)
@@ -132,6 +139,8 @@ namespace BackendGameVibes.Services.Forum {
                     t.Title,
                     t.CreatedDateTime,
                     t.LastUpdatedDateTime,
+                    userIdOwner = t.UserOwnerId,
+                    usernameOwner = t.UserOwner!.UserName,
                     section = t.Section!.Name,
                     LastPostContent = t.Posts!
                         .OrderByDescending(p => p.CreatedDateTime)
@@ -156,6 +165,8 @@ namespace BackendGameVibes.Services.Forum {
                         t.Title,
                         t.CreatedDateTime,
                         t.LastUpdatedDateTime,
+                        userIdOwner = t.UserOwnerId,
+                        usernameOwner = t.UserOwner!.UserName,
                         LastPostContent = t.Posts!
                         .OrderByDescending(p => p.CreatedDateTime)
                         .Select(p => p.Content)
@@ -177,6 +188,8 @@ namespace BackendGameVibes.Services.Forum {
                     t.Title,
                     t.CreatedDateTime,
                     t.LastUpdatedDateTime,
+                    userIdOwner = t.UserOwnerId,
+                    usernameOwner = t.UserOwner!.UserName,
                     section = t.Section!.Name,
                     LastPostContent = t.Posts!
                         .OrderByDescending(p => p.CreatedDateTime)

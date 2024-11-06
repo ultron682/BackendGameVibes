@@ -30,6 +30,8 @@ namespace BackendGameVibes.Services.Forum {
                     p.CreatedDateTime,
                     p.LikesCount,
                     p.DisLikesCount,
+                    p.UserOwnerId,
+                    p.UserOwner!.UserName,
                     userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
                 })
                 .ToArrayAsync();
