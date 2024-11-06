@@ -5,7 +5,6 @@ using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Reported;
 using BackendGameVibes.Models.DTOs.Forum;
 using BackendGameVibes.Models.DTOs.Reported;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.IServices.Forum;
 
@@ -22,7 +21,7 @@ namespace BackendGameVibes.Services.Forum {
             _forumExperienceService = forumExperienceService;
         }
 
-        public async Task<IEnumerable<object>> GetAllForumPostsByForumThreadId(int idThread) {
+        public async Task<IEnumerable<object>> GetPostsByThreadId(int idThread) {
             return await _context.ForumPosts
                 .Where(p => p.ThreadId == idThread)
                 .Select(p => new {

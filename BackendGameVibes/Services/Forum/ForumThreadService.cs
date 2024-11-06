@@ -55,7 +55,7 @@ namespace BackendGameVibes.Services.Forum {
             if (thread == null)
                 return null;
 
-            var postsOfThread = await _postService.GetAllForumPostsByForumThreadId(id);
+            var postsOfThread = await _postService.GetPostsByThreadId(id);
 
             return new {
                 thread,
