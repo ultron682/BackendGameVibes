@@ -94,7 +94,7 @@ namespace BackendGameVibes.Services.Forum {
                     s.Name,
                     s.HexColor
                 })
-                .ToListAsync();
+                .ToArrayAsync();
         }
 
         public async Task<IEnumerable<object>> AddSection(AddSectionDTO addSectionDTO) {
