@@ -31,7 +31,7 @@ namespace BackendGameVibes.Services.Forum {
                     p.LikesCount,
                     p.DisLikesCount,
                     p.UserOwnerId,
-                    p.UserOwner!.UserName,
+                    username = p.UserOwner!.UserName,
                     userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
                 })
                 .ToArrayAsync();
