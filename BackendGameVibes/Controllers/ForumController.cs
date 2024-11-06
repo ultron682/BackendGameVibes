@@ -161,21 +161,6 @@ namespace BackendGameVibes.Controllers {
             return Ok(await _threadService.GetSections());
         }
 
-        [HttpPost("thread-section-names")]
-        public async Task<ActionResult<IEnumerable<object>>> AddSection(AddSectionDTO addSectionDTO) {
-            return Ok(await _threadService.AddSection(addSectionDTO));
-        }
-
-        [HttpPatch("thread-section-name/{sectionId:int}")]
-        public async Task<ActionResult<IEnumerable<object>>> UpdateSection(int sectionId, AddSectionDTO sectionDTO) {
-            return Ok(await _threadService.UpdateSection(sectionId, sectionDTO));
-        }
-
-        [HttpDelete("thread-section-name/{sectionId:int}")]
-        public async Task<ActionResult<IEnumerable<object>>> RemoveSection(int sectionId) {
-            return Ok(await _threadService.RemoveSection(sectionId));
-        }
-
         [HttpGet("forum-roles")]
         public async Task<ActionResult<IEnumerable<object>>> GetForumRoles() {
             return Ok(await _threadService.GetForumRoles());

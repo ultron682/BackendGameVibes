@@ -12,6 +12,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.IdentityModel.Tokens;
 using BackendGameVibes.IServices.Forum;
 using BackendGameVibes.Models.DTOs;
+using BackendGameVibes.Models.Forum;
 
 
 namespace BackendGameVibes.Controllers {
@@ -329,6 +330,21 @@ namespace BackendGameVibes.Controllers {
 
             bool isSuccess = await _accountService.SendGeneralEmailToUserAsync(user, emailSendDTO.Subject!, emailSendDTO.Message!);
             return Ok(isSuccess);
+        }
+
+        [HttpPost("thread-section-names")]
+        public async Task<ActionResult<IEnumerable<object>>> AddSection(AddSectionDTO addSectionDTO) {
+            return Ok(await _forumThreadService.AddSection(addSectionDTO));
+        }
+
+        [HttpPatch("thread-section-name/{sectionId:int}")]
+        public async Task<ActionResult<IEnumerable<object>>> UpdateSection(int sectionId, AddSectionDTO sectionDTO) {
+            return Ok(await _forumThreadService.UpdateSection(sectionId, sectionDTO));
+        }
+
+        [HttpDelete("thread-section-name/{sectionId:int}")]
+        public async Task<ActionResult<IEnumerable<object>>> RemoveSection(int sectionId) {
+            return Ok(await _forumThreadService.RemoveSection(sectionId));
         }
     }
 }

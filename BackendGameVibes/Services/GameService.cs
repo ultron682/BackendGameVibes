@@ -171,12 +171,18 @@ namespace BackendGameVibes.Services {
         // Metoda pomocnicza do identyfikacji platform
         private List<int> GetPlatformIds(dynamic platforms) {
             var platformIds = new List<int>();
-            if (platforms.Windows)
-                platformIds.Add(1);
-            if (platforms.Mac)
-                platformIds.Add(2);
-            if (platforms.Linux)
-                platformIds.Add(3);
+            try {
+                if (platforms.Windows)
+                    platformIds.Add(1);
+                if (platforms.Mac)
+                    platformIds.Add(2);
+                if (platforms.Linux)
+                    platformIds.Add(3);
+            }
+            catch {
+
+            }
+
             return platformIds;
         }
 
