@@ -22,10 +22,17 @@ namespace BackendGameVibes.Services.Forum {
             _forumExperienceService = forumExperienceService;
         }
 
-        public async Task<ActionResult<IEnumerable<ForumPost>>> GetAllPosts(int idThread) {
+        public async Task<IEnumerable<object>> GetAllForumPostsByForumThreadId(int idThread) {
             return await _context.ForumPosts
                 .Where(p => p.ThreadId == idThread)
-                .ToListAsync();
+                .Select(p => new {
+                    p.Id,
+                    p.Content,
+                    p.CreatedDateTime,
+                    p.LikesCount,
+                    p.DisLikesCount
+                })
+                .ToArrayAsync();
         }
 
         public async Task<ForumPost> AddForumPost(ForumPostDTO newForumPostDTO) {
@@ -97,6 +104,12 @@ namespace BackendGameVibes.Services.Forum {
         public async Task<object?> GetPostByIdAsync(int postId) {
             return await _context.ForumPosts
                 .Include(p => p.UserOwner)
+                .Select(p => new {
+                    p.Id,
+                    p.Content,
+                    p.CreatedDateTime,
+                    p.ThreadId
+                })
                 .FirstOrDefaultAsync(p => p.Id == postId);
         }
 

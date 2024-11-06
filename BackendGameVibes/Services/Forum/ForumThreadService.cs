@@ -11,11 +11,13 @@ namespace BackendGameVibes.Services.Forum {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly IForumExperienceService _forumExperienceService;
+        private readonly IForumPostService _postService;
 
-        public ForumThreadService(ApplicationDbContext context, IMapper mapper, IForumExperienceService forumExperienceService) {
+        public ForumThreadService(ApplicationDbContext context, IMapper mapper, IForumExperienceService forumExperienceService, IForumPostService postService) {
             _context = context;
             _mapper = mapper;
             _forumExperienceService = forumExperienceService;
+            _postService = postService;
         }
 
         public async Task<ForumThread> AddThreadAsync(NewForumThreadDTO newForumThreadDTO) {
@@ -36,8 +38,8 @@ namespace BackendGameVibes.Services.Forum {
             return newForumThread;
         }
 
-        public async Task<object?> GetForumThread(int id) {
-            return await _context.ForumThreads
+        public async Task<object?> GetForumThreadWithPosts(int id) {
+            var thread = await _context.ForumThreads
                 .Include(t => t.Posts)
                 .Select(t => new {
                     t.Id,
@@ -47,13 +49,18 @@ namespace BackendGameVibes.Services.Forum {
                     t.UserOwnerId,
                     usernameOwner = t.UserOwner!.UserName,
                     section = t.Section!.Name,
-                    LastPostContent = t.Posts!
-                        .OrderByDescending(p => p.CreatedDateTime)
-                        .Select(p => p.Content)
-                        .FirstOrDefault()
-                        ?? "NoLastPost",
                 })
                 .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (thread == null)
+                return null;
+
+            var postsOfThread = await _postService.GetAllForumPostsByForumThreadId(id);
+
+            return new {
+                thread,
+                postsOfThread = postsOfThread.ToArray()
+            };
         }
 
         public async Task<object[]> GetLandingThreads() {

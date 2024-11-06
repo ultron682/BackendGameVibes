@@ -24,15 +24,15 @@ namespace BackendGameVibes.Controllers {
             _threadService = threadService;
         }
 
-        [SwaggerOperation("pogrupowane przez sekcje")]
+        [SwaggerOperation("wątki pogrupowane przez sekcje")]
         [HttpGet("threads/sections")]
         public async Task<ActionResult<IEnumerable<ForumPost>>> GetThreadsGroupBySections() {
             return Ok(await _threadService.GetThreadsGroupBySectionsAsync());
         }
 
         [HttpGet("threads/{id:int}")]
-        public async Task<ActionResult> GetPosts(int id) {
-            object? thread = await _threadService.GetForumThread(id);
+        public async Task<ActionResult> GetThreadPosts(int id) {
+            object? thread = await _threadService.GetForumThreadWithPosts(id);
 
             if (thread == null) {
                 return NotFound();
@@ -168,9 +168,9 @@ namespace BackendGameVibes.Controllers {
             return Ok(await _threadService.GetForumRoles());
         }
 
-        [HttpPost("interact/{postId}")]
+        [HttpPost("interact/{postId:int}")]
         [Authorize]
-        [SwaggerOperation("isLike = true,false, null- noInteraction(remove Like/Dislike)")]
+        [SwaggerOperation("isLike = true,false,  null - noInteraction(remove Like/Dislike)")]
         public async Task<ActionResult> LikePost(int postId, bool? isLike) {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
