@@ -333,16 +333,19 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpPost("thread-section-names")]
+        [Authorize("admin")]
         public async Task<ActionResult<IEnumerable<object>>> AddSection(AddSectionDTO addSectionDTO) {
             return Ok(await _forumThreadService.AddSection(addSectionDTO));
         }
 
         [HttpPatch("thread-section-name/{sectionId:int}")]
+        [Authorize("admin")]
         public async Task<ActionResult<IEnumerable<object>>> UpdateSection(int sectionId, AddSectionDTO sectionDTO) {
             return Ok(await _forumThreadService.UpdateSection(sectionId, sectionDTO));
         }
 
         [HttpDelete("thread-section-name/{sectionId:int}")]
+        [Authorize("admin")]
         public async Task<ActionResult<IEnumerable<object>>> RemoveSection(int sectionId) {
             return Ok(await _forumThreadService.RemoveSection(sectionId));
         }
