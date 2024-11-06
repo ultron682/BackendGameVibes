@@ -119,8 +119,7 @@ namespace BackendGameVibes.Services.Forum {
                     p.LikesCount,
                     p.DisLikesCount,
                     p.UserOwnerId,
-                    username = p.UserOwner!.UserName,
-                    userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
+                    username = p.UserOwner!.UserName
                 })
                 .FirstOrDefaultAsync(p => p.Id == postId);
         }
@@ -136,8 +135,7 @@ namespace BackendGameVibes.Services.Forum {
                     p.LikesCount,
                     p.DisLikesCount,
                     p.UserOwnerId,
-                    username = p.UserOwner!.UserName,
-                    userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
+                    username = p.UserOwner!.UserName
                 })
                 .OrderByDescending(p => p.CreatedDateTime)
             .ToArrayAsync();

@@ -78,6 +78,39 @@ namespace BackendGameVibes.Helpers {
             "Gra zachęca do eksploracji i wynagradza za ciekawość gracza."
         };
 
+        private static readonly string[] SpamSuspicionContent = new[]
+        {
+            "Ten post wygląda na spam – brak konkretnej treści.",
+            "To konto publikowało podobne wpisy, może to być spam.",
+            "Ciągle te same linki, wygląda to podejrzanie.",
+            "Znów widzę te same wiadomości od tego użytkownika – możliwy spam.",
+            "Treść posta nie ma związku z tematem, wygląda to na spam.",
+            "Niepokojące, jak często ten użytkownik promuje tę samą stronę.",
+            "Brak sensu w wypowiedzi – może to być automatyczny spam.",
+            "Post składa się głównie z linków, raczej to nie jest przypadkowe.",
+            "Podejrzanie podobne posty widziałem już wcześniej.",
+            "Znów to samo kopiowane w różnych wątkach – możliwe, że to bot.",
+            "Zawartość posta jest ogólna i nie wnosi nic do dyskusji, wygląda na spam.",
+            "Linki w tej wiadomości prowadzą do podejrzanych stron.",
+            "To konto tylko reklamuje, nic wartościowego nie wnosi do forum.",
+            "Wydaje się, że to konto istnieje tylko po to, by spamować.",
+            "Ten wpis powtarza się w wielu wątkach – wygląda na spam.",
+            "Treść posta wygląda na wygenerowaną automatycznie.",
+            "Wpis jest całkowicie nie na temat – może to być spam.",
+            "To kolejna reklama tego samego produktu, możliwe, że to spam.",
+            "Ciężko uwierzyć, że to prawdziwy użytkownik – wygląda jak bot.",
+            "Brak jakiejkolwiek interakcji z innymi – wygląda na spamowe konto.",
+            "Konto zostało stworzone niedawno i od razu reklamuje produkty.",
+            "Powtarzające się wzorce wypowiedzi, bardzo przypomina spam.",
+            "Jeden post na temat, a reszta to reklamy – raczej to nie przypadek.",
+            "Kolejny raz widzę podobne linki, ewidentnie to spam.",
+            "Wpisy użytkownika są bardzo schematyczne i bez wartości merytorycznej.",
+            "Znów to samo konto promuje te same strony w różnych wątkach.",
+            "Treść posta jest chaotyczna i nie wnosi nic wartościowego.",
+            "Wszystkie posty tego użytkownika to praktycznie reklamy.",
+            "Wygląda na to, że ten użytkownik spamuje różnymi linkami.",
+            "Kolejny raz promowanie tej samej strony, wygląda to na spam."
+        };
 
         public static string GenerateRandomSentence(int wordCount) {
             Random random = new Random();
@@ -330,13 +363,13 @@ namespace BackendGameVibes.Helpers {
                 await postService!.ReportPostAsync(testUsers[random.Next(0, testUsers.Count)]!.Id!,
                     new ReportPostDTO {
                         ForumPostId = posts[random.Next(0, posts.Count)].Id,
-                        Reason = "Spam " + GenerateRandomSentence(random.Next(5, 9))
+                        Reason = SpamSuspicionContent[random.Next(0, SpamSuspicionContent.Length)]
                     });
 
                 await reviewService.ReportReviewAsync(testUsers[random.Next(0, testUsers.Count)]!.Id!,
                     new ReportReviewDTO {
                         ReviewId = reviews[random.Next(0, reviews.Count)].Id,
-                        Reason = "Spam " + GenerateRandomSentence(random.Next(5, 9))
+                        Reason = SpamSuspicionContent[random.Next(0, SpamSuspicionContent.Length)]
                     });
 
                 Console.Write(".");
