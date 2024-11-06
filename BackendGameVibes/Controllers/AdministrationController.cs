@@ -11,6 +11,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.IdentityModel.Tokens;
 using BackendGameVibes.IServices.Forum;
+using BackendGameVibes.Models.DTOs;
 
 
 namespace BackendGameVibes.Controllers {
@@ -320,13 +321,13 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPost("send-email-to/{userId}")]
         [Authorize(Policy = "modOrAdmin")]
-        public async Task<IActionResult> SendEmailToUser(string userId, [Required] string subject, [Required] string message) {
+        public async Task<IActionResult> SendEmailToUser(string userId, EmailSendDTO emailSendDTO) {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) {
                 return NotFound();
             }
 
-            bool isSuccess = await _accountService.SendGeneralEmailToUserAsync(user, subject, message);
+            bool isSuccess = await _accountService.SendGeneralEmailToUserAsync(user, emailSendDTO.Subject!, emailSendDTO.Message!);
             return Ok(isSuccess);
         }
     }

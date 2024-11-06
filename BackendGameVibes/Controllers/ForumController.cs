@@ -30,8 +30,6 @@ namespace BackendGameVibes.Controllers {
         [SwaggerOperation("zwraca wątek z postami. jesli podamy userId to jeszcze będzie info o interakcji danego uzytkownika z postem")]
         [HttpGet("threads/{id:int}:userId")]
         public async Task<ActionResult> GetThreadPosts(int id, string? userId = null) {
-            Console.WriteLine("userId: " + userId);
-
             object? thread = await _threadService.GetForumThreadWithPosts(id, userId);
 
             if (thread == null) {
