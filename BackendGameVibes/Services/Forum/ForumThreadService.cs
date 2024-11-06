@@ -38,7 +38,7 @@ namespace BackendGameVibes.Services.Forum {
             return newForumThread;
         }
 
-        public async Task<object?> GetForumThreadWithPosts(int id) {
+        public async Task<object?> GetForumThreadWithPosts(int id, string? userId = null) {
             var thread = await _context.ForumThreads
                 .Include(t => t.Posts)
                 .Select(t => new {
@@ -48,14 +48,14 @@ namespace BackendGameVibes.Services.Forum {
                     t.LastUpdatedDateTime,
                     t.UserOwnerId,
                     usernameOwner = t.UserOwner!.UserName,
-                    section = t.Section!.Name,
+                    section = t.Section!.Name
                 })
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (thread == null)
                 return null;
 
-            var postsOfThread = await _postService.GetPostsByThreadId(id);
+            var postsOfThread = await _postService.GetPostsByThreadId(id, userId);
 
             return new {
                 thread,

@@ -21,7 +21,7 @@ namespace BackendGameVibes.Services.Forum {
             _forumExperienceService = forumExperienceService;
         }
 
-        public async Task<IEnumerable<object>> GetPostsByThreadId(int idThread) {
+        public async Task<IEnumerable<object>> GetPostsByThreadId(int idThread, string? userId = null) {
             return await _context.ForumPosts
                 .Where(p => p.ThreadId == idThread)
                 .Select(p => new {
@@ -29,7 +29,8 @@ namespace BackendGameVibes.Services.Forum {
                     p.Content,
                     p.CreatedDateTime,
                     p.LikesCount,
-                    p.DisLikesCount
+                    p.DisLikesCount,
+                    userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
                 })
                 .ToArrayAsync();
         }

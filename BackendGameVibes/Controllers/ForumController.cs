@@ -2,15 +2,12 @@
 using BackendGameVibes.Models.DTOs.Forum;
 using BackendGameVibes.Models.DTOs.Reported;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.Security.Claims;
 using BackendGameVibes.IServices.Forum;
 using System.ComponentModel.DataAnnotations;
 using Swashbuckle.AspNetCore.Annotations;
-using Microsoft.Extensions.Hosting;
+
 
 namespace BackendGameVibes.Controllers {
     [Route("api/forum")]
@@ -30,9 +27,12 @@ namespace BackendGameVibes.Controllers {
             return Ok(await _threadService.GetThreadsGroupBySectionsAsync());
         }
 
-        [HttpGet("threads/{id:int}")]
-        public async Task<ActionResult> GetThreadPosts(int id) {
-            object? thread = await _threadService.GetForumThreadWithPosts(id);
+        [SwaggerOperation("zwraca wątek z postami. jesli podamy userId to jeszcze będzie info o interakcji danego uzytkownika z postem")]
+        [HttpGet("threads/{id:int}:userId")]
+        public async Task<ActionResult> GetThreadPosts(int id, string? userId = null) {
+            Console.WriteLine("userId: " + userId);
+
+            object? thread = await _threadService.GetForumThreadWithPosts(id, userId);
 
             if (thread == null) {
                 return NotFound();
@@ -170,8 +170,8 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPost("interact/{postId:int}")]
         [Authorize]
-        [SwaggerOperation("isLike = true,false,  null - noInteraction(remove Like/Dislike)")]
-        public async Task<ActionResult> LikePost(int postId, bool? isLike) {
+        [SwaggerOperation("isLike = true,false,  null - noInteraction(remove Like/Dislike) zwracana tablica postInteractions pokazuje tylko aktualnego uzytkownika")]
+        public async Task<ActionResult> InteractPost(int postId, bool? isLike) {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
                 return Unauthorized("User not authenticated, claim not found");
