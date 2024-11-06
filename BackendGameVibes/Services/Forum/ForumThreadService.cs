@@ -5,6 +5,9 @@ using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.DTOs.Forum;
 using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.IServices.Forum;
+using X.PagedList;
+using X.PagedList.Extensions;
+
 
 namespace BackendGameVibes.Services.Forum {
     public class ForumThreadService : IForumThreadService {
@@ -188,33 +191,45 @@ namespace BackendGameVibes.Services.Forum {
         }
 
 
-        public async Task<object[]> GetThreadsGroupBySectionsAsync() {
-            return await _context.ForumThreads
+        public async Task<object> GetThreadsGroupBySectionsAsync(int pageNumber = 1, int pageSize = 10) {
+            var query = await _context.ForumThreads
                 .Include(t => t.Section)
                 .GroupBy(t => t.Section!.Name)
                 .Select(g => new {
                     SectionName = g.Key,
                     ThreadsCount = g.Count(),
-                    Threads = g.Select(t => new {
-                        t.Id,
-                        t.Title,
-                        t.CreatedDateTime,
-                        t.LastUpdatedDateTime,
-                        userIdOwner = t.UserOwnerId,
-                        usernameOwner = t.UserOwner!.UserName,
-                        LastPostContent = t.Posts!
-                        .OrderByDescending(p => p.CreatedDateTime)
-                        .Select(p => p.Content)
-                        .FirstOrDefault()
-                        ?? "NoLastPost",
-                    })
-                    .OrderByDescending(p => p.CreatedDateTime)
-                    .ToArray()
+                    Threads = g.OrderByDescending(t => t.CreatedDateTime)
+                                .Skip((pageNumber - 1) * pageSize) 
+                                .Take(pageSize)
+                                .Select(t => new {
+                                    t.Id,
+                                    t.Title,
+                                    t.CreatedDateTime,
+                                    t.LastUpdatedDateTime,
+                                    userIdOwner = t.UserOwnerId,
+                                    usernameOwner = t.UserOwner!.UserName,
+                                    LastPostContent = t.Posts!
+                                        .OrderByDescending(p => p.CreatedDateTime)
+                                        .Select(p => p.Content)
+                                        .FirstOrDefault()
+                                        ?? "NoLastPost",
+                                })
+                                .ToArray()
                 })
                 .ToArrayAsync();
+
+            int totalSections = query.Length;
+
+            return new {
+                TotalSections = totalSections,
+                PageSize = pageSize,
+                CurrentPage = pageNumber,
+                TotalPages = (int)Math.Ceiling(totalSections / (double)pageSize),
+                Data = query
+            };
         }
 
-        public async Task<object[]> GetThreadsInSectionAsync(int sectionId) {
+        public async Task<object[]> GetThreadsInSectionAsync(int sectionId, int pageNumber = 1, int pageSize = 10) {
             return await _context.ForumThreads
                 .Include(t => t.Section)
                 .Where(t => t.SectionId == sectionId)

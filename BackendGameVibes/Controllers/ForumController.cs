@@ -23,8 +23,8 @@ namespace BackendGameVibes.Controllers {
 
         [SwaggerOperation("wątki pogrupowane przez sekcje")]
         [HttpGet("threads/sections")]
-        public async Task<ActionResult<IEnumerable<ForumPost>>> GetThreadsGroupBySections() {
-            return Ok(await _threadService.GetThreadsGroupBySectionsAsync());
+        public async Task<ActionResult<IEnumerable<ForumPost>>> GetThreadsGroupBySections(int pageNumber = 1, int pageSize = 10) {
+            return Ok(await _threadService.GetThreadsGroupBySectionsAsync(pageNumber = 1, pageSize = 10));
         }
 
         [SwaggerOperation("zwraca wątek z postami. jesli podamy userId to jeszcze będzie info o interakcji danego uzytkownika z postem")]
