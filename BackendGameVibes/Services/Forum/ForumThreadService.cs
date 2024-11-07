@@ -269,7 +269,7 @@ namespace BackendGameVibes.Services.Forum {
         }
 
         public async Task<IEnumerable<object>> RemoveSectionAsync(int idSection) {
-            ForumSection? section = await _context.ForumSections.FindAsync(idSection);
+            ForumSection? section = await _context.ForumSections.FirstOrDefaultAsync(s => s.Id == idSection);
             if (section == null)
                 return null!;
 
