@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using BackendGameVibes.IServices.Forum;
 using BackendGameVibes.Models.DTOs;
 using BackendGameVibes.Models.Forum;
+using System.Data;
 
 
 namespace BackendGameVibes.Controllers {
@@ -64,7 +65,9 @@ namespace BackendGameVibes.Controllers {
         // dane logowania konta admina w DbInitializer.cs
         [HttpGet("user")]
         [Authorize("admin")]
-        public async Task<IActionResult> GetAllUsers() {
+        public async Task<IActionResult> GetAllUsersWithRoles() {
+            //var userRoles = await _userManager.GetRolesAsync(_userManager.FindByIdAsync());
+
             var users = await _context.Users
                 .Select(u => new {
                     u.Id,
@@ -76,11 +79,32 @@ namespace BackendGameVibes.Controllers {
                     u.PhoneNumber,
                     u.PhoneNumberConfirmed,
                     u.AccessFailedCount,
-                    u.Description,
-                    roles = _userManager.GetRolesAsync(u).Result.ToArray()
+                    u.Description
                 }).ToArrayAsync();
 
-            return Ok(users);
+
+            var usersWithRoles = new List<object>();
+
+            foreach (var user in users) {
+                var userGameVibes = await _userManager.FindByIdAsync(user!.Id)!;
+                var roles = await _userManager.GetRolesAsync(userGameVibes!);
+
+                usersWithRoles.Add(new {
+                    user.Id,
+                    user.Email,
+                    user.EmailConfirmed,
+                    user.UserName,
+                    user.ForumRoleName,
+                    user.ExperiencePoints,
+                    user.PhoneNumber,
+                    user.PhoneNumberConfirmed,
+                    user.AccessFailedCount,
+                    user.Description,
+                    roles = roles.ToArray()
+                });
+            }
+
+            return Ok(usersWithRoles);
         }
 
         [HttpGet("user/{userId}")]
@@ -129,6 +153,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpDelete("review/{id}")]
         [Authorize(Policy = "modOrAdmin")]
+        [SwaggerOperation("modOrAdmin")]
         public async Task<IActionResult> DeleteReview(int id) {
             var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == id);
             if (review == null) {
@@ -142,6 +167,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpDelete("post/{id}")]
         [Authorize(Policy = "modOrAdmin")]
+        [SwaggerOperation("modOrAdmin")]
         public async Task<IActionResult> DeletePost(int id) {
             var post = await _context.ForumPosts.FirstOrDefaultAsync(p => p.Id == id);
             if (post == null) {
@@ -155,6 +181,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPatch("user")]
         [Authorize(Policy = "modOrAdmin")]
+        [SwaggerOperation("modOrAdmin")]
         public async Task<IActionResult> UpdateUser(UserGameVibesDTO userDTO) {
             UserGameVibes? userGameVibes = await _userManager.FindByIdAsync(userDTO.Id);
             if (userGameVibes == null) {
@@ -228,6 +255,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPost("user/change-profile-picture")]
         [Authorize(Policy = "modOrAdmin")]
+        [SwaggerOperation("modOrAdmin")]
         public async Task<IActionResult> UpdateUserProfilePicture(string userId, IFormFile profilePicture) {
             if (userId.IsNullOrEmpty())
                 return Unauthorized("User not authenticated");
@@ -264,6 +292,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpGet("reviews/reported")]
         [Authorize(Policy = "modOrAdmin")]
+        [SwaggerOperation("modOrAdmin")]
         public async Task<IActionResult> GetReportedReviews() {
             return Ok(await _context.ReportedReviews
                 .Include(r => r.ReporterUser)
@@ -283,6 +312,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpGet("posts/reported")]
         [Authorize(Policy = "modOrAdmin")]
+        [SwaggerOperation("modOrAdmin")]
         public async Task<IActionResult> GetReportedPosts() {
             return Ok(await _context.ReportedForumPosts
                 .Include(p => p.ReporterUser)
@@ -302,6 +332,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPost("post/finish")]
         [Authorize(Policy = "modOrAdmin")]
+        [SwaggerOperation("modOrAdmin")]
         public async Task<IActionResult> FinishReportedPost([Required] int id, [Required] bool toRemovePost) {
             var reportedPost = await _forumPostService.FinishReportPostAsync(id, toRemovePost);
             if (reportedPost == null) {
@@ -312,6 +343,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPost("review/finish")]
         [Authorize(Policy = "modOrAdmin")]
+        [SwaggerOperation("modOrAdmin")]
         public async Task<IActionResult> FinishReportedReview([Required] int id, [Required] bool toRemoveReview) {
             var reportedReview = await _reviewService.FinishReportReviewAsync(id, toRemoveReview);
             if (reportedReview == null) {
@@ -322,6 +354,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPost("send-email-to/{userId}")]
         [Authorize(Policy = "modOrAdmin")]
+        [SwaggerOperation("modOrAdmin")]
         public async Task<IActionResult> SendEmailToUser(string userId, EmailSendDTO emailSendDTO) {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) {

@@ -8,6 +8,8 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
 using BackendGameVibes.Models;
+using BackendGameVibes.Models.User;
+using Microsoft.AspNetCore.Identity;
 
 
 namespace BackendGameVibes.Controllers {
