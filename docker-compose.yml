@@ -1,0 +1,53 @@
+services:
+  # react:
+  #   build: ./ReactGameVibes
+  #   ports:
+  #     - "3500:3000"
+  #   depends_on:
+  #     - aspnet
+  #   environment:
+  #     - WATCHPACK_POLLING=true
+  #   volumes:
+  #     - ./ReactGameVibes/src:/app/src
+  #     - ./ReactGameVibes/public:/app/public
+  #   networks:
+  #     - app-network
+  aspnet:
+    build:
+      context: ..
+      dockerfile: ./BackendGameVibes/BackendGameVibes/Dockerfile
+    ports:
+      - "2137:5556"
+    environment:
+      - ASPNETCORE_HTTP_PORTS=5556
+    networks:
+      - app-network
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    image: "mysql:8.4.3"
+    environment:
+      MYSQL_ROOT_PASSWORD: "rootpassword"
+      MYSQL_DATABASE: "GameVibesDB"
+      MYSQL_USER: "gamevibesuser"
+      MYSQL_PASSWORD: "gamevibespassword"
+    ports:
+      - "3308:3306"
+    volumes:
+    - ./db-data:/var/lib/mysql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  db-data:
+networks:
+  app-network:
+    driver: bridge
