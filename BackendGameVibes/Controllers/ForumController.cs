@@ -23,14 +23,14 @@ namespace BackendGameVibes.Controllers {
 
         [SwaggerOperation("wątki pogrupowane przez sekcje")]
         [HttpGet("threads/sections")]
-        public async Task<ActionResult<IEnumerable<ForumPost>>> GetThreadsGroupBySections(int pageNumber = 1, int pageSize = 10) {
-            return Ok(await _threadService.GetThreadsGroupBySectionsAsync(pageNumber = 1, pageSize = 10));
+        public async Task<IActionResult> GetThreadsGroupBySections(int pageNumber = 1, int threadsInSectionSize = 10) {
+            return Ok(await _threadService.GetThreadsGroupBySectionsAsync(pageNumber, threadsInSectionSize));
         }
 
         [SwaggerOperation("zwraca wątek z postami. jesli podamy userId to jeszcze będzie info o interakcji danego uzytkownika z postem")]
-        [HttpGet("threads/{id:int}:userId")]
-        public async Task<ActionResult> GetThreadPosts(int id, string? userId = null) {
-            object? thread = await _threadService.GetForumThreadWithPosts(id, userId);
+        [HttpGet("threads/{id:int}")]
+        public async Task<IActionResult> GetThreadWithPosts(int id, string? userId = null, int pageNumber = 1, int postsSize = 10) {
+            object? thread = await _threadService.GetThreadWithPostsAsync(id, userId, pageNumber, postsSize);
 
             if (thread == null) {
                 return NotFound();
@@ -40,17 +40,22 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpGet("threads/sections/{sectionId:int}")]
-        public async Task<ActionResult<IEnumerable<ForumPost>>> GetThreadsInSections(int sectionId) {
-            return Ok(await _threadService.GetThreadsInSectionAsync(sectionId));
+        public async Task<IActionResult> GetThreadsInSections(int sectionId, int pageNumber = 1, int threadsInSectionSize = 10) {
+            var forumThreads = await _threadService.GetThreadsInSectionAsync(sectionId, pageNumber, threadsInSectionSize);
+
+            if (forumThreads == null) {
+                return NotFound();
+            }
+
+            return Ok(forumThreads);
         }
 
         [HttpPost("threads")]
         [Authorize]
-        public async Task<ActionResult<Thread>> CreateThread(NewForumThreadDTO forumThreadDTO) {
+        public async Task<IActionResult> CreateThread(NewForumThreadDTO forumThreadDTO) {
             if (ModelState.IsValid) {
                 ForumThread forumThread = await _threadService.AddThreadAsync(forumThreadDTO);
                 return Ok(forumThread);
-                //return CreatedAtAction(nameof(GetThreadById), new { id = thread.Id }, thread);
             }
             else {
                 return BadRequest("Wrong ForumThreadDTO");
@@ -58,7 +63,33 @@ namespace BackendGameVibes.Controllers {
         }
 
 
-        [HttpGet("posts/{id}")]
+        [HttpGet("{userId}/threads")]
+        [SwaggerResponse(404, "no threads belong to user or no user")]
+        [SwaggerResponse(200, "found")]
+        public async Task<ActionResult<IEnumerable<object>>> GetUserThreads(string userId, int pageNumber = 1, int threadsSize = 10) {
+            var threads = await _threadService.GetThreadsByUserIdAsync(userId, pageNumber, threadsSize);
+
+            if (threads == null)
+                return NotFound();
+
+            return Ok(threads);
+        }
+
+
+        [HttpGet("{userId}/posts")]
+        [SwaggerResponse(404, "no posts belong to user or no user")]
+        [SwaggerResponse(200, "found")]
+        public async Task<ActionResult<IEnumerable<object>>> GetAllUserPosts(string userId, int pageNumber = 1, int postsSize = 10) {
+            var posts = await _postService.GetPostsByUserIdAsync(userId, pageNumber, postsSize);
+
+            if (posts == null)
+                return NotFound();
+
+            return Ok(posts);
+        }
+
+
+        [HttpGet("posts/{id:int}")]
         public async Task<ActionResult<object>> GetPostById(int id) {
             return Ok(await _postService.GetPostByIdAsync(id));
         }
@@ -67,7 +98,7 @@ namespace BackendGameVibes.Controllers {
         [Authorize]
         public async Task<ActionResult<Thread>> CreatePost(ForumPostDTO forumPostDTO) {
             if (ModelState.IsValid) {
-                ForumPost forumPost = await _postService.AddForumPost(forumPostDTO);
+                ForumPost forumPost = await _postService.AddForumPostAsync(forumPostDTO);
                 return Ok(forumPost);
                 //return CreatedAtAction(nameof(GetThreadById), new { id = thread.Id }, thread);
             }
@@ -132,24 +163,13 @@ namespace BackendGameVibes.Controllers {
             return NotFound();
         }
 
-        [HttpGet("{userId}/threads")]
-        public async Task<ActionResult<IEnumerable<object>>> GetUserThreads(string userId) {
-            return Ok(await _threadService.GetAllUserThreads(userId));
-        }
-
-
-        [HttpGet("{userId}/posts")]
-        public async Task<ActionResult<IEnumerable<object>>> GetUserPosts(string userId) {
-            return Ok(await _postService.GetAllUserPosts(userId));
-        }
-
         [HttpGet("search-phrase")]
-        public async Task<ActionResult> SearchForumByPhrase([Required] string phrase) {
+        public async Task<ActionResult> SearchForumByPhrase([Required, MinLength(3)] string phrase, int pageNumber = 1, int resultSize = 10) {
             phrase = phrase.ToLower();
 
             var result = new {
-                threads = await _threadService.GetThreadsByPhrase(phrase),
-                posts = await _postService.GetPostsByPhrase(phrase)
+                threads = await _threadService.GetThreadsByPhraseAsync(phrase, pageNumber, resultSize),
+                posts = await _postService.GetPostsByPhraseAsync(phrase, pageNumber, resultSize)
             };
 
             return Ok(result);
@@ -158,12 +178,12 @@ namespace BackendGameVibes.Controllers {
 
         [HttpGet("thread-section-names")]
         public async Task<ActionResult<IEnumerable<object>>> GetSections() {
-            return Ok(await _threadService.GetSections());
+            return Ok(await _threadService.GetSectionsAsync());
         }
 
         [HttpGet("forum-roles")]
         public async Task<ActionResult<IEnumerable<object>>> GetForumRoles() {
-            return Ok(await _threadService.GetForumRoles());
+            return Ok(await _threadService.GetAllForumRolesAsync());
         }
 
         [HttpPost("interact/{postId:int}")]

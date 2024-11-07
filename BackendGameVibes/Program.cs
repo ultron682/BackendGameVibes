@@ -9,10 +9,9 @@ using BackendGameVibes.Services;
 using BackendGameVibes.Services.Forum;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,7 +43,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("GameVibesDbConnection"),
         new MySqlServerVersion(new Version(8, 0, 26)),
-        mySqlOptions => mySqlOptions.EnableRetryOnFailure()));
+        mySqlOptions => { mySqlOptions.EnableRetryOnFailure(); mySqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery); }));
 
 builder.Services
     .AddIdentity<UserGameVibes, IdentityRole>()

@@ -7,6 +7,8 @@ using BackendGameVibes.Models.DTOs.Forum;
 using BackendGameVibes.Models.DTOs.Reported;
 using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.IServices.Forum;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using System.Threading;
 
 
 namespace BackendGameVibes.Services.Forum {
@@ -21,9 +23,12 @@ namespace BackendGameVibes.Services.Forum {
             _forumExperienceService = forumExperienceService;
         }
 
-        public async Task<IEnumerable<object>> GetPostsByThreadId(int idThread, string? userId = null) {
-            return await _context.ForumPosts
-                .Where(p => p.ThreadId == idThread)
+        public async Task<object> GetPostsByThreadIdAsync(int threadId, string? userId = null, int pageNumber = 1, int postsSize = 10) {
+            var query = await _context.ForumPosts
+                .Where(p => p.ThreadId == threadId)
+                .OrderByDescending(t => t.CreatedDateTime)
+                .Skip((pageNumber - 1) * postsSize)
+                .Take(postsSize)
                 .Select(p => new {
                     p.Id,
                     p.Content,
@@ -35,9 +40,94 @@ namespace BackendGameVibes.Services.Forum {
                     userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
                 })
                 .ToArrayAsync();
+
+            int totalPosts = await _context.ForumPosts.Where(p => p.ThreadId == threadId).CountAsync();
+
+            return new {
+                TotalPosts = totalPosts,
+                PageSize = postsSize,
+                CurrentPage = pageNumber,
+                TotalPages = (int)Math.Ceiling(totalPosts / (double)postsSize),
+                Data = query
+            };
         }
 
-        public async Task<ForumPost> AddForumPost(ForumPostDTO newForumPostDTO) {
+        public async Task<object> GetPostsByUserIdAsync(string userId, int pageNumber = 1, int postsSize = 10) {
+            var query = await _context.ForumPosts
+            .Where(p => p.UserOwnerId == userId)
+            .OrderByDescending(t => t.CreatedDateTime)
+            .Skip((pageNumber - 1) * postsSize)
+            .Take(postsSize)
+            .Select(p => new {
+                 p.Id,
+                 p.Content,
+                 p.ThreadId,
+                 p.CreatedDateTime,
+                 p.LikesCount,
+                 p.DisLikesCount,
+                 p.UserOwnerId,
+                 username = p.UserOwner!.UserName,
+                 userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
+             })
+            .ToArrayAsync();
+
+            int totalPosts = await _context.ForumPosts.Where(p => p.UserOwnerId == userId).CountAsync();
+
+            return new {
+                TotalPosts = totalPosts,
+                PageSize = postsSize,
+                CurrentPage = pageNumber,
+                TotalPages = (int)Math.Ceiling(totalPosts / (double)postsSize),
+                Data = query
+            };
+        }
+
+        public async Task<object?> GetPostByIdAsync(int postId) {
+            return await _context.ForumPosts
+                .Include(p => p.UserOwner)
+                .Select(p => new {
+                    p.Id,
+                    p.Content,
+                    p.ThreadId,
+                    p.CreatedDateTime,
+                    p.LikesCount,
+                    p.DisLikesCount,
+                    p.UserOwnerId,
+                    username = p.UserOwner!.UserName
+                })
+                .FirstOrDefaultAsync(p => p.Id == postId);
+        }
+
+        public async Task<object?> GetPostsByPhraseAsync(string phrase, int pageNumber = 1, int postsSize = 10) {
+            var query = await _context.ForumPosts
+                .Where(t => t.Content!.ToLower().Contains(phrase))
+                .OrderByDescending(t => t.CreatedDateTime)
+                .Skip((pageNumber - 1) * postsSize)
+                .Take(postsSize)
+                .Select(p => new {
+                    p.Id,
+                    p.Content,
+                    p.ThreadId,
+                    p.CreatedDateTime,
+                    p.LikesCount,
+                    p.DisLikesCount,
+                    p.UserOwnerId,
+                    username = p.UserOwner!.UserName
+                })
+            .ToArrayAsync();
+
+            int totalPosts = await _context.ForumPosts.Where(t => t.Content!.ToLower().Contains(phrase)).CountAsync();
+
+            return new {
+                TotalPosts = totalPosts,
+                PageSize = postsSize,
+                CurrentPage = pageNumber,
+                TotalPages = (int)Math.Ceiling(totalPosts / (double)postsSize),
+                Data = query
+            };
+        }
+
+        public async Task<ForumPost> AddForumPostAsync(ForumPostDTO newForumPostDTO) {
             ForumPost newForumPost = _mapper.Map<ForumPost>(newForumPostDTO);
 
             _context.ForumPosts.Add(newForumPost);
@@ -88,57 +178,6 @@ namespace BackendGameVibes.Services.Forum {
             await _context.SaveChangesAsync();
 
             return reportedPost;
-        }
-
-        public async Task<IEnumerable<object>> GetAllUserPosts(string userId) {
-            return await _context.ForumPosts
-             .Where(p => p.UserOwnerId == userId)
-             .Select(p => new {
-                 p.Id,
-                 p.Content,
-                 p.ThreadId,
-                 p.CreatedDateTime,
-                 p.LikesCount,
-                 p.DisLikesCount,
-                 p.UserOwnerId,
-                 username = p.UserOwner!.UserName,
-                 userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
-             })
-             .OrderByDescending(p => p.CreatedDateTime)
-             .ToArrayAsync();
-        }
-
-        public async Task<object?> GetPostByIdAsync(int postId) {
-            return await _context.ForumPosts
-                .Include(p => p.UserOwner)
-                .Select(p => new {
-                    p.Id,
-                    p.Content,
-                    p.ThreadId,
-                    p.CreatedDateTime,
-                    p.LikesCount,
-                    p.DisLikesCount,
-                    p.UserOwnerId,
-                    username = p.UserOwner!.UserName
-                })
-                .FirstOrDefaultAsync(p => p.Id == postId);
-        }
-
-        public async Task<object[]?> GetPostsByPhrase(string phrase) {
-            return await _context.ForumPosts
-                .Where(t => t.Content!.ToLower().Contains(phrase))
-                .Select(p => new {
-                    p.Id,
-                    p.Content,
-                    p.ThreadId,
-                    p.CreatedDateTime,
-                    p.LikesCount,
-                    p.DisLikesCount,
-                    p.UserOwnerId,
-                    username = p.UserOwner!.UserName
-                })
-                .OrderByDescending(p => p.CreatedDateTime)
-            .ToArrayAsync();
         }
 
         public async Task<ForumPost?> UpdatePostByIdAsync(int postId, string userId, ForumPostUpdateDTO postUpdateDTO) {

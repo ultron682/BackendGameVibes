@@ -3,17 +3,17 @@ using BackendGameVibes.Models.DTOs.Forum;
 
 namespace BackendGameVibes.IServices.Forum {
     public interface IForumThreadService : IDisposable {
+        Task<object> GetThreadsGroupBySectionsAsync(int pageNumber, int threadsInsectionSize);
+        Task<object> GetThreadsInSectionAsync(int sectionId, int pageNumber, int pageSize);
+        Task<object> GetThreadsByUserIdAsync(string userId, int pageNumber = 1, int threadsSize = 10);
+        Task<IEnumerable<object>> GetAllForumRolesAsync();
+        Task<object?> GetThreadWithPostsAsync(int threadId, string? userId, int pageNumber, int postsSize);
+        Task<object[]> GetLandingThreadsAsync();
+        Task<object?> GetThreadsByPhraseAsync(string phrase, int pageNumber = 1, int threadsSize = 10);
+        Task<IEnumerable<object>> GetSectionsAsync();
         Task<ForumThread> AddThreadAsync(NewForumThreadDTO newThread);
-        Task<IEnumerable<object>> GetAllUserThreads(string userId);
-        Task<IEnumerable<object>> GetForumRoles();
-        Task<object?> GetForumThreadWithPosts(int threadId, string? userId = null);
-        Task<object[]> GetLandingThreads();
-        Task<object[]?> GetThreadsByPhrase(string phrase);
-        Task<IEnumerable<object>> GetSections();
-        Task<object> GetThreadsGroupBySectionsAsync(int pageNumber = 1, int pageSize = 10);
-        Task<object[]> GetThreadsInSectionAsync(int sectionId, int pageNumber = 1, int pageSize = 10);
-        Task<IEnumerable<object>> RemoveSection(int idSection);
-        Task<IEnumerable<object>> UpdateSection(int idSection, AddSectionDTO addSectionDTO);
-        Task<IEnumerable<object>> AddSection(AddSectionDTO addSectionDTO);
+        Task<IEnumerable<object>> AddSectionAsync(AddSectionDTO addSectionDTO);
+        Task<IEnumerable<object>> RemoveSectionAsync(int idSection);
+        Task<IEnumerable<object>> UpdateSectionAsync(int idSection, AddSectionDTO addSectionDTO);
     }
 }

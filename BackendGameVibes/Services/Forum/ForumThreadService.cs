@@ -5,8 +5,8 @@ using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.DTOs.Forum;
 using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.IServices.Forum;
-using X.PagedList;
-using X.PagedList.Extensions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using static System.Collections.Specialized.BitVector32;
 
 
 namespace BackendGameVibes.Services.Forum {
@@ -21,6 +21,210 @@ namespace BackendGameVibes.Services.Forum {
             _mapper = mapper;
             _forumExperienceService = forumExperienceService;
             _postService = postService;
+        }
+
+        public async Task<object> GetThreadsGroupBySectionsAsync(int pageNumber = 1, int threadsInsectionSize = 10) {
+            var query = await _context.ForumThreads
+                .Include(t => t.Section)
+                .GroupBy(t => t.Section!.Name)
+                .Select(g => new {
+                    SectionName = g.Key,
+                    ThreadsCount = g.Count(),
+                    Threads = g.OrderByDescending(t => t.CreatedDateTime)
+                                .Skip((pageNumber - 1) * threadsInsectionSize)
+                                .Take(threadsInsectionSize)
+                                .Select(t => new {
+                                    t.Id,
+                                    t.Title,
+                                    t.CreatedDateTime,
+                                    t.LastUpdatedDateTime,
+                                    userIdOwner = t.UserOwnerId,
+                                    usernameOwner = t.UserOwner!.UserName,
+                                    LastPostContent = t.Posts!
+                                        .OrderByDescending(p => p.CreatedDateTime)
+                                        .Select(p => p.Content)
+                                        .FirstOrDefault()
+                                        ?? "NoLastPost",
+                                })
+                                .ToArray()
+                })
+                .ToArrayAsync();
+
+            return new {
+                Data = query
+            };
+        }
+
+        public async Task<object> GetThreadsInSectionAsync(int sectionId, int pageNumber = 1, int threadsInsectionSize = 10) {
+            var query = await _context.ForumThreads
+                .Where(t => t.SectionId == sectionId)
+                .OrderByDescending(t => t.CreatedDateTime)
+                .Skip((pageNumber - 1) * threadsInsectionSize)
+                .Take(threadsInsectionSize)
+                .Include(t => t.Section)
+                .Select(t => new {
+                    t.Id,
+                    t.Title,
+                    t.CreatedDateTime,
+                    t.LastUpdatedDateTime,
+                    userIdOwner = t.UserOwnerId,
+                    usernameOwner = t.UserOwner!.UserName,
+                    section = t.Section!.Name,
+                    LastPostContent = t.Posts!
+                        .OrderByDescending(p => p.CreatedDateTime)
+                        .Select(p => p.Content)
+                        .FirstOrDefault()
+                        ?? "NoLastPost",
+                })
+                .ToArrayAsync();
+
+            int totalThreads = await _context.ForumThreads.Where(t => t.SectionId == sectionId).CountAsync();
+
+            return new {
+                TotalThreads = totalThreads,
+                PageSize = threadsInsectionSize,
+                CurrentPage = pageNumber,
+                TotalPages = (int)Math.Ceiling(totalThreads / (double)threadsInsectionSize),
+                Data = query
+            };
+
+        }
+
+        public async Task<object?> GetThreadWithPostsAsync(int threadId, string? userId = null, int pageNumber = 1, int postsSize = 10) {
+            var thread = await _context.ForumThreads
+                .Include(t => t.Posts)
+                .Select(t => new {
+                    t.Id,
+                    t.Title,
+                    t.CreatedDateTime,
+                    t.LastUpdatedDateTime,
+                    t.UserOwnerId,
+                    usernameOwner = t.UserOwner!.UserName,
+                    section = t.Section!.Name
+                })
+                .FirstOrDefaultAsync(t => t.Id == threadId);
+
+            if (thread == null)
+                return null;
+
+            var postsOfThread = await _postService.GetPostsByThreadIdAsync(threadId, userId, pageNumber, postsSize);
+
+            return new {
+                thread,
+                postsOfThread
+            };
+        }
+
+        public async Task<object[]> GetLandingThreadsAsync() {
+            return await _context.ForumThreads
+                .OrderByDescending(ft => ft.CreatedDateTime)
+                .Take(5)
+                .Include(t => t.Section)
+                .Include(t => t.UserOwner)
+                .Select(t => new {
+                    t.Id,
+                    t.Title,
+                    t.CreatedDateTime,
+                    t.LastUpdatedDateTime,
+                    t.UserOwnerId,
+                    usernameOwner = t.UserOwner!.UserName,
+                    section = t.Section!.Name,
+                    LastPostContent = t.Posts!
+                        .OrderByDescending(p => p.CreatedDateTime)
+                        .Select(p => p.Content)
+                        .FirstOrDefault()
+                        ?? "NoLastPost",
+                })
+                .ToArrayAsync();
+        }
+
+        public async Task<IEnumerable<object>> GetSectionsAsync() {
+            return await _context.ForumSections
+                .Select(s => new {
+                    s.Id,
+                    s.Name,
+                    s.HexColor
+                })
+                .ToArrayAsync();
+        }
+
+        public async Task<IEnumerable<object>> GetAllForumRolesAsync() {
+            var forumRoles = await _context.ForumRoles
+             .Select(fr => new {
+                 fr.Id,
+                 fr.Name,
+                 currentThreshold = fr.Threshold,
+             })
+             .ToArrayAsync();
+
+            return forumRoles;
+        }
+
+        public async Task<object> GetThreadsByUserIdAsync(string userId, int pageNumber = 1, int threadsSize = 10) {
+            var query = await _context.ForumThreads
+                .Where(t => t.UserOwnerId == userId)
+                .OrderByDescending(t => t.CreatedDateTime)
+                .Skip((pageNumber - 1) * threadsSize)
+                .Take(threadsSize)
+                .Select(t => new {
+                    t.Id,
+                    t.Title,
+                    t.CreatedDateTime,
+                    t.LastUpdatedDateTime,
+                    userIdOwner = t.UserOwnerId,
+                    usernameOwner = t.UserOwner!.UserName,
+                    section = t.Section!.Name,
+                    LastPostContent = t.Posts!
+                        .OrderByDescending(p => p.CreatedDateTime)
+                        .Select(p => p.Content)
+                        .FirstOrDefault()
+                        ?? "NoLastPost",
+                })
+                .ToArrayAsync();
+
+            int totalThreads = await _context.ForumThreads.Where(t => t.UserOwnerId == userId).CountAsync();
+
+            return new {
+                TotalThreads = totalThreads,
+                PageSize = threadsSize,
+                CurrentPage = pageNumber,
+                TotalPages = (int)Math.Ceiling(totalThreads / (double)threadsSize),
+                Data = query
+            };
+        }
+
+        public async Task<object?> GetThreadsByPhraseAsync(string phrase, int pageNumber = 1, int threadsSize = 10) {
+            var query = await _context.ForumThreads
+                .Where(t => t.Title!.ToLower().Contains(phrase))
+                .OrderByDescending(t => t.CreatedDateTime)
+                .Skip((pageNumber - 1) * threadsSize)
+                .Take(threadsSize)
+                .Include(t => t.Section)
+                .Select(t => new {
+                    t.Id,
+                    t.Title,
+                    t.CreatedDateTime,
+                    t.LastUpdatedDateTime,
+                    userIdOwner = t.UserOwnerId,
+                    usernameOwner = t.UserOwner!.UserName,
+                    section = t.Section!.Name,
+                    LastPostContent = t.Posts!
+                        .OrderByDescending(p => p.CreatedDateTime)
+                        .Select(p => p.Content)
+                        .FirstOrDefault()
+                        ?? "NoLastPost",
+                })
+                .ToArrayAsync();
+
+            int totalThreads = await _context.ForumThreads.Where(t => t.Title!.ToLower().Contains(phrase)).CountAsync();
+
+            return new {
+                TotalThreads = totalThreads,
+                PageSize = threadsSize,
+                CurrentPage = pageNumber,
+                TotalPages = (int)Math.Ceiling(totalThreads / (double)threadsSize),
+                Data = query
+            };
         }
 
         public async Task<ForumThread> AddThreadAsync(NewForumThreadDTO newForumThreadDTO) {
@@ -41,75 +245,16 @@ namespace BackendGameVibes.Services.Forum {
             return newForumThread;
         }
 
-        public async Task<object?> GetForumThreadWithPosts(int id, string? userId = null) {
-            var thread = await _context.ForumThreads
-                .Include(t => t.Posts)
-                .Select(t => new {
-                    t.Id,
-                    t.Title,
-                    t.CreatedDateTime,
-                    t.LastUpdatedDateTime,
-                    t.UserOwnerId,
-                    usernameOwner = t.UserOwner!.UserName,
-                    section = t.Section!.Name
-                })
-                .FirstOrDefaultAsync(t => t.Id == id);
-
-            if (thread == null)
-                return null;
-
-            var postsOfThread = await _postService.GetPostsByThreadId(id, userId);
-
-            return new {
-                thread,
-                postsOfThread = postsOfThread.ToArray()
-            };
-        }
-
-        public async Task<object[]> GetLandingThreads() {
-            return await _context.ForumThreads
-                .Include(t => t.Section)
-                .Include(t => t.UserOwner)
-                .AsSplitQuery()
-                .Select(t => new {
-                    t.Id,
-                    t.Title,
-                    t.CreatedDateTime,
-                    t.LastUpdatedDateTime,
-                    t.UserOwnerId,
-                    usernameOwner = t.UserOwner!.UserName,
-                    section = t.Section!.Name,
-                    LastPostContent = t.Posts!
-                        .OrderByDescending(p => p.CreatedDateTime)
-                        .Select(p => p.Content)
-                        .FirstOrDefault()
-                        ?? "NoLastPost",
-                })
-                .OrderByDescending(ft => ft.CreatedDateTime)
-                .Take(5)
-                .ToArrayAsync();
-        }
-
-        public async Task<IEnumerable<object>> GetSections() {
-            return await _context.ForumSections
-                .Select(s => new {
-                    s.Id,
-                    s.Name,
-                    s.HexColor
-                })
-                .ToArrayAsync();
-        }
-
-        public async Task<IEnumerable<object>> AddSection(AddSectionDTO addSectionDTO) {
+        public async Task<IEnumerable<object>> AddSectionAsync(AddSectionDTO addSectionDTO) {
             ForumSection newSection = _mapper.Map<ForumSection>(addSectionDTO);
 
             _context.ForumSections.Add(newSection);
             await _context.SaveChangesAsync();
 
-            return await GetSections();
+            return await GetSectionsAsync();
         }
 
-        public async Task<IEnumerable<object>> UpdateSection(int idSection, AddSectionDTO addSectionDTO) {
+        public async Task<IEnumerable<object>> UpdateSectionAsync(int idSection, AddSectionDTO addSectionDTO) {
             ForumSection? section = await _context.ForumSections.FindAsync(idSection);
             if (section == null)
                 return null!;
@@ -120,10 +265,10 @@ namespace BackendGameVibes.Services.Forum {
 
             await _context.SaveChangesAsync();
 
-            return await GetSections();
+            return await GetSectionsAsync();
         }
 
-        public async Task<IEnumerable<object>> RemoveSection(int idSection) {
+        public async Task<IEnumerable<object>> RemoveSectionAsync(int idSection) {
             ForumSection? section = await _context.ForumSections.FindAsync(idSection);
             if (section == null)
                 return null!;
@@ -131,124 +276,7 @@ namespace BackendGameVibes.Services.Forum {
             _context.ForumSections.Remove(section);
             await _context.SaveChangesAsync();
 
-            return await GetSections();
-        }
-
-        public async Task<IEnumerable<object>> GetForumRoles() {
-            var forumRoles = await _context.ForumRoles
-             .Select(fr => new {
-                 fr.Id,
-                 fr.Name,
-                 currentThreshold = fr.Threshold,
-
-             })
-             .ToArrayAsync();
-
-            return forumRoles;
-        }
-
-        public async Task<IEnumerable<object>> GetAllUserThreads(string userId) {
-            return await _context.ForumThreads
-                .Where(t => t.UserOwnerId == userId)
-                .Select(t => new {
-                    t.Id,
-                    t.Title,
-                    t.CreatedDateTime,
-                    t.LastUpdatedDateTime,
-                    userIdOwner = t.UserOwnerId,
-                    usernameOwner = t.UserOwner!.UserName,
-                    section = t.Section!.Name,
-                    LastPostContent = t.Posts!
-                        .OrderByDescending(p => p.CreatedDateTime)
-                        .Select(p => p.Content)
-                        .FirstOrDefault()
-                        ?? "NoLastPost",
-                })
-                .OrderByDescending(p => p.CreatedDateTime)
-                .ToArrayAsync();
-        }
-
-        public async Task<object[]?> GetThreadsByPhrase(string phrase) {
-            return await _context.ForumThreads
-                .Include(t => t.Section)
-                .Where(t => t.Title!.ToLower().Contains(phrase))
-                .Select(t => new {
-                    t.Id,
-                    t.Title,
-                    t.CreatedDateTime,
-                    t.LastUpdatedDateTime,
-                    userIdOwner = t.UserOwnerId,
-                    usernameOwner = t.UserOwner!.UserName,
-                    section = t.Section!.Name,
-                    LastPostContent = t.Posts!
-                        .OrderByDescending(p => p.CreatedDateTime)
-                        .Select(p => p.Content)
-                        .FirstOrDefault()
-                        ?? "NoLastPost",
-                })
-                .OrderByDescending(p => p.CreatedDateTime)
-                .ToArrayAsync();
-        }
-
-
-        public async Task<object> GetThreadsGroupBySectionsAsync(int pageNumber = 1, int pageSize = 10) {
-            var query = await _context.ForumThreads
-                .Include(t => t.Section)
-                .GroupBy(t => t.Section!.Name)
-                .Select(g => new {
-                    SectionName = g.Key,
-                    ThreadsCount = g.Count(),
-                    Threads = g.OrderByDescending(t => t.CreatedDateTime)
-                                .Skip((pageNumber - 1) * pageSize) 
-                                .Take(pageSize)
-                                .Select(t => new {
-                                    t.Id,
-                                    t.Title,
-                                    t.CreatedDateTime,
-                                    t.LastUpdatedDateTime,
-                                    userIdOwner = t.UserOwnerId,
-                                    usernameOwner = t.UserOwner!.UserName,
-                                    LastPostContent = t.Posts!
-                                        .OrderByDescending(p => p.CreatedDateTime)
-                                        .Select(p => p.Content)
-                                        .FirstOrDefault()
-                                        ?? "NoLastPost",
-                                })
-                                .ToArray()
-                })
-                .ToArrayAsync();
-
-            int totalSections = query.Length;
-
-            return new {
-                TotalSections = totalSections,
-                PageSize = pageSize,
-                CurrentPage = pageNumber,
-                TotalPages = (int)Math.Ceiling(totalSections / (double)pageSize),
-                Data = query
-            };
-        }
-
-        public async Task<object[]> GetThreadsInSectionAsync(int sectionId, int pageNumber = 1, int pageSize = 10) {
-            return await _context.ForumThreads
-                .Include(t => t.Section)
-                .Where(t => t.SectionId == sectionId)
-                .Select(t => new {
-                    t.Id,
-                    t.Title,
-                    t.CreatedDateTime,
-                    t.LastUpdatedDateTime,
-                    userIdOwner = t.UserOwnerId,
-                    usernameOwner = t.UserOwner!.UserName,
-                    section = t.Section!.Name,
-                    LastPostContent = t.Posts!
-                        .OrderByDescending(p => p.CreatedDateTime)
-                        .Select(p => p.Content)
-                        .FirstOrDefault()
-                        ?? "NoLastPost",
-                })
-                .OrderByDescending(p => p.CreatedDateTime)
-                .ToArrayAsync();
+            return await GetSectionsAsync();
         }
 
         public void Dispose() {
