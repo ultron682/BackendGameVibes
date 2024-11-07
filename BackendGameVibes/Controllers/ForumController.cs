@@ -52,9 +52,16 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPost("threads")]
         [Authorize]
+        [SwaggerResponse(200, "created")]
+        [SwaggerResponse(400, "NoUser or NoSection found")]
         public async Task<IActionResult> CreateThread(NewForumThreadDTO forumThreadDTO) {
             if (ModelState.IsValid) {
-                ForumThread forumThread = await _threadService.AddThreadAsync(forumThreadDTO);
+                ForumThread? forumThread = await _threadService.AddThreadAsync(forumThreadDTO);
+
+                if (forumThread == null) {
+                    return BadRequest("NoUser or NoSection found");
+                }
+
                 return Ok(forumThread);
             }
             else {

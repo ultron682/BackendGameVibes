@@ -90,9 +90,6 @@ namespace BackendGameVibes.Services {
                 return null;
 
             var userRoles = await _userManager.GetRolesAsync(userGameVibes);
-            foreach (var role in userRoles) {
-                Console.WriteLine(role);
-            }
 
             var accountInfo = await _context.Users
                 .Include(u => u.ForumRole)

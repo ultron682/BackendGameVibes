@@ -227,8 +227,16 @@ namespace BackendGameVibes.Services.Forum {
             };
         }
 
-        public async Task<ForumThread> AddThreadAsync(NewForumThreadDTO newForumThreadDTO) {
+        public async Task<ForumThread?> AddThreadAsync(NewForumThreadDTO newForumThreadDTO) {
             ForumThread? newForumThread = _mapper.Map<ForumThread>(newForumThreadDTO);
+
+            var foundSection = await _context.ForumSections.FirstOrDefaultAsync(fs => fs.Id == newForumThreadDTO.SectionId);
+            if (foundSection == null)
+                return null;
+
+            var foundUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == newForumThreadDTO.UserOwnerId);
+            if (foundUser == null)
+                return null;
 
             ForumPost newForumPost = new() {
                 Content = newForumThreadDTO.FirstForumPostContent,
