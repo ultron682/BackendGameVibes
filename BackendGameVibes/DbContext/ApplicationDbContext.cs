@@ -125,7 +125,7 @@ namespace BackendGameVibes.Data {
                     .HasMaxLength(100);
 
                 ent.Property(g => g.Description)
-                    .HasMaxLength(1000);
+                    .HasMaxLength(10000);
 
                 ent.HasMany(g => g.Platforms)
                     .WithMany(p => p.Games)
@@ -207,7 +207,7 @@ namespace BackendGameVibes.Data {
                 ent.HasOne(sr => sr.Game)
                     .WithMany(g => g.SystemRequirements)
                     .HasForeignKey(sr => sr.GameId)
-                    .OnDelete(DeleteBehavior.SetNull);
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             // Review ent
@@ -234,11 +234,11 @@ namespace BackendGameVibes.Data {
                     .HasMaxLength(1000);
 
                 ent.Property(r => r.CreatedAt)
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP(6)")
                     .IsRequired();
 
                 ent.Property(r => r.UpdatedAt)
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP(6)")
                     .IsRequired();
 
                 ent.HasOne(r => r.Game)
@@ -259,12 +259,14 @@ namespace BackendGameVibes.Data {
                 ent.HasKey(t => t.Id);
 
                 ent.Property(t => t.CreatedDateTime)
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .HasColumnType("datetime(6)")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP(6)")
                     .IsRequired()
                     .ValueGeneratedOnAdd();
 
                 ent.Property(t => t.LastUpdatedDateTime)
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .HasColumnType("datetime(6)")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP(6)")
                     .IsRequired()
                     .ValueGeneratedOnAddOrUpdate();
 
@@ -288,12 +290,12 @@ namespace BackendGameVibes.Data {
                 ent.HasKey(p => p.Id);
 
                 ent.Property(p => p.CreatedDateTime)
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP(6)")
                     .IsRequired()
                     .ValueGeneratedOnAdd();
 
                 ent.Property(p => p.LastUpdatedDateTime)
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP(6)")
                     .IsRequired()
                     .ValueGeneratedOnAddOrUpdate();
 
@@ -312,7 +314,7 @@ namespace BackendGameVibes.Data {
 
             mB.Entity<FriendRequest>(ent => {
                 ent.Property(fR => fR.SentAt)
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
                 ent.HasOne(fr => fr.SenderUser)
                    .WithMany(u => u.UserFriendRequestsSent)
@@ -327,7 +329,7 @@ namespace BackendGameVibes.Data {
 
             mB.Entity<Friend>(ent => {
                 ent.Property(fR => fR.FriendsSince)
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
                 ent.HasOne(f => f.User)
                     .WithMany(u => u.UserFriends)

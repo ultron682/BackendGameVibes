@@ -7,13 +7,10 @@ using BackendGameVibes.Models.Points;
 using BackendGameVibes.Models.User;
 using BackendGameVibes.Services;
 using BackendGameVibes.Services.Forum;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,12 +38,11 @@ builder.Services.AddSwaggerGen(c => {
     c.EnableAnnotations();
 });
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => {
-    //options.UseMySql(builder.Configuration.GetConnectionString("GameVibesDbConnection"), new MySqlServerVersion(new Version(8, 0, 35)));
-    options.UseSqlite("Data Source=GameVibesDatabase.db;Cache=Shared", o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
-    options.EnableSensitiveDataLogging(false);
-}
-);
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("GameVibesDbConnection"),
+        new MySqlServerVersion(new Version(8, 0, 26)),
+        mySqlOptions => mySqlOptions.EnableRetryOnFailure()));
 
 builder.Services
     .AddIdentity<UserGameVibes, IdentityRole>()
