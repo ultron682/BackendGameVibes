@@ -63,6 +63,9 @@ namespace BackendGameVibes.Data {
         public DbSet<ActionCode> ActiveActionCodes {
             get; set;
         }
+        public DbSet<ForumPostInteraction> ForumPostInteractions {
+            get; set;
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.LogTo(message => Debug.WriteLine(message));
@@ -249,10 +252,10 @@ namespace BackendGameVibes.Data {
 
             mB.Entity<ForumSection>(ent => {
                 ent.HasData(
-                    new ForumSection() { Id = 1, Name = "general" },
-                    new ForumSection() { Id = 2, Name = "technologies" },
-                    new ForumSection() { Id = 3, Name = "offtopic" },
-                    new ForumSection() { Id = 4, Name = "advices" });
+                    new ForumSection() { Id = 1, Name = "general", HexColor = "#d98600" },
+                    new ForumSection() { Id = 2, Name = "technologies", HexColor = "#00b1d9" },
+                    new ForumSection() { Id = 3, Name = "offtopic", HexColor = "#1cad0c" },
+                    new ForumSection() { Id = 4, Name = "advices", HexColor = "#91248e" });
             });
 
             mB.Entity<ForumThread>(ent => {
@@ -299,10 +302,10 @@ namespace BackendGameVibes.Data {
                     .IsRequired()
                     .ValueGeneratedOnAddOrUpdate();
 
-                ent.Property(p => p.Likes)
+                ent.Property(p => p.LikesCount)
                     .HasDefaultValue(0);
 
-                ent.Property(p => p.DisLikes)
+                ent.Property(p => p.DisLikesCount)
                     .HasDefaultValue(0);
 
                 ent.HasOne(p => p.UserOwner)
@@ -379,6 +382,24 @@ namespace BackendGameVibes.Data {
                 ent.Property(rr => rr.Reason)
                     .HasMaxLength(255)
                     .IsRequired();
+            });
+
+            mB.Entity<ForumPostInteraction>(ent => {
+                ent.HasOne(fpi => fpi.UserGameVibes)
+                    .WithMany(u => u.UserPostInteractions)
+                    .HasForeignKey(fpi => fpi.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                ent.HasOne(fpi => fpi.ForumPost)
+                    .WithMany(p => p.PostInteractions)
+                    .HasForeignKey(fpi => fpi.PostId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                ent.Property(fpi => fpi.IsLike)
+                    .HasDefaultValue(null);
+
+
+
             });
 
             base.OnModelCreating(mB);

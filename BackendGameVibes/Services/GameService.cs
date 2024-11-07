@@ -6,6 +6,8 @@ using BackendGameVibes.Models.DTOs;
 using BackendGameVibes.Models.Steam;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace BackendGameVibes.Services {
     public class GameService : IGameService {
@@ -89,6 +91,99 @@ namespace BackendGameVibes.Services {
                         .ToArray()
                 })
                 .ToArrayAsync();
+        }
+
+
+        public async Task<(Game?, bool)[]> InitGamesBySteamIds(ApplicationDbContext applicationDbContext, HashSet<int> steamGamesToInitID) {
+            var tasks = steamGamesToInitID
+                .Select(_steamService.GetInfoGame)
+                .ToArray();
+
+            var combinedResults = await Task.WhenAll(tasks);
+
+            var existingGames = applicationDbContext.Games
+                .Where(g => steamGamesToInitID.Contains(g.SteamId))
+                .ToDictionary(g => g.SteamId);
+
+            var dbGenres = applicationDbContext.Genres.ToList();
+
+            var resultsGames = new List<(Game?, bool)>();
+
+            foreach (var (steamGameId, steamGameData) in steamGamesToInitID.Zip(combinedResults, (id, data) => (id, data))) {
+                Game? foundGame = existingGames.TryGetValue(steamGameId, out var gameInDb) ? gameInDb : null;
+
+                if (foundGame != null) {
+                    resultsGames.Add((foundGame, true));
+                    continue;
+                }
+
+                Game newGame = new Game {
+                    SteamId = steamGameId,
+                    Title = steamGameData?.name ?? "Brak tytułu",
+                    Description = steamGameData?.detailed_description ?? "Brak opisu",
+                    CoverImage = @$"https://steamcdn-a.akamaihd.net/steam/apps/{steamGameId}/library_600x900_2x.jpg",
+                    ReleaseDate = ParseReleaseDate(steamGameData?.release_date.Date),
+                    GameImages = steamGameData?.screenshots?.Select(s => new GameImage { ImagePath = s.path_full }).ToList() ?? new List<GameImage>()
+                };
+
+                // Przypisanie gatunków
+                var gameGenres = steamGameData?.genres?
+                    .Select(g => new Models.Games.Genre { Id = int.Parse(g.id), Name = g.description })
+                    .ToList() ?? new List<Models.Games.Genre>();
+
+                foreach (var genre in gameGenres) {
+                    var existingGenre = dbGenres.FirstOrDefault(g => g.Id == genre.Id);
+                    if (existingGenre == null) {
+                        applicationDbContext.Genres.Add(genre);
+                        dbGenres.Add(genre);
+                        newGame.Genres.Add(genre);
+                    }
+                    else {
+                        newGame.Genres.Add(existingGenre);
+                    }
+                }
+
+                // Przypisanie platform - dodaj tylko istniejące platformy
+                var platformIds = GetPlatformIds(steamGameData?.platforms);
+                var existingPlatforms = applicationDbContext.Platforms.Where(p => platformIds.Contains(p.Id)).ToList();
+                newGame.Platforms = existingPlatforms;
+
+                applicationDbContext.Games.Add(newGame);
+                resultsGames.Add((newGame, true));
+                Console.WriteLine("Added game: " + newGame.Title);
+            }
+
+            // Zapisanie zmian w bazie, aby zapewnić, że `Genres` są dodane przed `Games`.
+            await applicationDbContext.SaveChangesAsync();
+            return resultsGames.ToArray();
+        }
+
+        // Metoda pomocnicza do parsowania daty
+        private DateOnly ParseReleaseDate(string? date) {
+            try {
+                return DateOnly.ParseExact(date, "d MMM, yyyy", System.Globalization.CultureInfo.InvariantCulture);
+            }
+            catch {
+                return DateOnly.FromDateTime(DateTime.Now);
+            }
+        }
+
+        // Metoda pomocnicza do identyfikacji platform
+        private List<int> GetPlatformIds(dynamic platforms) {
+            var platformIds = new List<int>();
+            try {
+                if (platforms.Windows)
+                    platformIds.Add(1);
+                if (platforms.Mac)
+                    platformIds.Add(2);
+                if (platforms.Linux)
+                    platformIds.Add(3);
+            }
+            catch {
+
+            }
+
+            return platformIds;
         }
 
         public async Task<(Game?, bool)> CreateGame(int steamGameId) {

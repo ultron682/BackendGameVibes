@@ -6,7 +6,9 @@
         public string? Name {
             get; set;
         }
-
+        public string? HexColor {
+            get; set;
+        }
         public ICollection<ForumThread>? Threads {
             get; set;
         }

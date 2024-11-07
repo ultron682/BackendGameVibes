@@ -11,12 +11,13 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.IdentityModel.Tokens;
 using BackendGameVibes.IServices.Forum;
+using BackendGameVibes.Models.DTOs;
+using BackendGameVibes.Models.Forum;
 
 
 namespace BackendGameVibes.Controllers {
     [ApiController]
     [Route("api/administration")]
-    [SwaggerTag("Require authorization admin")]
     public class AdministrationController : ControllerBase {
         private readonly UserManager<UserGameVibes> _userManager;
         private readonly ApplicationDbContext _context;
@@ -321,14 +322,32 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPost("send-email-to/{userId}")]
         [Authorize(Policy = "modOrAdmin")]
-        public async Task<IActionResult> SendEmailToUser(string userId, [Required] string subject, [Required] string message) {
+        public async Task<IActionResult> SendEmailToUser(string userId, EmailSendDTO emailSendDTO) {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null) {
                 return NotFound();
             }
 
-            bool isSuccess = await _accountService.SendGeneralEmailToUserAsync(user, subject, message);
+            bool isSuccess = await _accountService.SendGeneralEmailToUserAsync(user, emailSendDTO.Subject!, emailSendDTO.Message!);
             return Ok(isSuccess);
+        }
+
+        [HttpPost("thread-section-names")]
+        [Authorize("admin")]
+        public async Task<ActionResult<IEnumerable<object>>> AddSection(AddSectionDTO addSectionDTO) {
+            return Ok(await _forumThreadService.AddSection(addSectionDTO));
+        }
+
+        [HttpPatch("thread-section-name/{sectionId:int}")]
+        [Authorize("admin")]
+        public async Task<ActionResult<IEnumerable<object>>> UpdateSection(int sectionId, AddSectionDTO sectionDTO) {
+            return Ok(await _forumThreadService.UpdateSection(sectionId, sectionDTO));
+        }
+
+        [HttpDelete("thread-section-name/{sectionId:int}")]
+        [Authorize("admin")]
+        public async Task<ActionResult<IEnumerable<object>>> RemoveSection(int sectionId) {
+            return Ok(await _forumThreadService.RemoveSection(sectionId));
         }
     }
 }

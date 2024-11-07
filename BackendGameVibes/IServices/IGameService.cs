@@ -1,6 +1,7 @@
 ﻿using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.DTOs;
 using BackendGameVibes.Models.Steam;
+using BackendGameVibes.Data;
 
 namespace BackendGameVibes.IServices {
     public interface IGameService : IDisposable {
@@ -14,5 +15,6 @@ namespace BackendGameVibes.IServices {
         Task<object[]> GetLandingGames();
         Task<object[]> GetUpcomingGames();
         Task<IEnumerable<object>> GetGameReviews(int id);
+        Task<(Game?, bool)[]> InitGamesBySteamIds(ApplicationDbContext applicationDbContext, HashSet<int> steamGamesToInitID);
     }
 }

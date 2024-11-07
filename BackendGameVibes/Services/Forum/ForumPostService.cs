@@ -5,7 +5,6 @@ using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Reported;
 using BackendGameVibes.Models.DTOs.Forum;
 using BackendGameVibes.Models.DTOs.Reported;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.IServices.Forum;
 
@@ -22,10 +21,20 @@ namespace BackendGameVibes.Services.Forum {
             _forumExperienceService = forumExperienceService;
         }
 
-        public async Task<ActionResult<IEnumerable<ForumPost>>> GetAllPosts(int idThread) {
+        public async Task<IEnumerable<object>> GetPostsByThreadId(int idThread, string? userId = null) {
             return await _context.ForumPosts
                 .Where(p => p.ThreadId == idThread)
-                .ToListAsync();
+                .Select(p => new {
+                    p.Id,
+                    p.Content,
+                    p.CreatedDateTime,
+                    p.LikesCount,
+                    p.DisLikesCount,
+                    p.UserOwnerId,
+                    username = p.UserOwner!.UserName,
+                    userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
+                })
+                .ToArrayAsync();
         }
 
         public async Task<ForumPost> AddForumPost(ForumPostDTO newForumPostDTO) {
@@ -87,8 +96,13 @@ namespace BackendGameVibes.Services.Forum {
              .Select(p => new {
                  p.Id,
                  p.Content,
+                 p.ThreadId,
                  p.CreatedDateTime,
-                 p.ThreadId
+                 p.LikesCount,
+                 p.DisLikesCount,
+                 p.UserOwnerId,
+                 username = p.UserOwner!.UserName,
+                 userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
              })
              .OrderByDescending(p => p.CreatedDateTime)
              .ToArrayAsync();
@@ -97,17 +111,31 @@ namespace BackendGameVibes.Services.Forum {
         public async Task<object?> GetPostByIdAsync(int postId) {
             return await _context.ForumPosts
                 .Include(p => p.UserOwner)
+                .Select(p => new {
+                    p.Id,
+                    p.Content,
+                    p.ThreadId,
+                    p.CreatedDateTime,
+                    p.LikesCount,
+                    p.DisLikesCount,
+                    p.UserOwnerId,
+                    username = p.UserOwner!.UserName
+                })
                 .FirstOrDefaultAsync(p => p.Id == postId);
         }
 
         public async Task<object[]?> GetPostsByPhrase(string phrase) {
             return await _context.ForumPosts
                 .Where(t => t.Content!.ToLower().Contains(phrase))
-                .Select(t => new {
-                    t.Id,
-                    t.Content,
-                    t.CreatedDateTime,
-                    t.LastUpdatedDateTime
+                .Select(p => new {
+                    p.Id,
+                    p.Content,
+                    p.ThreadId,
+                    p.CreatedDateTime,
+                    p.LikesCount,
+                    p.DisLikesCount,
+                    p.UserOwnerId,
+                    username = p.UserOwner!.UserName
                 })
                 .OrderByDescending(p => p.CreatedDateTime)
             .ToArrayAsync();
@@ -140,6 +168,77 @@ namespace BackendGameVibes.Services.Forum {
 
             return false;
         }
+
+
+        public async Task<object?> InteractPostAsync(string userId, int postId, bool? isToLike) {
+            ForumPost? post = await _context.ForumPosts
+                .FirstOrDefaultAsync(p => p.Id == postId);
+
+            if (post == null) {
+                return null;
+            }
+
+            ForumPostInteraction? postInteraction = await _context.ForumPostInteractions
+                .FirstOrDefaultAsync(pl => pl.UserId == userId && pl.PostId == postId);
+
+            if (postInteraction != null) {
+                if (isToLike == null) {
+                    if (postInteraction.IsLike == true) {
+                        post.LikesCount--;
+                    }
+                    else if (postInteraction.IsLike == false) {
+                        post.DisLikesCount--;
+                    }
+
+                    _context.ForumPostInteractions.Remove(postInteraction);
+                }
+                else if (isToLike == true) {
+                    if (postInteraction.IsLike == false) {
+                        post.LikesCount++;
+                        post.DisLikesCount--;
+                    }
+                    else if (postInteraction.IsLike == null) {
+                        post.LikesCount++;
+                    }
+
+                    postInteraction.IsLike = isToLike;
+                    _context.ForumPostInteractions.Update(postInteraction);
+                }
+                else if (isToLike == false) {
+                    if (postInteraction.IsLike == true) {
+                        post.LikesCount--;
+                        post.DisLikesCount++;
+                    }
+                    else if (postInteraction.IsLike == null) {
+                        post.DisLikesCount++;
+                    }
+
+                    postInteraction.IsLike = isToLike;
+                    _context.ForumPostInteractions.Update(postInteraction);
+                }
+            }
+            else {
+                if (isToLike != null) {
+                    _context.ForumPostInteractions.Add(new ForumPostInteraction {
+                        UserId = userId,
+                        PostId = postId,
+                        IsLike = isToLike
+                    });
+
+                    if (isToLike == true) {
+                        post.LikesCount++;
+                    }
+                    else {
+                        post.DisLikesCount++;
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return post;
+        }
+
 
         public void Dispose() {
             _context.Dispose();

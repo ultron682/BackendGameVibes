@@ -2,15 +2,12 @@
 using BackendGameVibes.Models.DTOs.Forum;
 using BackendGameVibes.Models.DTOs.Reported;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.Security.Claims;
 using BackendGameVibes.IServices.Forum;
 using System.ComponentModel.DataAnnotations;
 using Swashbuckle.AspNetCore.Annotations;
-using Microsoft.Extensions.Hosting;
+
 
 namespace BackendGameVibes.Controllers {
     [Route("api/forum")]
@@ -24,20 +21,22 @@ namespace BackendGameVibes.Controllers {
             _threadService = threadService;
         }
 
-
-        [HttpGet("threads")]
-        public async Task<ActionResult<IEnumerable<Thread>>> GetThreads() {
-            return Ok(await _threadService.GetAllThreads());
-        }
-
-        [HttpGet("threads/:id")]
-        public async Task<ActionResult<IEnumerable<ForumPost>>> GetPosts(int id) {
-            return Ok(await _threadService.GetForumThread(id));
-        }
-
+        [SwaggerOperation("wątki pogrupowane przez sekcje")]
         [HttpGet("threads/sections")]
-        public async Task<ActionResult<IEnumerable<ForumPost>>> GetThreadsGroupBySections() {
-            return Ok(await _threadService.GetThreadsGroupBySectionsAsync());
+        public async Task<ActionResult<IEnumerable<ForumPost>>> GetThreadsGroupBySections(int pageNumber = 1, int pageSize = 10) {
+            return Ok(await _threadService.GetThreadsGroupBySectionsAsync(pageNumber = 1, pageSize = 10));
+        }
+
+        [SwaggerOperation("zwraca wątek z postami. jesli podamy userId to jeszcze będzie info o interakcji danego uzytkownika z postem")]
+        [HttpGet("threads/{id:int}:userId")]
+        public async Task<ActionResult> GetThreadPosts(int id, string? userId = null) {
+            object? thread = await _threadService.GetForumThreadWithPosts(id, userId);
+
+            if (thread == null) {
+                return NotFound();
+            }
+
+            return Ok(thread);
         }
 
         [HttpGet("threads/sections/{sectionId:int}")]
@@ -46,6 +45,7 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpPost("threads")]
+        [Authorize]
         public async Task<ActionResult<Thread>> CreateThread(NewForumThreadDTO forumThreadDTO) {
             if (ModelState.IsValid) {
                 ForumThread forumThread = await _threadService.AddThreadAsync(forumThreadDTO);
@@ -55,6 +55,12 @@ namespace BackendGameVibes.Controllers {
             else {
                 return BadRequest("Wrong ForumThreadDTO");
             }
+        }
+
+
+        [HttpGet("posts/{id}")]
+        public async Task<ActionResult<object>> GetPostById(int id) {
+            return Ok(await _postService.GetPostByIdAsync(id));
         }
 
         [HttpPost("posts")]
@@ -68,21 +74,6 @@ namespace BackendGameVibes.Controllers {
             else {
                 return BadRequest("Wrong ForumThreadDTO");
             }
-        }
-
-        [HttpGet("section")]
-        public async Task<ActionResult<IEnumerable<object>>> GetSections() {
-            return Ok(await _threadService.GetSections());
-        }
-
-        [HttpGet("forum-roles")]
-        public async Task<ActionResult<IEnumerable<object>>> GetForumRoles() {
-            return Ok(await _threadService.GetForumRoles());
-        }
-
-        [HttpGet("posts/:id")]
-        public async Task<ActionResult<object>> GetPostById(int id) {
-            return Ok(await _postService.GetPostByIdAsync(id));
         }
 
         [HttpPost("posts/report")]
@@ -104,6 +95,41 @@ namespace BackendGameVibes.Controllers {
             else {
                 return BadRequest("ErrorOnReportPost");
             }
+        }
+
+
+        [HttpPatch("posts/{postId:int}")]
+        [Authorize]
+        [SwaggerResponse(404, "no post or post doesnt belong to user")]
+        [SwaggerResponse(200, "updated")]
+        public async Task<IActionResult> UpdatePost(int postId, ForumPostUpdateDTO postUpdateDTO) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            ForumPost? post = await _postService.UpdatePostByIdAsync(postId, userId, postUpdateDTO);
+            if (post == null) {
+                return NotFound();
+            }
+
+            return Ok(post);
+        }
+
+        [HttpDelete("posts/{postId:int}")]
+        [Authorize]
+        [SwaggerResponse(404, "no post or post doesnt belong to user")]
+        [SwaggerResponse(200, "deleted")]
+        public async Task<IActionResult> DeletePost(int postId) {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            bool isSuccess = await _postService.DeletePostByIdAsync(postId, userId);
+            if (isSuccess) {
+                return Ok();
+            }
+
+            return NotFound();
         }
 
         [HttpGet("{userId}/threads")]
@@ -129,38 +155,31 @@ namespace BackendGameVibes.Controllers {
             return Ok(result);
         }
 
-        [HttpPatch("{postId}")]
+
+        [HttpGet("thread-section-names")]
+        public async Task<ActionResult<IEnumerable<object>>> GetSections() {
+            return Ok(await _threadService.GetSections());
+        }
+
+        [HttpGet("forum-roles")]
+        public async Task<ActionResult<IEnumerable<object>>> GetForumRoles() {
+            return Ok(await _threadService.GetForumRoles());
+        }
+
+        [HttpPost("interact/{postId:int}")]
         [Authorize]
-        [SwaggerResponse(404, "no post or post doesnt belong to user")]
-        [SwaggerResponse(200, "updated")]
-        public async Task<IActionResult> UpdatePost(int postId, ForumPostUpdateDTO postUpdateDTO) {
+        [SwaggerOperation("isLike = true,false,  null - noInteraction(remove Like/Dislike) zwracana tablica postInteractions pokazuje tylko aktualnego uzytkownika")]
+        public async Task<ActionResult> InteractPost(int postId, bool? isLike) {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
                 return Unauthorized("User not authenticated, claim not found");
 
-            ForumPost? post = await _postService.UpdatePostByIdAsync(postId, userId, postUpdateDTO);
+            object? post = await _postService.InteractPostAsync(userId, postId, isLike);
             if (post == null) {
                 return NotFound();
             }
 
             return Ok(post);
-        }
-
-        [HttpDelete("{postId}")]
-        [Authorize]
-        [SwaggerResponse(404, "no post or post doesnt belong to user")]
-        [SwaggerResponse(200, "deleted")]
-        public async Task<IActionResult> DeletePost(int postId) {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User not authenticated, claim not found");
-
-            bool isSuccess = await _postService.DeletePostByIdAsync(postId, userId);
-            if (isSuccess) {
-                return Ok();
-            }
-
-            return NotFound();
         }
     }
 }

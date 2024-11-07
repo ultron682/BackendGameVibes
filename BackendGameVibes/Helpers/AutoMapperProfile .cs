@@ -8,8 +8,7 @@ using BackendGameVibes.Models.DTOs.Reported;
 using BackendGameVibes.Models.Reviews;
 using BackendGameVibes.Models.User;
 
-namespace BackendGameVibes.Helpers
-{
+namespace BackendGameVibes.Helpers {
     public class AutoMapperProfile : Profile {
         public AutoMapperProfile() {
             CreateMap<ReviewDTO, Review>();
@@ -27,6 +26,7 @@ namespace BackendGameVibes.Helpers
             CreateMap<ReportedPost, ReportPostDTO>();
             CreateMap<ReportedReview, ReportReviewDTO>();
             CreateMap<ReportReviewDTO, ReportedReview>();
+            CreateMap<AddSectionDTO, ForumSection>();
         }
     }
 }

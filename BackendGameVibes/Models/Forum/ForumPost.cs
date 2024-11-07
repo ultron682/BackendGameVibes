@@ -21,10 +21,10 @@ namespace BackendGameVibes.Models.Forum {
         public string? UserOwnerId {
             get; set;
         }
-        public int Likes {
+        public int LikesCount {
             get; set;
         }
-        public int DisLikes {
+        public int DisLikesCount {
             get; set;
         }
 
@@ -35,6 +35,9 @@ namespace BackendGameVibes.Models.Forum {
             get; set;
         }
         public ICollection<Reported.ReportedPost>? ReportsToThisPosts {
+            get; set;
+        } = [];
+        public ICollection<ForumPostInteraction>? PostInteractions {
             get; set;
         } = [];
     }
