@@ -9,7 +9,7 @@ namespace BackendGameVibes.IServices.Forum {
         Task<object> GetPostsByUserIdAsync(string userId, int pageNumber, int postsSize);
         Task<object?> GetPostByIdAsync(int postId);
         Task<object?> GetPostsByPhraseAsync(string phrase, int pageNumber = 1, int postsSize = 10);
-        Task<ForumPost> AddForumPostAsync(ForumPostDTO forumPostDTO);
+        Task<ForumPost?> AddForumPostAsync(ForumPostDTO forumPostDTO);
         Task<bool> DeletePostByIdAsync(int postId, string userId);
         Task<ReportedPost?> FinishReportPostAsync(int id, bool toRemovePost);
         Task<ReportedPost?> ReportPostAsync(string userId, ReportPostDTO reportPostDTO);

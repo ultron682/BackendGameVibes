@@ -103,11 +103,17 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPost("posts")]
         [Authorize]
+        [SwaggerResponse(200, "created")]
+        [SwaggerResponse(400, "Wrong ForumThreadDTO")]
+        [SwaggerResponse(404, "no thread or no user")]
         public async Task<ActionResult<Thread>> CreatePost(ForumPostDTO forumPostDTO) {
             if (ModelState.IsValid) {
-                ForumPost forumPost = await _postService.AddForumPostAsync(forumPostDTO);
+                ForumPost? forumPost = await _postService.AddForumPostAsync(forumPostDTO);
+
+                if (forumPost == null)
+                    return NotFound();
+
                 return Ok(forumPost);
-                //return CreatedAtAction(nameof(GetThreadById), new { id = thread.Id }, thread);
             }
             else {
                 return BadRequest("Wrong ForumThreadDTO");

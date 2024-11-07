@@ -59,16 +59,16 @@ namespace BackendGameVibes.Services.Forum {
             .Skip((pageNumber - 1) * postsSize)
             .Take(postsSize)
             .Select(p => new {
-                 p.Id,
-                 p.Content,
-                 p.ThreadId,
-                 p.CreatedDateTime,
-                 p.LikesCount,
-                 p.DisLikesCount,
-                 p.UserOwnerId,
-                 username = p.UserOwner!.UserName,
-                 userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
-             })
+                p.Id,
+                p.Content,
+                p.ThreadId,
+                p.CreatedDateTime,
+                p.LikesCount,
+                p.DisLikesCount,
+                p.UserOwnerId,
+                username = p.UserOwner!.UserName,
+                userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
+            })
             .ToArrayAsync();
 
             int totalPosts = await _context.ForumPosts.Where(p => p.UserOwnerId == userId).CountAsync();
@@ -127,8 +127,16 @@ namespace BackendGameVibes.Services.Forum {
             };
         }
 
-        public async Task<ForumPost> AddForumPostAsync(ForumPostDTO newForumPostDTO) {
+        public async Task<ForumPost?> AddForumPostAsync(ForumPostDTO newForumPostDTO) {
             ForumPost newForumPost = _mapper.Map<ForumPost>(newForumPostDTO);
+
+            var foundThread = await _context.ForumThreads.FirstOrDefaultAsync(ft => ft.Id == newForumPostDTO.ThreadId);
+            if (foundThread == null)
+                return null;
+
+            var foundUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == newForumPostDTO.UserOwnerId);
+            if (foundUser == null)
+                return null;
 
             _context.ForumPosts.Add(newForumPost);
             await _context.SaveChangesAsync();
@@ -143,6 +151,9 @@ namespace BackendGameVibes.Services.Forum {
             if (forumPost == null) {
                 return null;
             }
+            var foundUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            if (foundUser == null)
+                return null;
 
             var existingReport = await _context.ReportedForumPosts
                 .FirstOrDefaultAsync(rp => rp.ForumPostId == reportPostDTO.ForumPostId && rp.ReporterUserId == userId);
