@@ -90,19 +90,13 @@ namespace BackendGameVibes.Services {
                 return null;
 
             var userRoles = await _userManager.GetRolesAsync(userGameVibes);
+            foreach (var role in userRoles) {
+                Console.WriteLine(role);
+            }
 
             var accountInfo = await _context.Users
-                .Where(u => u.Id == userGameVibes.Id)
-                .Include(u => u.UserReviews)
                 .Include(u => u.ForumRole)
                 .Include(u => u.ProfilePicture)
-                .Include(u => u.UserReportedReviews)
-                .Include(u => u.UserFriendRequestsReceived)
-                .Include(u => u.UserFriendRequestsSent)
-                .Include(u => u.UserForumThreads)
-                .Include(u => u.UserForumPosts)
-                .Include(u => u.UserReportedPosts)
-                .Include(u => u.UserFollowedGames)
                 .Select(u => new {
                     u.Id,
                     u.Email,
@@ -120,7 +114,7 @@ namespace BackendGameVibes.Services {
                     u.Description,
                     Roles = userRoles.ToArray(),
                 })
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(u => u.Id == userGameVibes.Id);
 
             return accountInfo!;
         }

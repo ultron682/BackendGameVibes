@@ -63,7 +63,7 @@ namespace BackendGameVibes.Controllers {
 
 
         // dane logowania konta admina w DbInitializer.cs
-        [HttpGet("user")]
+        [HttpGet("users")]
         [Authorize("admin")]
         public async Task<IActionResult> GetAllUsersWithRoles() {
             //var userRoles = await _userManager.GetRolesAsync(_userManager.FindByIdAsync());
@@ -107,21 +107,19 @@ namespace BackendGameVibes.Controllers {
             return Ok(usersWithRoles);
         }
 
-        [HttpGet("user/{userId}")]
+        [HttpGet("users/{userId}")]
         [Authorize("admin")]
         public async Task<IActionResult> GetUser(string userId) {
-            UserGameVibes? userGameVibes = await _userManager.FindByIdAsync(userId);
+            var accountInfo = await _accountService.GetBasicAccountInfoAsync(userId);
 
-            if (userGameVibes == null) {
+            if (accountInfo == null) {
                 return NotFound();
             }
-
-            var accountInfo = _accountService.GetBasicAccountInfoAsync(userGameVibes.Id);
 
             return Ok(accountInfo);
         }
 
-        [HttpPost("user")]
+        [HttpPost("users")]
         [Authorize("admin")]
         public async Task<IActionResult> AddUser(RegisterDTO newUserData) {
             if (newUserData == null) {
@@ -135,7 +133,7 @@ namespace BackendGameVibes.Controllers {
                 return BadRequest("User exist");
         }
 
-        [HttpDelete("user")]
+        [HttpDelete("users")]
         [Authorize("admin")]
         public async Task<IActionResult> DeleteUser(string userId) {
             UserGameVibes? userGameVibes = await _userManager.FindByIdAsync(userId);
@@ -151,35 +149,7 @@ namespace BackendGameVibes.Controllers {
             }
         }
 
-        [HttpDelete("review/{id}")]
-        [Authorize(Policy = "modOrAdmin")]
-        [SwaggerOperation("modOrAdmin")]
-        public async Task<IActionResult> DeleteReview(int id) {
-            var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == id);
-            if (review == null) {
-                return NotFound();
-            }
-
-            _context.Reviews.Remove(review);
-            await _context.SaveChangesAsync();
-            return Ok("removed");
-        }
-
-        [HttpDelete("post/{id}")]
-        [Authorize(Policy = "modOrAdmin")]
-        [SwaggerOperation("modOrAdmin")]
-        public async Task<IActionResult> DeletePost(int id) {
-            var post = await _context.ForumPosts.FirstOrDefaultAsync(p => p.Id == id);
-            if (post == null) {
-                return NotFound();
-            }
-
-            _context.ForumPosts.Remove(post);
-            await _context.SaveChangesAsync();
-            return Ok("removed");
-        }
-
-        [HttpPatch("user")]
+        [HttpPatch("users")]
         [Authorize(Policy = "modOrAdmin")]
         [SwaggerOperation("modOrAdmin")]
         public async Task<IActionResult> UpdateUser(UserGameVibesDTO userDTO) {
@@ -270,6 +240,34 @@ namespace BackendGameVibes.Controllers {
                 var result = await _accountService.UpdateProfilePictureAsync(userId, imageData);
                 return result ? Ok("ProfilePictureUpdated") : BadRequest("FailedToUpdateProfilePicture");
             }
+        }
+
+        [HttpDelete("reviews/{id}")]
+        [Authorize(Policy = "modOrAdmin")]
+        [SwaggerOperation("modOrAdmin")]
+        public async Task<IActionResult> DeleteReview(int id) {
+            var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == id);
+            if (review == null) {
+                return NotFound();
+            }
+
+            _context.Reviews.Remove(review);
+            await _context.SaveChangesAsync();
+            return Ok("removed");
+        }
+
+        [HttpDelete("post/{id}")]
+        [Authorize(Policy = "modOrAdmin")]
+        [SwaggerOperation("modOrAdmin")]
+        public async Task<IActionResult> DeletePost(int id) {
+            var post = await _context.ForumPosts.FirstOrDefaultAsync(p => p.Id == id);
+            if (post == null) {
+                return NotFound();
+            }
+
+            _context.ForumPosts.Remove(post);
+            await _context.SaveChangesAsync();
+            return Ok("removed");
         }
 
         [HttpGet("role")]
