@@ -156,7 +156,7 @@ namespace BackendGameVibes.Helpers {
                     Email = "admin@admin.com",
                     EmailConfirmed = true
                 };
-                string userPWD = "Admin123.";
+                string userPWD = "Test123.";
 
                 IdentityResult chkUser = await userManager.CreateAsync(newUser, userPWD);
 
@@ -178,7 +178,7 @@ namespace BackendGameVibes.Helpers {
                     Email = "mod@mod.com",
                     EmailConfirmed = true
                 };
-                string userPWD = "Mod123.";
+                string userPWD = "Test123.";
 
                 IdentityResult chkUser = await userManager.CreateAsync(newUser, userPWD);
 
@@ -344,7 +344,7 @@ namespace BackendGameVibes.Helpers {
 
                 int postsCount = random.Next(0, 10);
                 for (int j = 0; j < postsCount; j++) {
-                    await postService!.AddForumPost(new ForumPostDTO {
+                    await postService!.AddForumPostAsync(new ForumPostDTO {
                         Content = PostContent[random.Next(0, PostContent.Length)],
                         ThreadId = newForumThread.Id,
                         UserOwnerId = testUsers[random.Next(0, testUsers.Count)]!.Id
@@ -357,12 +357,12 @@ namespace BackendGameVibes.Helpers {
             startTime = DateTime.Now;
             Console.WriteLine("Adding reports for reviews and posts");
             var reviews = await applicationDbContext.Reviews.ToListAsync();
-            var posts = await applicationDbContext.ForumPosts.ToListAsync();
+            var forumPosts = await applicationDbContext.ForumPosts.ToListAsync();
 
             for (int i = 0; i < 20; i++) {
                 await postService!.ReportPostAsync(testUsers[random.Next(0, testUsers.Count)]!.Id!,
                     new ReportPostDTO {
-                        ForumPostId = posts[random.Next(0, posts.Count)].Id,
+                        ForumPostId = forumPosts[random.Next(0, forumPosts.Count)].Id,
                         Reason = SpamSuspicionContent[random.Next(0, SpamSuspicionContent.Length)]
                     });
 
@@ -375,7 +375,29 @@ namespace BackendGameVibes.Helpers {
                 Console.Write(".");
             }
 
-            Console.WriteLine("Finished Init DB");
+
+            Console.WriteLine($" {(DateTime.Now - startTime).TotalSeconds}");
+            startTime = DateTime.Now;
+            Console.WriteLine("Adding likes and dislikes for posts");
+
+            for (int i = 0; i < 200; i++) {
+                await postService!.InteractPostAsync(testUsers[random.Next(0, testUsers.Count)]!.Id!,
+                    forumPosts[random.Next(0, forumPosts.Count)].Id, true);
+
+                Console.Write(".");
+            }
+
+            Console.Write("  ^  ");
+
+            for (int i = 0; i < 200; i++) {
+                await postService!.InteractPostAsync(testUsers[random.Next(0, testUsers.Count)]!.Id!,
+                    forumPosts[random.Next(0, forumPosts.Count)].Id, false);
+
+                Console.Write(".");
+            }
+
+
+            Console.WriteLine("\nFinished Init DB");
         }
     }
 }
