@@ -5,7 +5,7 @@ using BackendGameVibes.Models.DTOs.Reported;
 
 namespace BackendGameVibes.IServices.Forum {
     public interface IForumPostService : IDisposable {
-        Task<object> GetPostsByThreadIdAsync(int idThread, string? userId, int pageNumber, int postsSize);
+        Task<object> GetPostsByThreadIdAsync(int idThread, string? userAccessToken, int pageNumber, int postsSize);
         Task<object> GetPostsByUserIdAsync(string userId, int pageNumber, int postsSize);
         Task<object?> GetPostByIdAsync(int postId);
         Task<object?> GetPostsByPhraseAsync(string phrase, int pageNumber = 1, int postsSize = 10);

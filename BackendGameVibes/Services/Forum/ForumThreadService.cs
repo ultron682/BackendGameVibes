@@ -90,7 +90,7 @@ namespace BackendGameVibes.Services.Forum {
 
         }
 
-        public async Task<object?> GetThreadWithPostsAsync(int threadId, string? userId = null, int pageNumber = 1, int postsSize = 10) {
+        public async Task<object?> GetThreadWithPostsAsync(int threadId, string? userAccessToken = null, int pageNumber = 1, int postsSize = 10) {
             var thread = await _context.ForumThreads
                 .Include(t => t.Posts)
                 .Select(t => new {
@@ -107,7 +107,7 @@ namespace BackendGameVibes.Services.Forum {
             if (thread == null)
                 return null;
 
-            var postsOfThread = await _postService.GetPostsByThreadIdAsync(threadId, userId, pageNumber, postsSize);
+            var postsOfThread = await _postService.GetPostsByThreadIdAsync(threadId, userAccessToken, pageNumber, postsSize);
 
             return new {
                 thread,
@@ -115,7 +115,7 @@ namespace BackendGameVibes.Services.Forum {
             };
         }
 
-        public async Task<object[]> GetLandingThreadsAsync() {
+        public async Task<object[]> GetThreadsLandingAsync() {
             return await _context.ForumThreads
                 .OrderByDescending(ft => ft.CreatedDateTime)
                 .Take(5)
@@ -138,7 +138,7 @@ namespace BackendGameVibes.Services.Forum {
                 .ToArrayAsync();
         }
 
-        public async Task<IEnumerable<object>> GetSectionsAsync() {
+        public async Task<IEnumerable<object>> GetForumSectionsAsync() {
             return await _context.ForumSections
                 .Select(s => new {
                     s.Id,
@@ -148,7 +148,7 @@ namespace BackendGameVibes.Services.Forum {
                 .ToArrayAsync();
         }
 
-        public async Task<IEnumerable<object>> GetAllForumRolesAsync() {
+        public async Task<IEnumerable<object>> GetForumRolesAsync() {
             var forumRoles = await _context.ForumRoles
              .Select(fr => new {
                  fr.Id,
@@ -259,7 +259,7 @@ namespace BackendGameVibes.Services.Forum {
             _context.ForumSections.Add(newSection);
             await _context.SaveChangesAsync();
 
-            return await GetSectionsAsync();
+            return await GetForumSectionsAsync();
         }
 
         public async Task<IEnumerable<object>> UpdateSectionAsync(int idSection, AddSectionDTO addSectionDTO) {
@@ -273,7 +273,7 @@ namespace BackendGameVibes.Services.Forum {
 
             await _context.SaveChangesAsync();
 
-            return await GetSectionsAsync();
+            return await GetForumSectionsAsync();
         }
 
         public async Task<IEnumerable<object>> RemoveSectionAsync(int idSection) {
@@ -284,7 +284,7 @@ namespace BackendGameVibes.Services.Forum {
             _context.ForumSections.Remove(section);
             await _context.SaveChangesAsync();
 
-            return await GetSectionsAsync();
+            return await GetForumSectionsAsync();
         }
 
         public void Dispose() {

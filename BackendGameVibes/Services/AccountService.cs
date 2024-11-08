@@ -26,11 +26,13 @@ namespace BackendGameVibes.Services {
         private readonly HtmlTemplateService _htmlTemplateService;
         private readonly IForumExperienceService _forumExperienceService;
         private readonly ActionCodesService _actionCodesService;
+        private readonly JwtTokenService _jwtTokenService;
 
         public AccountService(ApplicationDbContext context, UserManager<UserGameVibes> userManager,
             SignInManager<UserGameVibes> signInManager, IConfiguration configuration, MailService mail_Service,
             HtmlTemplateService htmlTemplateService, RoleManager<IdentityRole> roleManager,
-            IForumExperienceService forumExperienceService, ActionCodesService actionCodesService) {
+            IForumExperienceService forumExperienceService, ActionCodesService actionCodesService,
+            JwtTokenService jwtTokenService) {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
@@ -40,6 +42,7 @@ namespace BackendGameVibes.Services {
             _roleManager = roleManager;
             _forumExperienceService = forumExperienceService;
             _actionCodesService = actionCodesService;
+            _jwtTokenService = jwtTokenService;
         }
 
         public async Task<IdentityResult> RegisterUserAsync(RegisterDTO model) {
@@ -68,13 +71,22 @@ namespace BackendGameVibes.Services {
         }
 
         public async Task<(string, string[])> GenerateJwtTokenAsync(UserGameVibes user) {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             IList<string> roles = await _userManager.GetRolesAsync(user);
             var rolesString = string.Join(",", roles);
-            Console.WriteLine(rolesString);
-            var token = JwtTokenGenerator.GenerateToken(user.Email!, user.UserName!, user.Id, rolesString, key, _configuration["Jwt:Issuer"]!, _configuration["Jwt:Audience"]!);
+
+            var token = _jwtTokenService.GenerateToken(user.Email!,
+                user.UserName!,
+                user.Id,
+                rolesString
+            );
+
             return (token, roles.ToArray());
         }
+
+        public (string? email, string? username, string? userId, string? role) GetDataFromJwtTokenAsync(string accessToken) {
+            return _jwtTokenService.GetTokenClaims(accessToken);
+        }
+
 
         public async Task<SignInResult?> LoginUserAsync(UserGameVibes user, string password) {
             return await _signInManager.PasswordSignInAsync(user.UserName!, password, true, true);

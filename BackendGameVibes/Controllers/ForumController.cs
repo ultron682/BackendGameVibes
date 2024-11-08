@@ -29,8 +29,8 @@ namespace BackendGameVibes.Controllers {
 
         [SwaggerOperation("zwraca wątek z postami. jesli podamy userId to jeszcze będzie info o interakcji danego uzytkownika z postem")]
         [HttpGet("threads/{id:int}")]
-        public async Task<IActionResult> GetThreadWithPosts(int id, string? userId = null, int pageNumber = 1, int postsSize = 10) {
-            object? thread = await _threadService.GetThreadWithPostsAsync(id, userId, pageNumber, postsSize);
+        public async Task<IActionResult> GetThreadWithPosts(int id, string? userAccessToken = null, int pageNumber = 1, int postsSize = 10) {
+            object? thread = await _threadService.GetThreadWithPostsAsync(id, userAccessToken, pageNumber, postsSize);
 
             if (thread == null) {
                 return NotFound();
@@ -191,12 +191,12 @@ namespace BackendGameVibes.Controllers {
 
         [HttpGet("thread-section-names")]
         public async Task<ActionResult<IEnumerable<object>>> GetSections() {
-            return Ok(await _threadService.GetSectionsAsync());
+            return Ok(await _threadService.GetForumSectionsAsync());
         }
 
         [HttpGet("forum-roles")]
         public async Task<ActionResult<IEnumerable<object>>> GetForumRoles() {
-            return Ok(await _threadService.GetAllForumRolesAsync());
+            return Ok(await _threadService.GetForumRolesAsync());
         }
 
         [HttpPost("interact/{postId:int}")]

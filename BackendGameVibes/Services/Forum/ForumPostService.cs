@@ -7,8 +7,7 @@ using BackendGameVibes.Models.DTOs.Forum;
 using BackendGameVibes.Models.DTOs.Reported;
 using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.IServices.Forum;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using System.Threading;
+using BackendGameVibes.Helpers;
 
 
 namespace BackendGameVibes.Services.Forum {
@@ -16,14 +15,21 @@ namespace BackendGameVibes.Services.Forum {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly IForumExperienceService _forumExperienceService;
+        private readonly JwtTokenService _jwtTokenService;
 
-        public ForumPostService(ApplicationDbContext context, IMapper mapper, IForumExperienceService forumExperienceService) {
+        public ForumPostService(ApplicationDbContext context,
+            IMapper mapper,
+            IForumExperienceService forumExperienceService,
+            JwtTokenService jwtTokenService) {
             _context = context;
             _mapper = mapper;
             _forumExperienceService = forumExperienceService;
+            _jwtTokenService = jwtTokenService;
         }
 
-        public async Task<object> GetPostsByThreadIdAsync(int threadId, string? userId = null, int pageNumber = 1, int postsSize = 10) {
+        public async Task<object> GetPostsByThreadIdAsync(int threadId, string? userAccessToken = null, int pageNumber = 1, int postsSize = 10) {
+            var userId = _jwtTokenService.GetTokenClaims(userAccessToken!).userId ?? null;
+
             var query = await _context.ForumPosts
                 .Where(p => p.ThreadId == threadId)
                 .OrderByDescending(t => t.CreatedDateTime)
