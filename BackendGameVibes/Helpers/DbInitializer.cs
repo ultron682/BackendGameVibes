@@ -201,7 +201,7 @@ namespace BackendGameVibes.Helpers {
                         UserName = "test",
                         Email = "test@test.com",
                         EmailConfirmed = true,
-                        Description = "Hello, I'am GOD of the INNYCH GRACZY",
+                        Description = "Hello, I jestem GOD of the INNYCH GRACZY",
                         ProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultImagePath) }
                     }
                 ];
@@ -213,7 +213,7 @@ namespace BackendGameVibes.Helpers {
                         UserName = $"test{i}",
                         Email = $"test{i}@test.com",
                         EmailConfirmed = true,
-                        Description = "Hello, I'am good player. Test description",
+                        Description = "Hello, I'm good player. Test description",
                         ProfilePicture = newProfilePicture
                     });
                 }

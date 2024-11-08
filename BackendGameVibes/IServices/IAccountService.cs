@@ -7,7 +7,7 @@ using BackendGameVibes.Models;
 namespace BackendGameVibes.IServices {
     public interface IAccountService : IDisposable {
         Task<IdentityResult> ConfirmEmailAsync(string userId, string token);
-        Task<string> GenerateJwtTokenAsync(UserGameVibes user);
+        Task<(string, string[])> GenerateJwtTokenAsync(UserGameVibes user);
         Task<object?> GetBasicAccountInfoAsync(string userId);
         Task<object?> GetPublicAccountInfoAsync(string userId);
         Task<UserGameVibes?> GetUserByEmailAsync(string email);

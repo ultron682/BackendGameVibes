@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
+using System.Data;
 
 
 namespace BackendGameVibes.Services {
@@ -66,12 +67,13 @@ namespace BackendGameVibes.Services {
             return await _userManager.FindByIdAsync(userId);
         }
 
-        public async Task<string> GenerateJwtTokenAsync(UserGameVibes user) {
+        public async Task<(string, string[])> GenerateJwtTokenAsync(UserGameVibes user) {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-            var roles = await _userManager.GetRolesAsync(user);
+            IList<string> roles = await _userManager.GetRolesAsync(user);
             var rolesString = string.Join(",", roles);
+            Console.WriteLine(rolesString);
             var token = JwtTokenGenerator.GenerateToken(user.Email!, user.UserName!, user.Id, rolesString, key, _configuration["Jwt:Issuer"]!, _configuration["Jwt:Audience"]!);
-            return token;
+            return (token, roles.ToArray());
         }
 
         public async Task<SignInResult?> LoginUserAsync(UserGameVibes user, string password) {

@@ -67,18 +67,9 @@ namespace BackendGameVibes.Controllers {
 
                 var loginResult = await _accountService.LoginUserAsync(user, model.Password);
                 if (loginResult != null && loginResult.Succeeded) {
-                    var token = await _accountService.GenerateJwtTokenAsync(user);
+                    (string accessToken, string[] userRoles) = await _accountService.GenerateJwtTokenAsync(user);
 
-                    //var userToken = new IdentityUserToken<string> {
-                    //    UserId = user.Id,
-                    //    LoginProvider = "Default",
-                    //    Name = "LoginToken",
-                    //    Value = token
-                    //};
-
-                    //await _accountService.SaveTokenToDB(userToken); // todo: ERROR
-
-                    return Ok(new { accessToken = token });
+                    return Ok(new { accessToken, userRoles });
                 }
                 else if (loginResult!.IsLockedOut) {
                     var timeToEndLockout = user.LockoutEnd!.Value.Subtract(DateTime.Now);
