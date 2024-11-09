@@ -1,3 +1,4 @@
+using BackendGameVibes;
 using BackendGameVibes.Data;
 using BackendGameVibes.Helpers;
 using BackendGameVibes.IServices;
@@ -83,6 +84,7 @@ builder.Services.AddControllers()
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
+builder.Services.AddHostedService<BackgroundServiceRefresh>();
 builder.Services.AddSingleton<JwtTokenService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
