@@ -21,7 +21,7 @@ namespace BackendGameVibes.Services {
         }
 
         public SteamApp[] GetAllSteamIdsGames() {
-            return _steamService.steamGames[29000..30000];
+            return _steamService.steamGames![29000..30000];
         }
 
         public SteamApp[] FindSteamAppByName(string searchingName) {
@@ -123,7 +123,8 @@ namespace BackendGameVibes.Services {
                     Description = steamGameData?.detailed_description ?? "Brak opisu",
                     CoverImage = @$"https://steamcdn-a.akamaihd.net/steam/apps/{steamGameId}/library_600x900_2x.jpg",
                     ReleaseDate = ParseReleaseDate(steamGameData?.release_date.Date),
-                    GameImages = steamGameData?.screenshots?.Select(s => new GameImage { ImagePath = s.path_full }).ToList() ?? new List<GameImage>()
+                    GameImages = steamGameData?.screenshots?.Select(s => new GameImage { ImagePath = s.path_full }).ToList() ?? new List<GameImage>(),
+                    Genres = [],
                 };
 
                 // Przypisanie gatunków
@@ -158,8 +159,7 @@ namespace BackendGameVibes.Services {
             return resultsGames.ToArray();
         }
 
-        // Metoda pomocnicza do parsowania daty
-        private DateOnly ParseReleaseDate(string? date) {
+        private DateOnly ParseReleaseDate(string date) {
             try {
                 return DateOnly.ParseExact(date, "d MMM, yyyy", System.Globalization.CultureInfo.InvariantCulture);
             }
@@ -168,7 +168,6 @@ namespace BackendGameVibes.Services {
             }
         }
 
-        // Metoda pomocnicza do identyfikacji platform
         private List<int> GetPlatformIds(dynamic platforms) {
             var platformIds = new List<int>();
             try {

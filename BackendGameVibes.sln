@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackendGameVibes", "Backend
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{8B34CCEC-7BF9-415F-A48D-563EB0BE2D2D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BackendGameVibes.Tests", "BackendGameVibes.Tests\BackendGameVibes.Tests.csproj", "{BD9E82E2-9CC5-4C60-BD4B-6783320CFD9E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{8B34CCEC-7BF9-415F-A48D-563EB0BE2D2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B34CCEC-7BF9-415F-A48D-563EB0BE2D2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B34CCEC-7BF9-415F-A48D-563EB0BE2D2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD9E82E2-9CC5-4C60-BD4B-6783320CFD9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD9E82E2-9CC5-4C60-BD4B-6783320CFD9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD9E82E2-9CC5-4C60-BD4B-6783320CFD9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD9E82E2-9CC5-4C60-BD4B-6783320CFD9E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
