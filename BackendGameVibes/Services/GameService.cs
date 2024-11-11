@@ -57,13 +57,15 @@ public class GameService : IGameService {
 
     public async Task<object?> GetFilteredGames(FiltersGamesDTO filtersGamesDTO, int pageNumber = 1, int resultSize = 10) {
         var query = await _context.Games
-            .Where(g => filtersGamesDTO.GenresIds!.Contains(g.Genres!.Select(g => g.Id).FirstOrDefault())
-            && g.LastCalculatedRatingFromReviews >= filtersGamesDTO.RatingMin
-            && g.LastCalculatedRatingFromReviews <= filtersGamesDTO.RatingMax)
+            .Include(g => g.Genres)
+            .Where(g =>
+                (filtersGamesDTO.GenresIds == null || !filtersGamesDTO.GenresIds.Any() || g.Genres!.Any(genre => filtersGamesDTO.GenresIds.Contains(genre.Id))) &&
+                g.LastCalculatedRatingFromReviews >= filtersGamesDTO.RatingMin &&
+                g.LastCalculatedRatingFromReviews <= filtersGamesDTO.RatingMax
+            )
             .OrderByDescending(t => t.ReleaseDate)
             .Skip((pageNumber - 1) * resultSize)
             .Take(resultSize)
-            .Include(g => g.Genres)
             .Select(g => new {
                 g.Id,
                 g.Title,

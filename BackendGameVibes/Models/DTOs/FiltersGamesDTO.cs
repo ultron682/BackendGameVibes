@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BackendGameVibes.Models.DTOs {
     public class FiltersGamesDTO {
-        [Required]
         public int[]? GenresIds { get; set; } // category ids
         [Required]
         [DefaultValue("0.0")]
