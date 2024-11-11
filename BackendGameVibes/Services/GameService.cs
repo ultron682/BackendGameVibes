@@ -343,6 +343,53 @@ public class GameService : IGameService {
             .ToArrayAsync();
     }
 
+    public async Task<object?> UpdateGame(int gameId, GameUpdateDTO gameUpdateDTO) {
+        if (gameUpdateDTO == null) {
+            return null;
+        }
+
+        var game = await _context.Games
+            .Include(g => g.Genres)
+            .Include(g => g.Platforms)
+            .FirstOrDefaultAsync(g => g.Id == gameId);
+
+        if (game == null) {
+            return null;
+        }
+
+        try {
+            game.Title = gameUpdateDTO.Title ?? game.Title;
+            game.Description = gameUpdateDTO.Description ?? game.Description;
+            game.ReleaseDate = gameUpdateDTO.ReleaseDate ?? game.ReleaseDate;
+            game.SteamId = gameUpdateDTO.SteamId ?? game.SteamId;
+            game.CoverImage = gameUpdateDTO.CoverImage ?? game.CoverImage;
+            game.LastCalculatedRatingFromReviews = gameUpdateDTO.LastCalculatedRatingFromReviews ?? game.LastCalculatedRatingFromReviews;
+
+            _context.Games.Update(game);
+            await _context.SaveChangesAsync();
+        }
+        catch {
+            return null;
+        }
+
+        return game;
+    }
+
+    public async Task<bool?> RemoveGame(int gameId) {
+        var game = await _context.Games
+            .Include(g => g.Genres)
+            .Include(g => g.Platforms)
+            .FirstOrDefaultAsync(g => g.Id == gameId);
+
+        if (game == null) {
+            return null;
+        }
+
+        _context.Games.Remove(game);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
     public void Dispose() {
         _context.Dispose();
     }

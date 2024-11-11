@@ -16,4 +16,6 @@ public interface IGameService : IDisposable {
     Task<object[]> GetUpcomingGames();
     Task<object?> GetGameReviews(int id, int pageNumber = 1, int resultSize = 10);
     Task<(Game?, bool)[]> InitGamesBySteamIds(ApplicationDbContext applicationDbContext, HashSet<int> steamGamesToInitID);
+    Task<object?> UpdateGame(int gameId, GameUpdateDTO gameUpdateDTO);
+    Task<bool?> RemoveGame(int gameId);
 }

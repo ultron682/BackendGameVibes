@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using BackendGameVibes.Models.Steam;
 using Swashbuckle.AspNetCore.Annotations;
 using BackendGameVibes.Models.Games;
+using System.Security.Claims;
 
 namespace BackendGameVibes.Controllers;
 [ApiController]

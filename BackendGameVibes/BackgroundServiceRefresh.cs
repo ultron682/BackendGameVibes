@@ -3,7 +3,7 @@
         private Timer? _timer;
 
         public Task StartAsync(CancellationToken cancellationToken) {
-            _timer = new Timer(RefreshWork, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+            _timer = new Timer(RefreshWork, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
             return Task.CompletedTask;
         }
 

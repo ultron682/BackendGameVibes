@@ -14,6 +14,8 @@ using BackendGameVibes.IServices.Forum;
 using BackendGameVibes.Models.DTOs;
 using BackendGameVibes.Models.Forum;
 using System.Data;
+using BackendGameVibes.Services;
+using System.Security.Claims;
 
 
 namespace BackendGameVibes.Controllers {
@@ -29,7 +31,7 @@ namespace BackendGameVibes.Controllers {
         private readonly IForumPostService _forumPostService;
         private readonly IForumThreadService _forumThreadService;
         private readonly IReviewService _reviewService;
-
+        private readonly IGameService _gameService;
 
         public AdministrationController(ApplicationDbContext context,
             UserManager<UserGameVibes> userManager,
@@ -39,7 +41,8 @@ namespace BackendGameVibes.Controllers {
             IRoleService roleService,
             IForumPostService forumPostService,
             IForumThreadService forumThreadService,
-            IReviewService reviewService) {
+            IReviewService reviewService,
+            IGameService gameService) {
             _context = context;
             _mapper = mapper;
             _accountService = accountService;
@@ -49,6 +52,7 @@ namespace BackendGameVibes.Controllers {
             _forumPostService = forumPostService;
             _forumThreadService = forumThreadService;
             _reviewService = reviewService;
+            _gameService = gameService;
         }
 
         [SwaggerOperation("Usuwa baze i tworzy plik bazy od początku. Zamyka aplikację którą trzeba ręcznie ponownie uruchomic")]
@@ -379,6 +383,17 @@ namespace BackendGameVibes.Controllers {
         [Authorize("admin")]
         public async Task<ActionResult<IEnumerable<object>>> RemoveSection(int sectionId) {
             return Ok(await _forumThreadService.RemoveSectionAsync(sectionId));
+        }
+
+        [HttpPatch("games/update")]
+        [Authorize(Roles = "admin,mod")]
+        [SwaggerOperation("Require authorization admin or mod")]
+        public async Task<ActionResult> UpdateGame([FromBody] GameUpdateDTO gameUpdateDTO, int gameId) {
+            var game = await _gameService.UpdateGame(gameId, gameUpdateDTO);
+            if (game == null)
+                return NotFound("Game not found");
+
+            return Ok(game);
         }
     }
 }
