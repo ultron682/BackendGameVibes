@@ -395,5 +395,16 @@ namespace BackendGameVibes.Controllers {
 
             return Ok(game);
         }
+
+        [HttpPatch("games/remove")]
+        [Authorize(Roles = "admin,mod")]
+        [SwaggerOperation("Require authorization admin or mod")]
+        public async Task<ActionResult> RemoveGame(int gameId) {
+            var isRemoved = await _gameService.RemoveGame(gameId);
+            if (isRemoved == null)
+                return NotFound("Game not found or error");
+
+            return Ok(isRemoved);
+        }
     }
 }
