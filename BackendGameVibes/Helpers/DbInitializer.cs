@@ -142,6 +142,7 @@ namespace BackendGameVibes.Helpers {
             Console.WriteLine("Start Init DB");
 
             Console.WriteLine("Adding users with roles");
+            var defaultProfileImagePath = Path.Combine("wwwroot/Images", "default-profile.jpg");
             List<UserGameVibes?> testUsers = [];
 
 
@@ -151,10 +152,12 @@ namespace BackendGameVibes.Helpers {
                 await roleManager.CreateAsync(role);
 
                 //Admin           
+                var newProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultProfileImagePath) };
                 var newUser = new UserGameVibes {
                     UserName = "admin",
                     Email = "admin@admin.com",
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
+                    ProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultProfileImagePath) }
                 };
                 string userPWD = "Test123.";
 
@@ -173,10 +176,12 @@ namespace BackendGameVibes.Helpers {
                 await roleManager.CreateAsync(role);
 
                 //Mod         
+                var newProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultProfileImagePath) };
                 var newUser = new UserGameVibes {
                     UserName = "mod",
                     Email = "mod@mod.com",
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
+                    ProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultProfileImagePath) }
                 };
                 string userPWD = "Test123.";
 
@@ -194,20 +199,18 @@ namespace BackendGameVibes.Helpers {
                 role.Name = "user";
                 await roleManager.CreateAsync(role);
 
-                var defaultImagePath = Path.Combine("wwwroot/Images", "default-profile.jpg");
-
                 HashSet<UserGameVibes> newNotCreatedUsersGameVibes = [
                     new UserGameVibes {
                         UserName = "test",
                         Email = "test@test.com",
                         EmailConfirmed = true,
                         Description = "Hello, I jestem GOD of the INNYCH GRACZY",
-                        ProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultImagePath) }
+                        ProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultProfileImagePath) }
                     }
                 ];
 
                 for (int i = 2; i <= 10; i++) {
-                    var newProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultImagePath) };
+                    var newProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultProfileImagePath) };
 
                     newNotCreatedUsersGameVibes.Add(new UserGameVibes {
                         UserName = $"test{i}",
