@@ -63,7 +63,7 @@ namespace BackendGameVibes.Services {
 
         public async Task<GameData?> GetInfoGame(int id) {
             try {
-                var response = await _httpClient.GetAsync($"https://store.steampowered.com/api/appdetails?appids={id}");
+                var response = await _httpClient.GetAsync($"https://store.steampowered.com/api/appdetails?appids={id}&l=polish");
 
                 if (response.IsSuccessStatusCode) {
                     var jsonString = await response.Content.ReadAsStringAsync();
