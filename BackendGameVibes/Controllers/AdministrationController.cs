@@ -387,7 +387,7 @@ namespace BackendGameVibes.Controllers {
 
         [HttpPatch("games/update")]
         [Authorize(Roles = "admin,mod")]
-        [SwaggerOperation("Require authorization admin or mod")]
+        [SwaggerOperation("Require authorization admin or mod. Dajesz tylko te wlasciwosci ktore chcesz zmienic. nadpisuje się cała kolekcja wiec np. imagesUrls musisz podac wszystkie wraz z nowymi")]
         public async Task<ActionResult> UpdateGame([FromBody] GameUpdateDTO gameUpdateDTO, int gameId) {
             var game = await _gameService.UpdateGame(gameId, gameUpdateDTO);
             if (game == null)
@@ -396,7 +396,7 @@ namespace BackendGameVibes.Controllers {
             return Ok(game);
         }
 
-        [HttpPatch("games/remove")]
+        [HttpDelete("games/remove")]
         [Authorize(Roles = "admin,mod")]
         [SwaggerOperation("Require authorization admin or mod")]
         public async Task<ActionResult> RemoveGame(int gameId) {

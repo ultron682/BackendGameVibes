@@ -1,4 +1,8 @@
-﻿namespace BackendGameVibes.Models.DTOs;
+﻿using BackendGameVibes.Models.Games;
+using BackendGameVibes.Models.Reviews;
+using BackendGameVibes.Models.User;
+
+namespace BackendGameVibes.Models.DTOs;
 
 public class GameUpdateDTO {
     public string? Title {
@@ -17,6 +21,15 @@ public class GameUpdateDTO {
         get; set;
     }
     public double? LastCalculatedRatingFromReviews {
+        get; set;
+    }
+    public ICollection<int>? PlatformsIds {
+        get; set;
+    }
+    public ICollection<int>? GenresIds {
+        get; set;
+    }
+    public ICollection<string>? GameImagesUrls {
         get; set;
     }
 }

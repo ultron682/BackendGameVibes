@@ -351,6 +351,7 @@ public class GameService : IGameService {
         var game = await _context.Games
             .Include(g => g.Genres)
             .Include(g => g.Platforms)
+            .Include(g => g.GameImages)
             .FirstOrDefaultAsync(g => g.Id == gameId);
 
         if (game == null) {
@@ -365,6 +366,18 @@ public class GameService : IGameService {
             game.CoverImage = gameUpdateDTO.CoverImage ?? game.CoverImage;
             game.LastCalculatedRatingFromReviews = gameUpdateDTO.LastCalculatedRatingFromReviews ?? game.LastCalculatedRatingFromReviews;
 
+            if (gameUpdateDTO.GenresIds != null) {
+                game.Genres = await _context.Genres.Where(g => gameUpdateDTO.GenresIds.Contains(g.Id)).ToListAsync();
+            }
+
+            if (gameUpdateDTO.PlatformsIds != null) {
+                game.Platforms = await _context.Platforms.Where(p => gameUpdateDTO.PlatformsIds.Contains(p.Id)).ToListAsync();
+            }
+
+            if (gameUpdateDTO.GameImagesUrls != null) {
+                game.GameImages = gameUpdateDTO.GameImagesUrls.Select(url => new GameImage { ImagePath = url }).ToList();
+            }
+
             _context.Games.Update(game);
             await _context.SaveChangesAsync();
         }
@@ -372,7 +385,7 @@ public class GameService : IGameService {
             return null;
         }
 
-        return game;
+        return GetGame(game.Id);
     }
 
     public async Task<bool?> RemoveGame(int gameId) {
