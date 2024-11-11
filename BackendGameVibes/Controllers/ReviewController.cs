@@ -23,14 +23,14 @@ namespace BackendGameVibes.Controllers {
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllReviews() {
-            var reviews = await _reviewService.GetAllReviewsAsync();
+        public async Task<IActionResult> GetAllReviews(int pageNumber = 1, int resultSize = 10) {
+            var reviews = await _reviewService.GetAllReviewsAsync(pageNumber, resultSize);
             return Ok(reviews);
         }
 
         [HttpPost("search-phrase")]
-        public async Task<IActionResult> GetFilteredReviews([Required] ValueModel searchPhrase) {
-            var reviews = await _reviewService.GetFilteredReviewsAsync(searchPhrase.Value!);
+        public async Task<IActionResult> GetFilteredReviews([Required] ValueModel searchPhrase, int pageNumber = 1, int resultSize = 10) {
+            var reviews = await _reviewService.GetFilteredReviewsAsync(searchPhrase.Value!, pageNumber, resultSize);
             if (reviews == null) {
                 return NotFound();
             }
@@ -63,16 +63,6 @@ namespace BackendGameVibes.Controllers {
             else
                 return BadRequest("No gameId in db");
         }
-
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> UpdateReview(int id, [FromBody] Review review) {
-        //    if (id != review.Id) {
-        //        return BadRequest();
-        //    }
-
-        //    await _reviewService.UpdateReviewAsync(review);
-        //    return NoContent();
-        //}
 
         [HttpPost("report")]
         [Authorize]

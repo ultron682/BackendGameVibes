@@ -20,8 +20,11 @@ namespace BackendGameVibes.Services {
             _forumExperienceService = forumExperienceService;
         }
 
-        public async Task<IEnumerable<object>> GetAllReviewsAsync() {
-            return await _context.Reviews
+        public async Task<object?> GetAllReviewsAsync(int pageNumber = 1, int resultSize = 10) {
+            var query = await _context.Reviews
+                .OrderByDescending(t => t.CreatedAt)
+                .Skip((pageNumber - 1) * resultSize)
+                .Take(resultSize)
                 .Include(r => r.UserGameVibes)
                 .Select(r => new {
                     r.Id,
@@ -34,8 +37,51 @@ namespace BackendGameVibes.Services {
                     GameTitle = r.Game != null ? r.Game.Title : "NoData",
                     r.CreatedAt,
                 })
-                .ToArrayAsync();
+            .ToArrayAsync();
+
+            int totalResults = await _context.Reviews.CountAsync();
+
+            return new {
+                TotalResults = totalResults,
+                PageSize = resultSize,
+                CurrentPage = pageNumber,
+                TotalPages = (int)Math.Ceiling(totalResults / (double)resultSize),
+                Data = query
+            };
         }
+
+        public async Task<object?> GetFilteredReviewsAsync(string searchPhrase, int pageNumber = 1, int resultSize = 10) {
+            searchPhrase = searchPhrase.ToLower();
+
+            var query = await _context.Reviews
+                .Where(r => r.Comment!.ToLower().Contains(searchPhrase))
+                .OrderByDescending(t => t.CreatedAt)
+                .Skip((pageNumber - 1) * resultSize)
+                .Take(resultSize)
+                .Select(r => new {
+                    r.Id,
+                    r.GeneralScore,
+                    r.GameplayScore,
+                    r.GraphicsScore,
+                    r.AudioScore,
+                    r.Comment,
+                    Username = r.UserGameVibes != null ? r.UserGameVibes.UserName : "NoUsername",
+                    GameTitle = r.Game != null ? r.Game.Title : "NoData",
+                    r.CreatedAt,
+                })
+                .ToArrayAsync();
+
+            int totalResults = await _context.Reviews.Where(r => r.Comment!.ToLower().Contains(searchPhrase)).CountAsync();
+
+            return new {
+                TotalResults = totalResults,
+                PageSize = resultSize,
+                CurrentPage = pageNumber,
+                TotalPages = (int)Math.Ceiling(totalResults / (double)resultSize),
+                Data = query
+            };
+        }
+
 
         public async Task<object?> GetReviewByIdAsync(int id) {
             var review = await _context.Reviews
@@ -143,25 +189,6 @@ namespace BackendGameVibes.Services {
             await _context.SaveChangesAsync();
 
             return reportedReview;
-        }
-
-        public async Task<object[]?> GetFilteredReviewsAsync(string searchPhrase) {
-            searchPhrase = searchPhrase.ToLower();
-
-            return await _context.Reviews
-                .Select(r => new {
-                    r.Id,
-                    r.GeneralScore,
-                    r.GameplayScore,
-                    r.GraphicsScore,
-                    r.AudioScore,
-                    r.Comment,
-                    Username = r.UserGameVibes != null ? r.UserGameVibes.UserName : "NoUsername",
-                    GameTitle = r.Game != null ? r.Game.Title : "NoData",
-                    r.CreatedAt,
-                })
-                .Where(r => r.Comment!.ToLower().Contains(searchPhrase))
-                .ToArrayAsync();
         }
 
         public async Task<Review?> UpdateReviewByIdAsync(int reviewId, string userId, ReviewUpdateDTO reviewUpdateDTO) {
