@@ -93,6 +93,7 @@ builder.Services.AddTransient<MailService>();
 builder.Services.AddSingleton<HtmlTemplateService>();
 builder.Services.AddSingleton<SteamService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IForumRoleService, ForumRoleService>();
 builder.Services.AddScoped<IForumThreadService, ForumThreadService>();
 builder.Services.AddScoped<IForumPostService, ForumPostService>();
 builder.Services.AddTransient<IForumExperienceService, ForumExperienceService>();
