@@ -27,9 +27,6 @@ namespace BackendGameVibes.Data {
         public DbSet<GameImage> GameImages {
             get; set;
         }
-        public DbSet<SystemRequirement> SystemRequirements {
-            get; set;
-        }
         public DbSet<Review> Reviews {
             get; set;
         }
@@ -130,6 +127,10 @@ namespace BackendGameVibes.Data {
                 ent.Property(g => g.Description)
                     .HasMaxLength(10000);
 
+                ent.Property(g => g.LastCalculatedRatingFromReviews)
+                    .HasPrecision(3, 1)
+                    .HasDefaultValue(0.0);
+
                 ent.HasMany(g => g.Platforms)
                     .WithMany(p => p.Games)
                     .UsingEntity(j => j.ToTable("GamesPlatforms")); // many to many so we need 3 table to store the relationship
@@ -142,11 +143,6 @@ namespace BackendGameVibes.Data {
                     .WithOne(img => img.Game)
                     .HasForeignKey(img => img.GameId)
                     .OnDelete(DeleteBehavior.Cascade);
-
-                ent.HasMany(g => g.SystemRequirements)
-                    .WithOne(sr => sr.Game)
-                    .HasForeignKey(sr => sr.GameId)
-                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             // Platform ent
@@ -183,36 +179,6 @@ namespace BackendGameVibes.Data {
                     .HasMaxLength(255);
             });
 
-            // SystemRequirement ent
-            mB.Entity<SystemRequirement>(ent => {
-                ent.HasKey(sr => sr.Id);
-
-                ent.Property(sr => sr.CpuRequirement)
-                    .IsRequired()
-                    .HasMaxLength(100);
-
-                ent.Property(sr => sr.GpuRequirement)
-                    .IsRequired()
-                    .HasMaxLength(100);
-
-                ent.Property(sr => sr.RamRequirement)
-                    .IsRequired()
-                    .HasMaxLength(50);
-
-                ent.Property(sr => sr.DiskRequirement)
-                    .IsRequired()
-                    .HasMaxLength(50);
-
-                ent.Property(sr => sr.OperatingSystemRequirement)
-                    .IsRequired()
-                    .HasMaxLength(100);
-
-                ent.HasOne(sr => sr.Game)
-                    .WithMany(g => g.SystemRequirements)
-                    .HasForeignKey(sr => sr.GameId)
-                    .OnDelete(DeleteBehavior.Cascade);
-            });
-
             // Review ent
             mB.Entity<Review>(ent => {
                 ent.HasKey(r => r.Id);
@@ -243,6 +209,9 @@ namespace BackendGameVibes.Data {
                 ent.Property(r => r.UpdatedAt)
                     .HasDefaultValueSql("CURRENT_TIMESTAMP(6)")
                     .IsRequired();
+
+                ent.Property(r => r.AverageRating)
+                    .HasPrecision(3, 1);
 
                 ent.HasOne(r => r.Game)
                     .WithMany(g => g.Reviews)

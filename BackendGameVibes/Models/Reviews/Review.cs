@@ -24,6 +24,9 @@ namespace BackendGameVibes.Models.Reviews {
         public double GameplayScore {
             get; set;
         }
+        public double AverageRating {
+            get; set;
+        }
         public string? Comment {
             get; set;
         } // change property name from "Comment" to "Content"

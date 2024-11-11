@@ -320,7 +320,7 @@ namespace BackendGameVibes.Helpers {
             startTime = DateTime.Now;
             Console.WriteLine("Adding reviews for games");
 
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 250; i++) {
                 await reviewService.AddReviewAsync(new Review {
                     GameId = createdGames[random.Next(0, createdGames.Count)].game!.Id,
                     Comment = PostContent[random.Next(0, PostContent.Length)],
