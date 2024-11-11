@@ -338,22 +338,24 @@ namespace BackendGameVibes.Helpers {
             startTime = DateTime.Now;
             Console.WriteLine("Adding threads with posts");
             for (int i = 0; i < 50; i++) {
-                ForumThread newForumThread = await threadService!.AddThreadAsync(new NewForumThreadDTO {
+                ForumThread? newForumThread = await threadService!.AddThreadAsync(new NewForumThreadDTO {
                     Title = ForumThreadsTitles[random.Next(0, ForumThreadsTitles.Length)],
                     UserOwnerId = testUsers[random.Next(0, testUsers.Count)]!.Id!,
                     SectionId = random.Next(1, 5),
                     FirstForumPostContent = PostContent[random.Next(0, PostContent.Length)]
                 });
 
-                int postsCount = random.Next(0, 10);
-                for (int j = 0; j < postsCount; j++) {
-                    await postService!.AddForumPostAsync(new ForumPostDTO {
-                        Content = PostContent[random.Next(0, PostContent.Length)],
-                        ThreadId = newForumThread.Id,
-                        UserOwnerId = testUsers[random.Next(0, testUsers.Count)]!.Id
-                    });
+                if (newForumThread != null) {
+                    int postsCount = random.Next(10, 30);
+                    for (int j = 0; j < postsCount; j++) {
+                        await postService!.AddForumPostAsync(new ForumPostDTO {
+                            Content = PostContent[random.Next(0, PostContent.Length)],
+                            ThreadId = newForumThread.Id,
+                            UserOwnerId = testUsers[random.Next(0, testUsers.Count)]!.Id
+                        });
+                    }
+                    Console.Write(".");
                 }
-                Console.Write(".");
             }
 
             Console.WriteLine($" {(DateTime.Now - startTime).TotalSeconds}");
@@ -383,7 +385,7 @@ namespace BackendGameVibes.Helpers {
             startTime = DateTime.Now;
             Console.WriteLine("Adding likes and dislikes for posts");
 
-            for (int i = 0; i < 200; i++) {
+            for (int i = 0; i < 300; i++) {
                 await postService!.InteractPostAsync(testUsers[random.Next(0, testUsers.Count)]!.Id!,
                     forumPosts[random.Next(0, forumPosts.Count)].Id, true);
 
@@ -392,7 +394,7 @@ namespace BackendGameVibes.Helpers {
 
             Console.Write("  ^  ");
 
-            for (int i = 0; i < 200; i++) {
+            for (int i = 0; i < 100; i++) {
                 await postService!.InteractPostAsync(testUsers[random.Next(0, testUsers.Count)]!.Id!,
                     forumPosts[random.Next(0, forumPosts.Count)].Id, false);
 
