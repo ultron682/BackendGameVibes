@@ -249,6 +249,21 @@ public class AdministrationController : ControllerBase {
         }
     }
 
+    [HttpPost("user/set-forum-role")]
+    [Authorize(Policy = "modOrAdmin")]
+    [SwaggerOperation("modOrAdmin")]
+    public async Task<IActionResult> SetForumRoleForUser([Required] string userId, [Required] int forumRoleId) {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null) {
+            return NotFound("NoUser");
+        }
+
+        user.ForumRoleId = forumRoleId;
+        await _userManager.UpdateAsync(user);
+
+        return Ok("ForumRoleUpdated");
+    }
+
     [HttpDelete("reviews/{id}")]
     [Authorize(Policy = "modOrAdmin")]
     [SwaggerOperation("modOrAdmin")]
