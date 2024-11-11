@@ -224,7 +224,7 @@ public class ReviewService : IReviewService {
             .FirstOrDefaultAsync(g => g.Id == gameId);
 
         if (game != null) {
-            var averageRating = game.Reviews!.Select(c => c.AverageRating).Average();
+            var averageRating = Math.Round(game.Reviews!.Select(c => c.AverageRating).Average(), 1);
             game.LastCalculatedRatingFromReviews = averageRating;
             _context.Games.Update(game);
 
