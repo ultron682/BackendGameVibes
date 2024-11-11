@@ -1,8 +1,7 @@
 ﻿using BackendGameVibes.Models.Reviews;
 using BackendGameVibes.Models.User;
 
-namespace BackendGameVibes.Models.Games
-{
+namespace BackendGameVibes.Models.Games {
     public class Game {
         public int Id {
             get; set;
@@ -22,6 +21,9 @@ namespace BackendGameVibes.Models.Games
         public string? CoverImage {
             get; set;
         }
+        public double? LastCalculatedRatingFromReviews {
+            get; set;
+        }
 
         public ICollection<Platform>? Platforms {
             get; set;
@@ -30,9 +32,6 @@ namespace BackendGameVibes.Models.Games
             get; set;
         } = [];
         public ICollection<GameImage>? GameImages {
-            get; set;
-        }
-        public ICollection<SystemRequirement>? SystemRequirements {
             get; set;
         }
         public ICollection<Review>? Reviews {
