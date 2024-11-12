@@ -28,7 +28,9 @@ namespace BackendGameVibes.Services.Forum {
         }
 
         public async Task<object> GetPostsByThreadIdAsync(int threadId, string? userAccessToken = null, int pageNumber = 1, int postsSize = 10) {
-            var userId = _jwtTokenService.GetTokenClaims(userAccessToken!).userId ?? null;
+            string? userId = null;
+            if (userAccessToken != null)
+                userId = _jwtTokenService.GetTokenClaims(userAccessToken).userId ?? null;
 
             var query = await _context.ForumPosts
                 .Where(p => p.ThreadId == threadId)

@@ -30,7 +30,7 @@ public class ForumController : ControllerBase {
         return Ok(await _threadService.GetThreadsGroupBySectionsAsync(pageNumber, threadsInSectionSize));
     }
 
-    [SwaggerOperation("zwraca wątek z postami. jesli podamy userId to jeszcze będzie info o interakcji danego uzytkownika z postem")]
+    [SwaggerOperation("zwraca wątek z postami. jesli podamy userAccessToken to jeszcze będzie info o interakcji danego uzytkownika z postem (optional)")]
     [HttpGet("threads/{id:int}")]
     public async Task<IActionResult> GetThreadWithPosts(int id, string? userAccessToken = null, int pageNumber = 1, int postsSize = 10) {
         object? thread = await _threadService.GetThreadWithPostsAsync(id, userAccessToken, pageNumber, postsSize);
@@ -59,7 +59,11 @@ public class ForumController : ControllerBase {
     [SwaggerResponse(400, "NoUser or NoSection found")]
     public async Task<IActionResult> CreateThread(NewForumThreadDTO forumThreadDTO) {
         if (ModelState.IsValid) {
-            ForumThread? forumThread = await _threadService.AddThreadAsync(forumThreadDTO);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                return Unauthorized("User not authenticated, claim not found");
+
+            object? forumThread = await _threadService.AddThreadAsync(userId, forumThreadDTO);
 
             if (forumThread == null) {
                 return BadRequest("NoUser or NoSection found");

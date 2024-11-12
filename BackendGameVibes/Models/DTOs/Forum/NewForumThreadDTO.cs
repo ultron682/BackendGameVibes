@@ -8,10 +8,6 @@ namespace BackendGameVibes.Models.DTOs.Forum {
             get; set;
         }
         [Required]
-        public string? UserOwnerId {
-            get; set;
-        }
-        [Required]
         public int? SectionId {
             get; set;
         }

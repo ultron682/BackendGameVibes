@@ -10,7 +10,7 @@ namespace BackendGameVibes.IServices.Forum {
         Task<object[]> GetThreadsLandingAsync();
         Task<object?> GetThreadsByPhraseAsync(string phrase, int pageNumber = 1, int threadsSize = 10);
         Task<IEnumerable<object>> GetForumSectionsAsync();
-        Task<ForumThread?> AddThreadAsync(NewForumThreadDTO newThread);
+        Task<object?> AddThreadAsync(string userId, NewForumThreadDTO newThread);
         Task<IEnumerable<object>> AddSectionAsync(AddSectionDTO addSectionDTO);
         Task<IEnumerable<object>> RemoveSectionAsync(int idSection);
         Task<IEnumerable<object>> UpdateSectionAsync(int idSection, AddSectionDTO addSectionDTO);

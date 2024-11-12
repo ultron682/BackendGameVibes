@@ -214,30 +214,31 @@ public class ForumThreadService : IForumThreadService {
         };
     }
 
-    public async Task<ForumThread?> AddThreadAsync(NewForumThreadDTO newForumThreadDTO) {
+    public async Task<object?> AddThreadAsync(string userId, NewForumThreadDTO newForumThreadDTO) {
         ForumThread? newForumThread = _mapper.Map<ForumThread>(newForumThreadDTO);
+        newForumThread.UserOwnerId = userId;
 
         var foundSection = await _context.ForumSections.FirstOrDefaultAsync(fs => fs.Id == newForumThreadDTO.SectionId);
         if (foundSection == null)
             return null;
 
-        var foundUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == newForumThreadDTO.UserOwnerId);
+        var foundUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
         if (foundUser == null)
             return null;
 
         ForumPost newForumPost = new() {
             Content = newForumThreadDTO.FirstForumPostContent,
-            ThreadId = newForumThread.Id,
-            UserOwnerId = newForumThreadDTO.UserOwnerId
+            Thread = newForumThread,
+            UserOwnerId = newForumThread.UserOwnerId
         };
         newForumThread.Posts!.Add(newForumPost);
 
         _context.ForumThreads.Add(newForumThread);
         await _context.SaveChangesAsync();
 
-        await _forumExperienceService.AddThreadPoints(newForumThreadDTO.UserOwnerId!);
+        await _forumExperienceService.AddThreadPoints(newForumThread.UserOwnerId);
 
-        return newForumThread;
+        return await GetThreadWithPostsAsync(newForumThread.Id);
     }
 
     public async Task<IEnumerable<object>> AddSectionAsync(AddSectionDTO addSectionDTO) {
