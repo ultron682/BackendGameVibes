@@ -293,14 +293,12 @@ public class DbInitializer {
             231430, // Company of Heroes 2
             3035570, // Assassin's Creed Mirage
             934700, //Dead Island 2
-            // Upcoming games:
-            3191990, // Tiny House Simulator 2024-11-05
-            2651280, // Marvel's Spider-Man 2
-            2246340, // Monster Hunter Wilds
-            1850050, // Alien: Rogue Incursion
-            2671160, // Galactic Civilizations IV - Megastructures
-            2677660, // Indiana Jones i Wielki Krąg
-            2767030, // Marvel Rivals
+            2161700, // Persona 3 Reload
+            39510, // Gothic II: Gold Classic
+            2679460, // Metaphor: ReFantazio
+            460950, // Katana zero
+            692850, // Bloodstained: Ritual of the Night
+            550, // Left 4 dead 2
             220, // Half-Life 2
             440, // Team Fortress 2
             730, // Counter-Strike 2
@@ -310,6 +308,26 @@ public class DbInitializer {
             245620, // Tropico 5
             43110, // Metro 2033
             105600, // Terraria
+            736260, // Baba is you
+		 253230, // A Hat in Time
+		 1145360, // Hades
+		 1790600, // Dragon Ball: Sparking! ZERO
+		 927380, // Yakuza Kiwami 2
+		 1687950, // Persona 5 Royal
+		 567640, // Danganronpa V3: Killing Harmony
+		 1533420, // Neon White
+		 431240, // Golf With Your Friends
+		 803600, // Disgaea 5 Complete
+		 787480, // Phoenix Wright: Ace Attorney Trilogy
+		 587620, // Okami HD
+            // Upcoming games:
+            3191990, // Tiny House Simulator 2024-11-05
+            2651280, // Marvel's Spider-Man 2
+            2246340, // Monster Hunter Wilds
+            1850050, // Alien: Rogue Incursion
+            2671160, // Galactic Civilizations IV - Megastructures
+            2677660, // Indiana Jones i Wielki Krąg
+            2767030, // Marvel Rivals
         ];
 
         var createdGames = new List<(Game? game, bool isSuccess)>();
