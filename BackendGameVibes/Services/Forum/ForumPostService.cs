@@ -34,6 +34,7 @@ namespace BackendGameVibes.Services.Forum {
 
             var query = await _context.ForumPosts
                 .Where(p => p.ThreadId == threadId)
+                .Include(p => p.PostInteractions)
                 .OrderByDescending(t => t.CreatedDateTime)
                 .Skip((pageNumber - 1) * postsSize)
                 .Take(postsSize)

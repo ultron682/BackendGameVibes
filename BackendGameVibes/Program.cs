@@ -55,7 +55,7 @@ builder.Services
 builder.Services.AddAuthenticationGameVibesJwt(builder.Configuration);
 
 builder.Services.AddAuthorizationGameVibes();
-
+builder.Services.AddMemoryCache();
 builder.Services.Configure<IdentityOptions>(options => {
     // Password settings.
     options.Password.RequireDigit = true;
