@@ -12,7 +12,6 @@ namespace BackendGameVibes.Helpers {
                                 .OfType<AuthorizeAttribute>().Any();
 
             if (hasAuthorize) {
-                // Dodaje wymaganie zabezpieczenia
                 operation.Security = new List<OpenApiSecurityRequirement>
                 {
                 new OpenApiSecurityRequirement
