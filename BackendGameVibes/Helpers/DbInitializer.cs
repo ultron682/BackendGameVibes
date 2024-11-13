@@ -350,7 +350,7 @@ public class DbInitializer {
                 for (int j = 0; j < postsCount; j++) {
                     await postService!.AddForumPostAsync(new ForumPostDTO {
                         Content = PostContent[random.Next(PostContent.Length)],
-                        ThreadId = newForumThread.Id,
+                        ThreadId = newForumThread.thread.Id,
                         UserOwnerId = testUsers[random.Next(testUsers.Count)]!.Id
                     });
                 }
