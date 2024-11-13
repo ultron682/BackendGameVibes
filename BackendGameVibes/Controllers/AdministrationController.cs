@@ -17,6 +17,7 @@ using System.Data;
 using BackendGameVibes.Services.Forum;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System;
 
 
 namespace BackendGameVibes.Controllers;
@@ -465,6 +466,41 @@ public class AdministrationController : ControllerBase {
         }
 
         _context.Genres.Remove(genre);
+        await _context.SaveChangesAsync();
+        return Ok();
+    }
+
+    [HttpPost("games/platforms")]
+    [Authorize("admin")]
+    public async Task<IActionResult> AddGamePlatform(ValueModel platformModel) {
+        _context.Platforms.Add(new Models.Games.Platform { Name = platformModel.Value });
+        await _context.SaveChangesAsync();
+        return Ok();
+    }
+
+    [HttpPatch("games/platforms/{platformId:int}")]
+    [Authorize("admin")]
+    public async Task<IActionResult> UpdateGamePlatform(int platformId, ValueModel platformModel) {
+        var platform = await _context.Platforms.FirstOrDefaultAsync(g => g.Id == platformId);
+        if (platform == null) {
+            return NotFound();
+        }
+
+        platform.Name = platformModel.Value;
+        _context.Platforms.Update(platform);
+        await _context.SaveChangesAsync();
+        return Ok();
+    }
+
+    [HttpDelete("games/platforms/{platformId:int}")]
+    [Authorize("admin")]
+    public async Task<IActionResult> RemoveGamePlatform(int platformId) {
+        var platform = await _context.Platforms.FirstOrDefaultAsync(g => g.Id == platformId);
+        if (platform == null) {
+            return NotFound();
+        }
+
+        _context.Platforms.Remove(platform);
         await _context.SaveChangesAsync();
         return Ok();
     }
