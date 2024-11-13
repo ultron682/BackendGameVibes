@@ -403,7 +403,7 @@ public class AdministrationController : ControllerBase {
         return Ok(await _forumThreadService.RemoveSectionAsync(sectionId));
     }
 
-    [HttpPatch("games/update")]
+    [HttpPatch("games")]
     [Authorize(Roles = "admin,mod")]
     [SwaggerOperation("Require authorization admin or mod. Dajesz tylko te wlasciwosci ktore chcesz zmienic. nadpisuje się cała kolekcja wiec np. imagesUrls musisz podac wszystkie wraz z nowymi")]
     public async Task<ActionResult> UpdateGame([FromBody] GameUpdateDTO gameUpdateDTO, int gameId) {
@@ -414,7 +414,7 @@ public class AdministrationController : ControllerBase {
         return Ok(game);
     }
 
-    [HttpDelete("games/remove")]
+    [HttpDelete("games")]
     [Authorize(Roles = "admin,mod")]
     [SwaggerOperation("Require authorization admin or mod")]
     public async Task<ActionResult> RemoveGame(int gameId) {
