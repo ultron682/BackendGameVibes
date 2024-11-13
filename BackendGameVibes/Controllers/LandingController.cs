@@ -29,9 +29,9 @@ namespace BackendGameVibes.Controllers {
 
             if (!_cache.TryGetValue(cacheKey, out object? landingPage)) {
                 landingPage = new {
-                    games = await _gameService.GetLandingGames(),
+                    games = await _gameService.GetLandingGamesAsync(),
                     reviews = await _reviewService.GetLandingReviewsAsync(),
-                    upcomingGames = await _gameService.GetUpcomingGames(),
+                    upcomingGames = await _gameService.GetUpcomingGamesAsync(),
                     latestForumThreads = await _forumThreadService.GetThreadsLandingAsync()
                 };
 

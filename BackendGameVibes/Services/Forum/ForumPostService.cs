@@ -46,6 +46,8 @@ namespace BackendGameVibes.Services.Forum {
                     p.DisLikesCount,
                     p.UserOwnerId,
                     username = p.UserOwner!.UserName,
+                    usernameProfilePicture = p.UserOwner!.ProfilePicture,
+                    usernameForumRole = p.UserOwner!.ForumRole,
                     userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
                 })
                 .ToArrayAsync();
@@ -76,6 +78,8 @@ namespace BackendGameVibes.Services.Forum {
                 p.DisLikesCount,
                 p.UserOwnerId,
                 username = p.UserOwner!.UserName,
+                usernameProfilePicture = p.UserOwner!.ProfilePicture,
+                usernameForumRole = p.UserOwner!.ForumRole,
                 userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
             })
             .ToArrayAsync();
@@ -102,7 +106,9 @@ namespace BackendGameVibes.Services.Forum {
                     p.LikesCount,
                     p.DisLikesCount,
                     p.UserOwnerId,
-                    username = p.UserOwner!.UserName
+                    username = p.UserOwner!.UserName,
+                    usernameProfilePicture = p.UserOwner!.ProfilePicture,
+                    usernameForumRole = p.UserOwner!.ForumRole,
                 })
                 .FirstOrDefaultAsync(p => p.Id == postId);
         }
@@ -121,7 +127,9 @@ namespace BackendGameVibes.Services.Forum {
                     p.LikesCount,
                     p.DisLikesCount,
                     p.UserOwnerId,
-                    username = p.UserOwner!.UserName
+                    username = p.UserOwner!.UserName,
+                    usernameProfilePicture = p.UserOwner!.ProfilePicture,
+                    usernameForumRole = p.UserOwner!.ForumRole,
                 })
             .ToArrayAsync();
 

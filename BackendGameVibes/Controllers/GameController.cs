@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace BackendGameVibes.Controllers;
 [ApiController]
-[Route("api/game")]
+[Route("api/games")]
 public class GameController : ControllerBase {
     private readonly IGameService _gameService;
 
@@ -17,24 +17,9 @@ public class GameController : ControllerBase {
         _gameService = gameService;
     }
 
-    [HttpGet("search")]
-    public ActionResult<SteamApp[]> FindSteamAppByName(string searchingName) {
-        var steamApp = _gameService.FindSteamAppByName(searchingName);
-        if (steamApp != null)
-            return Ok(steamApp);
-        else
-            return BadRequest("steamApp == null. maybe json with 500k lines is downloading...");
-    }
-
     [HttpGet]
-    public async Task<ActionResult> GetGames(int pageNumber = 1, int resultSize = 10) {
-        var games = await _gameService.GetGames(pageNumber, resultSize);
-        return Ok(games);
-    }
-
-    [HttpGet("filter")]
     public async Task<ActionResult> GetFilteredGames([FromQuery] FiltersGamesDTO filtersGamesDTO, int pageNumber = 1, int resultSize = 10) {
-        var filteredGames = await _gameService.GetFilteredGames(filtersGamesDTO, pageNumber, resultSize);
+        var filteredGames = await _gameService.GetFilteredGamesAsync(filtersGamesDTO, pageNumber, resultSize);
 
         if (filteredGames == null) {
             return NotFound("No games found with the given filters.");
@@ -45,7 +30,7 @@ public class GameController : ControllerBase {
 
     [HttpGet("{id}")]
     public async Task<ActionResult> GetGame(int id) {
-        var game = await _gameService.GetGame(id);
+        var game = await _gameService.GetGameDetailsAsync(id);
         if (game == null) {
             return NotFound();
         }
@@ -56,7 +41,7 @@ public class GameController : ControllerBase {
 
     [HttpGet("{id:int}/reviews")]
     public async Task<ActionResult> GetGameReviews(int id, int pageNumber = 1, int resultSize = 10) {
-        var gameReviews = await _gameService.GetGameReviews(id, pageNumber, resultSize);
+        var gameReviews = await _gameService.GetGameReviewsAsync(id, pageNumber, resultSize);
         if (gameReviews == null) {
             return NotFound();
         }
@@ -65,22 +50,18 @@ public class GameController : ControllerBase {
         }
     }
 
-    [HttpPost]
-    [Authorize(Roles = "admin,mod")]
-    [SwaggerOperation("Require authorization admin or mod")]
-    public async Task<ActionResult<Game>> CreateGame(int steamGameId = 292030) {
-        (Game? game, bool isSuccess) = await _gameService.CreateGame(steamGameId);
-        if (game == null && !isSuccess)
-            return BadRequest("SteamGameData is null");
-        else if (game != null && !isSuccess)
-            return Conflict(game);
+    [HttpGet("search-steam-game")]
+    public ActionResult<SteamApp[]> FindSteamAppByName(string searchingName) {
+        var steamApp = _gameService.FindSteamAppByName(searchingName);
+        if (steamApp != null)
+            return Ok(steamApp);
         else
-            return Ok(game);
+            return BadRequest("steamApp == null. maybe json with 500k lines is downloading...");
     }
 
     [HttpGet("genres")]
     public async Task<ActionResult<object[]>> GetGenres() {
-        var genres = await _gameService.GetGenres();
+        var genres = await _gameService.GetGenresAsync();
         if (genres == null || genres.Length == 0)
             return NotFound("No Genres");
 
@@ -89,10 +70,23 @@ public class GameController : ControllerBase {
 
     [HttpGet("platforms")]
     public async Task<ActionResult<object[]>> GetPlatforms() {
-        var platforms = await _gameService.GetPlatforms();
+        var platforms = await _gameService.GetPlatformsAsync();
         if (platforms == null || platforms.Length == 0)
             return NotFound("No Platforms");
 
         return Ok(platforms);
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "admin,mod")]
+    [SwaggerOperation("Require authorization admin or mod")]
+    public async Task<ActionResult<Game>> CreateGame(int steamGameId = 292030) {
+        (Game? game, bool isSuccess) = await _gameService.AddGameAsync(steamGameId);
+        if (game == null && !isSuccess)
+            return BadRequest("SteamGameData is null");
+        else if (game != null && !isSuccess)
+            return Conflict(game);
+        else
+            return Ok(game);
     }
 }

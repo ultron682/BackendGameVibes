@@ -314,7 +314,7 @@ public class DbInitializer {
 
         var createdGames = new List<(Game? game, bool isSuccess)>();
 
-        createdGames.AddRange(await gameService.InitGamesBySteamIds(applicationDbContext, steamGameIds));
+        createdGames.AddRange(await gameService.InitGamesBySteamIdsAsync(applicationDbContext, steamGameIds));
 
         Console.WriteLine($" {(DateTime.Now - startTime).TotalSeconds}");
         startTime = DateTime.Now;

@@ -6,6 +6,7 @@ using BackendGameVibes.Models.Steam;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using BackendGameVibes.Models.Reviews;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BackendGameVibes.Services;
 public class GameService : IGameService {
@@ -18,52 +19,41 @@ public class GameService : IGameService {
         _steamService = steamService;
     }
 
-    public SteamApp[] GetAllSteamIdsGames() {
-        return _steamService.steamGames![29000..30000];
-    }
-
     public SteamApp[] FindSteamAppByName(string searchingName) {
         return _steamService.FindSteamApp(searchingName) ?? [];
     }
 
-    public async Task<object?> GetGames(int pageNumber = 1, int resultSize = 10) {
-        var query = await _context.Games
-            .OrderByDescending(t => t.ReleaseDate)
-            .Skip((pageNumber - 1) * resultSize)
-            .Take(resultSize)
+    public async Task<object?> GetFilteredGamesAsync(FiltersGamesDTO filtersGamesDTO, int pageNumber = 1, int resultSize = 10) {
+        var query = _context.Games
             .Include(g => g.Genres)
-            .Select(g => new {
-                g.Id,
-                g.Title,
-                g.Description,
-                g.CoverImage,
-                g.ReleaseDate,
-                g.SteamId,
-                Rating = g.LastCalculatedRatingFromReviews,
-                RatingsCount = g.Reviews!.Count
-            })
-            .ToArrayAsync();
-
-        int totalResults = await _context.Games.CountAsync();
-
-        return new {
-            TotalResults = totalResults,
-            PageSize = resultSize,
-            CurrentPage = pageNumber,
-            TotalPages = (int)Math.Ceiling(totalResults / (double)resultSize),
-            Data = query
-        };
-    }
-
-    public async Task<object?> GetFilteredGames(FiltersGamesDTO filtersGamesDTO, int pageNumber = 1, int resultSize = 10) {
-        var query = await _context.Games
-            .Include(g => g.Genres)
+            .Include(g => g.Platforms)
             .Where(g =>
                 (filtersGamesDTO.GenresIds == null || !filtersGamesDTO.GenresIds.Any() || g.Genres!.Any(genre => filtersGamesDTO.GenresIds.Contains(genre.Id))) &&
                 g.LastCalculatedRatingFromReviews >= filtersGamesDTO.RatingMin &&
                 g.LastCalculatedRatingFromReviews <= filtersGamesDTO.RatingMax
-            )
-            .OrderByDescending(t => t.ReleaseDate)
+            );
+
+        int totalResults = await query.CountAsync();
+
+        query = filtersGamesDTO.SortedBy switch {
+            SortBy.Rating => filtersGamesDTO.IsSortedAscending
+                ? query.OrderBy(g => g.LastCalculatedRatingFromReviews)
+                : query.OrderByDescending(g => g.LastCalculatedRatingFromReviews),
+
+            SortBy.Name => filtersGamesDTO.IsSortedAscending
+                ? query.OrderBy(g => g.Title)
+                : query.OrderByDescending(g => g.Title),
+
+            SortBy.FollowedPlayers => filtersGamesDTO.IsSortedAscending
+                ? query.OrderBy(g => g.PlayersFollowing!.Count)
+                : query.OrderByDescending(g => g.PlayersFollowing!.Count),
+
+            _ => filtersGamesDTO.IsSortedAscending
+                ? query.OrderBy(g => g.ReleaseDate)
+                : query.OrderByDescending(g => g.ReleaseDate) // SortBy.ReleaseDate and others
+        };
+
+        var data = await query
             .Skip((pageNumber - 1) * resultSize)
             .Take(resultSize)
             .Select(g => new {
@@ -72,28 +62,27 @@ public class GameService : IGameService {
                 g.CoverImage,
                 g.ReleaseDate,
                 g.SteamId,
+                Platforms = g.Platforms!.Select(p => new { p.Id, p.Name }).ToArray(),
+                Genres = g.Genres!.Select(g => new { g.Id, g.Name }).ToArray(),
                 Rating = g.LastCalculatedRatingFromReviews,
-                RatingsCount = g.Reviews!.Count
+                RatingsCount = g.Reviews!.Count,
+                PlayersFollowingCount = g.PlayersFollowing!.Count
             })
             .ToArrayAsync();
 
-        int totalResults = await _context.Games
-            .Where(g => filtersGamesDTO.GenresIds!.Contains(g.Genres!.Select(g => g.Id).FirstOrDefault())
-            && g.LastCalculatedRatingFromReviews >= filtersGamesDTO.RatingMin
-            && g.LastCalculatedRatingFromReviews <= filtersGamesDTO.RatingMax)
-            .CountAsync();
 
         return new {
+            SortedBy = filtersGamesDTO.SortedBy.ToString()!.ToLower(),
+            filtersGamesDTO.IsSortedAscending,
             TotalResults = totalResults,
             PageSize = resultSize,
             CurrentPage = pageNumber,
             TotalPages = (int)Math.Ceiling(totalResults / (double)resultSize),
-            Data = query
+            Data = data
         };
     }
 
-
-    public async Task<object?> GetGame(int id) {
+    public async Task<object?> GetGameDetailsAsync(int id) {
         return await _context.Games
             .Include(g => g.Platforms)
             .Include(g => g.Genres)
@@ -104,17 +93,19 @@ public class GameService : IGameService {
                 g.Title,
                 g.Description,
                 g.CoverImage,
-                Platforms = g.Platforms!.Select(p => new { p.Id, p.Name }),
                 g.ReleaseDate,
                 g.SteamId,
+                Platforms = g.Platforms!.Select(p => new { p.Id, p.Name }).ToArray(),
                 Genres = g.Genres!.Select(g => new { g.Id, g.Name }).ToArray(),
                 GameImages = g.GameImages!.Select(image => new { image.ImagePath }),
-                Rating = g.LastCalculatedRatingFromReviews
+                Rating = g.LastCalculatedRatingFromReviews,
+                RatingsCount = g.Reviews!.Count,
+                PlayersFollowingCount = g.PlayersFollowing!.Count
             })
             .FirstOrDefaultAsync();
     }
 
-    public async Task<object?> GetGameReviews(int gameId, int pageNumber = 1, int resultSize = 10) {
+    public async Task<object?> GetGameReviewsAsync(int gameId, int pageNumber = 1, int resultSize = 10) {
         var query = await _context.Games
             .Include(g => g.Reviews)
             .Where(g => g.Id == gameId)
@@ -152,7 +143,7 @@ public class GameService : IGameService {
     }
 
 
-    public async Task<(Game?, bool)[]> InitGamesBySteamIds(ApplicationDbContext applicationDbContext, HashSet<int> steamGamesToInitID) {
+    public async Task<(Game?, bool)[]> InitGamesBySteamIdsAsync(ApplicationDbContext applicationDbContext, HashSet<int> steamGamesToInitID) {
         var tasks = steamGamesToInitID
             .Select(_steamService.GetInfoGame)
             .ToArray();
@@ -168,58 +159,17 @@ public class GameService : IGameService {
         var resultsGames = new List<(Game?, bool)>();
 
         foreach (var (steamGameId, steamGameData) in steamGamesToInitID.Zip(combinedResults, (id, data) => (id, data))) {
-            Game? foundGame = existingGames.TryGetValue(steamGameId, out var gameInDb) ? gameInDb : null;
 
-            if (foundGame != null) {
-                resultsGames.Add((foundGame, true));
-                continue;
-            }
-
-            Game newGame = new Game {
-                SteamId = steamGameId,
-                Title = steamGameData?.name ?? "Brak tytułu",
-                Description = steamGameData?.detailed_description ?? "Brak opisu",
-                CoverImage = @$"https://steamcdn-a.akamaihd.net/steam/apps/{steamGameId}/library_600x900_2x.jpg",
-                ReleaseDate = ParseReleaseDate(steamGameData?.release_date.Date),
-                GameImages = steamGameData?.screenshots?.Select(s => new GameImage { ImagePath = s.path_full }).ToList() ?? new List<GameImage>(),
-                Genres = [],
-            };
-
-            // Przypisanie gatunków
-            var gameGenres = steamGameData?.genres?
-                .Select(g => new Models.Games.Genre { Id = int.Parse(g.id), Name = g.description })
-                .ToList() ?? new List<Models.Games.Genre>();
-
-            foreach (var genre in gameGenres) {
-                var existingGenre = dbGenres.FirstOrDefault(g => g.Id == genre.Id);
-                if (existingGenre == null) {
-                    applicationDbContext.Genres.Add(genre);
-                    dbGenres.Add(genre);
-                    newGame.Genres.Add(genre);
-                }
-                else {
-                    newGame.Genres.Add(existingGenre);
-                }
-            }
-
-            // Przypisanie platform - dodaj tylko istniejące platformy
-            var platformIds = GetPlatformIds(steamGameData?.platforms);
-            var existingPlatforms = applicationDbContext.Platforms.Where(p => platformIds.Contains(p.Id)).ToList();
-            newGame.Platforms = existingPlatforms;
-
-            applicationDbContext.Games.Add(newGame);
-            resultsGames.Add((newGame, true));
-            Console.WriteLine("Added game: " + newGame.Title);
         }
 
-        // Zapisanie zmian w bazie, aby zapewnić, że `Genres` są dodane przed `Games`.
         await applicationDbContext.SaveChangesAsync();
         return resultsGames.ToArray();
     }
 
     private DateOnly ParseReleaseDate(string date) {
         try {
-            return DateOnly.ParseExact(date, "d MMM, yyyy", System.Globalization.CultureInfo.InvariantCulture);
+            DateTime parsedDate = DateTime.ParseExact(date, "d MMMM yyyy", new System.Globalization.CultureInfo("pl-PL"));
+            return DateOnly.FromDateTime(parsedDate);
         }
         catch {
             return DateOnly.FromDateTime(DateTime.Now);
@@ -243,7 +193,7 @@ public class GameService : IGameService {
         return platformIds;
     }
 
-    public async Task<(Game?, bool)> CreateGame(int steamGameId) {
+    public async Task<(Game?, bool)> AddGameAsync(int steamGameId) {
         Game? foundGame = await _context.Games.Where(g => g.SteamId == steamGameId).FirstOrDefaultAsync();
         if (foundGame != null)
             return (foundGame, false);
@@ -258,7 +208,8 @@ public class GameService : IGameService {
         game.Title = steamGameData.name;
         game.Description = steamGameData.detailed_description != null ? steamGameData.detailed_description : "Brak opisu";
         try {
-            game.ReleaseDate = DateOnly.ParseExact(steamGameData.release_date.Date, "d MMM, yyyy", System.Globalization.CultureInfo.InvariantCulture);
+            DateTime parsedDate = DateTime.ParseExact(steamGameData.release_date.Date, "d MMMM yyyy", new System.Globalization.CultureInfo("pl-PL"));
+            game.ReleaseDate = DateOnly.FromDateTime(parsedDate);
         }
         catch {
             game.ReleaseDate = DateOnly.FromDateTime(DateTime.Now);
@@ -305,7 +256,7 @@ public class GameService : IGameService {
         return (game, true);
     }
 
-    public async Task<object[]> GetGenres() {
+    public async Task<object[]> GetGenresAsync() {
         return await _context.Genres
             .Select(g => new {
                 g.Id,
@@ -314,7 +265,7 @@ public class GameService : IGameService {
             .ToArrayAsync();
     }
 
-    public async Task<object[]> GetPlatforms() {
+    public async Task<object[]> GetPlatformsAsync() {
         return await _context.Platforms
             .Select(g => new {
                 g.Id,
@@ -323,7 +274,7 @@ public class GameService : IGameService {
             .ToArrayAsync();
     }
 
-    public async Task<object[]> GetLandingGames() {
+    public async Task<object[]> GetLandingGamesAsync() {
         var games = await _context.Games
                         .OrderBy(r => EF.Functions.Random())
                         .Take(5)
@@ -338,7 +289,7 @@ public class GameService : IGameService {
         return games;
     }
 
-    public async Task<object[]> GetUpcomingGames() {
+    public async Task<object[]> GetUpcomingGamesAsync() {
         return await _context.Games
              .Where(g => g.ReleaseDate > DateOnly.FromDateTime(DateTime.Now))
              .OrderBy(r => EF.Functions.Random())
@@ -352,7 +303,7 @@ public class GameService : IGameService {
             .ToArrayAsync();
     }
 
-    public async Task<object?> UpdateGame(int gameId, GameUpdateDTO gameUpdateDTO) {
+    public async Task<object?> UpdateGameAsync(int gameId, GameUpdateDTO gameUpdateDTO) {
         if (gameUpdateDTO == null) {
             return null;
         }
@@ -394,10 +345,10 @@ public class GameService : IGameService {
             return null;
         }
 
-        return GetGame(game.Id);
+        return GetGameDetailsAsync(game.Id);
     }
 
-    public async Task<bool?> RemoveGame(int gameId) {
+    public async Task<bool?> RemoveGameAsync(int gameId) {
         var game = await _context.Games
             .Include(g => g.Genres)
             .Include(g => g.Platforms)

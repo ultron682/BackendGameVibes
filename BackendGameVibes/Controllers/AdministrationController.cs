@@ -399,7 +399,7 @@ public class AdministrationController : ControllerBase {
     [Authorize(Roles = "admin,mod")]
     [SwaggerOperation("Require authorization admin or mod. Dajesz tylko te wlasciwosci ktore chcesz zmienic. nadpisuje się cała kolekcja wiec np. imagesUrls musisz podac wszystkie wraz z nowymi")]
     public async Task<ActionResult> UpdateGame([FromBody] GameUpdateDTO gameUpdateDTO, int gameId) {
-        var game = await _gameService.UpdateGame(gameId, gameUpdateDTO);
+        var game = await _gameService.UpdateGameAsync(gameId, gameUpdateDTO);
         if (game == null)
             return NotFound("Game not found");
 
@@ -410,7 +410,7 @@ public class AdministrationController : ControllerBase {
     [Authorize(Roles = "admin,mod")]
     [SwaggerOperation("Require authorization admin or mod")]
     public async Task<ActionResult> RemoveGame(int gameId) {
-        var isRemoved = await _gameService.RemoveGame(gameId);
+        var isRemoved = await _gameService.RemoveGameAsync(gameId);
         if (isRemoved == null)
             return NotFound("Game not found or error");
 

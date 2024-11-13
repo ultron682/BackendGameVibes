@@ -46,24 +46,10 @@ public class GameControllerTests {
     }
 
     [Fact]
-    public async Task GetGames_ReturnsOk_WithListOfGames() {
-        // Arrange
-        var games = new object[] { new { Id = 1, Title = "Game1" } };
-        _gameServiceMock.Setup(service => service.GetGames()).ReturnsAsync(games);
-
-        // Act
-        var result = await _controller.GetGames();
-
-        // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result.Result);
-        Assert.Equal(games, okResult.Value);
-    }
-
-    [Fact]
     public async Task GetGame_ReturnsNotFound_WhenGameNotFound() {
         // Arrange
         int gameId = 999;
-        _gameServiceMock.Setup(service => service.GetGame(gameId)).ReturnsAsync((object)null);
+        _gameServiceMock.Setup(service => service.GetGameDetailsAsync(gameId)).ReturnsAsync((object)null);
 
         // Act
         var result = await _controller.GetGame(gameId);
@@ -77,7 +63,7 @@ public class GameControllerTests {
         // Arrange
         int gameId = 1;
         var game = new { Id = gameId, Title = "Game1" };
-        _gameServiceMock.Setup(service => service.GetGame(gameId)).ReturnsAsync(game);
+        _gameServiceMock.Setup(service => service.GetGameDetailsAsync(gameId)).ReturnsAsync(game);
 
         // Act
         var result = await _controller.GetGame(gameId);
@@ -91,7 +77,7 @@ public class GameControllerTests {
     public async Task GetGenres_ReturnsOk_WhenGenresFound() {
         // Arrange
         var genres = new object[] { new { Id = 1, Name = "Genre1" } };
-        _gameServiceMock.Setup(service => service.GetGenres()).ReturnsAsync(genres);
+        _gameServiceMock.Setup(service => service.GetGenresAsync()).ReturnsAsync(genres);
 
         // Act
         var result = await _controller.GetGenres();
@@ -105,7 +91,7 @@ public class GameControllerTests {
     public async Task GetFilteredGames_ReturnsOK_WhenGamesFound() {
         // Arrange
         var filters = new FiltersGamesDTO();
-        _gameServiceMock.Setup(service => service.GetFilteredGames(filters)).ReturnsAsync(new Game[] { new Game() { Title = "test", Description = "test" }, new Game() { Title = "test2", Description = "test2" } });
+        _gameServiceMock.Setup(service => service.GetFilteredGamesAsync(filters)).ReturnsAsync(new Game[] { new Game() { Title = "test", Description = "test" }, new Game() { Title = "test2", Description = "test2" } });
 
         // Act
         var result = await _controller.GetFilteredGames(filters);
