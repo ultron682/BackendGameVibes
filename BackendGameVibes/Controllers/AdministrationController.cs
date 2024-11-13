@@ -15,6 +15,8 @@ using BackendGameVibes.Models.DTOs;
 using BackendGameVibes.Models.Forum;
 using System.Data;
 using BackendGameVibes.Services.Forum;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 
 namespace BackendGameVibes.Controllers;
@@ -57,17 +59,6 @@ public class AdministrationController : ControllerBase {
         _gameService = gameService;
         _forumRoleService = forumRoleService;
     }
-
-    [SwaggerOperation("Usuwa baze i tworzy plik bazy od początku. Zamyka aplikację którą trzeba ręcznie ponownie uruchomic")]
-    [HttpGet("DROP_DATABASE")]
-    [AllowAnonymous]
-    public async Task<IActionResult> ResetDatabase() {
-        await _context.Database.EnsureDeletedAsync();
-        await _context.Database.EnsureCreatedAsync();
-        _applicationLifetime.StopApplication();
-        return Ok("Database deleted");
-    }
-
 
     // dane logowania konta admina w DbInitializer.cs
     [HttpGet("users")]
@@ -441,5 +432,40 @@ public class AdministrationController : ControllerBase {
     [Authorize("admin")]
     public async Task<ActionResult<IEnumerable<object>>> RemoveForumRole(int forumRoleId) {
         return Ok(await _forumRoleService.RemoveForumRoleAsync(forumRoleId));
+    }
+
+    [HttpPost("games/genres")]
+    [Authorize("admin")]
+    public async Task<IActionResult> AddGameGenre(ValueModel genreModel) {
+        _context.Genres.Add(new Models.Games.Genre { Name = genreModel.Value });
+        await _context.SaveChangesAsync();
+        return Ok();
+    }
+
+    [HttpPatch("games/genres/{genreId:int}")]
+    [Authorize("admin")]
+    public async Task<IActionResult> UpdateGameGenre(int genreId, ValueModel genreModel) {
+        var genre = await _context.Genres.FirstOrDefaultAsync(g => g.Id == genreId);
+        if (genre == null) {
+            return NotFound();
+        }
+
+        genre.Name = genreModel.Value;
+        _context.Genres.Update(genre);
+        await _context.SaveChangesAsync();
+        return Ok();
+    }
+
+    [HttpDelete("games/genres/{genreId:int}")]
+    [Authorize("admin")]
+    public async Task<IActionResult> RemoveGameGenre(int genreId) {
+        var genre = await _context.Genres.FirstOrDefaultAsync(g => g.Id == genreId);
+        if (genre == null) {
+            return NotFound();
+        }
+
+        _context.Genres.Remove(genre);
+        await _context.SaveChangesAsync();
+        return Ok();
     }
 }
