@@ -159,7 +159,48 @@ public class GameService : IGameService {
         var resultsGames = new List<(Game?, bool)>();
 
         foreach (var (steamGameId, steamGameData) in steamGamesToInitID.Zip(combinedResults, (id, data) => (id, data))) {
+            Game? foundGame = existingGames.TryGetValue(steamGameId, out var gameInDb) ? gameInDb : null;
 
+            if (foundGame != null) {
+                resultsGames.Add((foundGame, true));
+                continue;
+            }
+
+            Game newGame = new Game {
+                SteamId = steamGameId,
+                Title = steamGameData?.name ?? "Brak tytułu",
+                Description = steamGameData?.detailed_description ?? "Brak opisu",
+                CoverImage = @$"https://steamcdn-a.akamaihd.net/steam/apps/{steamGameId}/library_600x900_2x.jpg",
+                ReleaseDate = ParseReleaseDate(steamGameData?.release_date.Date),
+                GameImages = steamGameData?.screenshots?.Select(s => new GameImage { ImagePath = s.path_full }).ToList() ?? new List<GameImage>(),
+                Genres = [],
+            };
+
+            // Przypisanie gatunków
+            var gameGenres = steamGameData?.genres?
+                .Select(g => new Models.Games.Genre { Id = int.Parse(g.id), Name = g.description })
+                .ToList() ?? new List<Models.Games.Genre>();
+
+            foreach (var genre in gameGenres) {
+                var existingGenre = dbGenres.FirstOrDefault(g => g.Id == genre.Id);
+                if (existingGenre == null) {
+                    applicationDbContext.Genres.Add(genre);
+                    dbGenres.Add(genre);
+                    newGame.Genres.Add(genre);
+                }
+                else {
+                    newGame.Genres.Add(existingGenre);
+                }
+            }
+
+            // Przypisanie platform - dodaj tylko istniejące platformy
+            var platformIds = GetPlatformIds(steamGameData?.platforms);
+            var existingPlatforms = applicationDbContext.Platforms.Where(p => platformIds.Contains(p.Id)).ToList();
+            newGame.Platforms = existingPlatforms;
+
+            applicationDbContext.Games.Add(newGame);
+            resultsGames.Add((newGame, true));
+            Console.WriteLine("Added game: " + newGame.Title);
         }
 
         await applicationDbContext.SaveChangesAsync();
