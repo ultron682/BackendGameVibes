@@ -86,4 +86,13 @@ public class GameController : ControllerBase {
 
         return Ok(genres);
     }
+
+    [HttpGet("platforms")]
+    public async Task<ActionResult<object[]>> GetPlatforms() {
+        var platforms = await _gameService.GetPlatforms();
+        if (platforms == null || platforms.Length == 0)
+            return NotFound("No Platforms");
+
+        return Ok(platforms);
+    }
 }

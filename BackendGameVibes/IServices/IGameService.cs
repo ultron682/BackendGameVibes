@@ -12,6 +12,7 @@ public interface IGameService : IDisposable {
     SteamApp[] GetAllSteamIdsGames();
     Task<object?> GetGame(int id);
     Task<object[]> GetGenres();
+    Task<object[]> GetPlatforms();
     Task<object[]> GetLandingGames();
     Task<object[]> GetUpcomingGames();
     Task<object?> GetGameReviews(int id, int pageNumber = 1, int resultSize = 10);

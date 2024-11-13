@@ -314,6 +314,15 @@ public class GameService : IGameService {
             .ToArrayAsync();
     }
 
+    public async Task<object[]> GetPlatforms() {
+        return await _context.Platforms
+            .Select(g => new {
+                g.Id,
+                g.Name
+            })
+            .ToArrayAsync();
+    }
+
     public async Task<object[]> GetLandingGames() {
         var games = await _context.Games
                         .OrderBy(r => EF.Functions.Random())
