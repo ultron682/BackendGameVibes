@@ -113,7 +113,7 @@ public class ReviewService : IReviewService {
                 r.UserGameVibesId,
                 r.GameId,
                 r.Game!.Title,
-                r.UserGameVibes!.UserName,
+                Username = r.UserGameVibes != null ? r.UserGameVibes.UserName : "NoUsername",
                 r.Comment
             })
             .OrderBy(r => EF.Functions.Random())

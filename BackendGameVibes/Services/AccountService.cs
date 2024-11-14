@@ -49,7 +49,7 @@ namespace BackendGameVibes.Services {
             var user = new UserGameVibes { UserName = model.UserName, Email = model.Email };
             if (user.ProfilePicture == null) {
                 var defaultImagePath = Path.Combine("wwwroot/Images", "default-profile.jpg");
-                var newProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultImagePath) };
+                var newProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultImagePath), ImageFormat = "image/blob" };
 
                 user.ProfilePicture = newProfilePicture;
             }
@@ -582,6 +582,7 @@ namespace BackendGameVibes.Services {
             if (user == null) {
                 return false;
             }
+            user.ProfilePicture!.ImageFormat = "image/blob";
             user.ProfilePicture!.ImageData = imageData;
 
             var result = await _userManager.UpdateAsync(user);
