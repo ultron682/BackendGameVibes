@@ -37,5 +37,6 @@ namespace BackendGameVibes.IServices {
         Task<bool> FollowGameAsync(string userId, int gameId);
         Task<bool> UnfollowGameAsync(string userId, int gameId);
         (string? email, string? username, string? userId, string? role) GetDataFromJwtTokenAsync(string accessToken);
+        Task<object?> GetUserProfilePicture(string userId);
     }
 }

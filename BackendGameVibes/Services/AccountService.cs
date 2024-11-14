@@ -705,6 +705,22 @@ namespace BackendGameVibes.Services {
             return false;
         }
 
+        public async Task<object?> GetUserProfilePicture(string userId) {
+            var user = await _context.Users
+                .Include(u => u.ProfilePicture)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null) {
+                return null;
+            }
+
+            var profilePicture = user.ProfilePicture ?? null;
+            if (profilePicture != null) {
+                return new { profilePicture.ImageFormat, profilePicture.ImageData, profilePicture.UploadedDate };
+            }
+            return null;
+        }
+
         public void Dispose() {
             _context.Dispose();
             _userManager.Dispose();

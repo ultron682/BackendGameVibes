@@ -374,17 +374,12 @@ namespace BackendGameVibes.Controllers {
 
         [HttpGet("user/picture/{userId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetProfilePicture(string userId) {
-            var user = await _accountService.GetUserByIdAsync(userId);
-            if (user == null)
+        public async Task<IActionResult> GetUserProfilePicture(string userId) {
+            var userProfilePicture = await _accountService.GetUserProfilePicture(userId);
+            if (userProfilePicture == null)
                 return NotFound("User not found");
 
-            if (user.ProfilePicture != null) {
-                return Ok(new { user.ProfilePicture.ImageFormat, user.ProfilePicture.ImageData, user.ProfilePicture.UploadedDate });
-            }
-            else {
-                return NotFound("Profile picture not found");
-            }
+            return Ok(userProfilePicture);
         }
 
         [HttpPost("send-close-account-request")]
