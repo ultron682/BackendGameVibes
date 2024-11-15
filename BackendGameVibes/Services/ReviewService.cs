@@ -81,12 +81,31 @@ public class ReviewService : IReviewService {
         return await _context.Reviews
             .Include(r => r.Game)
             .Include(r => r.UserGameVibes)
-            .AsSplitQuery()
             .SelectReviewColumns()
             .OrderBy(r => EF.Functions.Random())
             .Take(5)
             .ToArrayAsync();
 
+    }
+
+    public async Task<object?> GetGameReviewsAsync(int gameId, int pageNumber = 1, int resultSize = 10) {
+        var query = await _context.Reviews
+            .Where(g => g.GameId == gameId)
+            .OrderByDescending(t => t.CreatedAt)
+            .Skip((pageNumber - 1) * resultSize)
+            .Take(resultSize)
+            .SelectReviewColumns()
+            .ToArrayAsync();
+
+        int totalResults = await _context.Reviews!.Where(r => r.GameId == gameId).CountAsync();
+
+        return new {
+            TotalResults = totalResults,
+            PageSize = resultSize,
+            CurrentPage = pageNumber,
+            TotalPages = (int)Math.Ceiling(totalResults / (double)resultSize),
+            Data = query
+        };
     }
 
     public async Task<Review?> AddReviewAsync(Review review) {

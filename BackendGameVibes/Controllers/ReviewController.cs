@@ -10,9 +10,10 @@ using BackendGameVibes.Models.Reported;
 using BackendGameVibes.Models.Reviews;
 using System.ComponentModel.DataAnnotations;
 
+
 namespace BackendGameVibes.Controllers;
 [ApiController]
-[Route("api/review")]
+[Route("api/reviews")]
 public class ReviewController : ControllerBase {
     private readonly IReviewService _reviewService;
     private readonly IMapper _mapper;
@@ -44,6 +45,17 @@ public class ReviewController : ControllerBase {
             return NotFound();
         }
         return Ok(review);
+    }
+
+    [HttpGet("game/{gameId:int}")]
+    public async Task<ActionResult> GetGameReviews(int gameId, int pageNumber = 1, int resultSize = 10) {
+        var gameReviews = await _reviewService.GetGameReviewsAsync(gameId, pageNumber, resultSize);
+        if (gameReviews == null) {
+            return NotFound();
+        }
+        else {
+            return Ok(gameReviews);
+        }
     }
 
     [HttpPost]

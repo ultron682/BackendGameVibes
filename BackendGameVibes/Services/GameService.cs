@@ -4,9 +4,7 @@ using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.DTOs;
 using BackendGameVibes.Models.Steam;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using BackendGameVibes.Models.Reviews;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using BackendGameVibes.Extensions;
 
 namespace BackendGameVibes.Services;
 public class GameService : IGameService {
@@ -104,44 +102,6 @@ public class GameService : IGameService {
             })
             .FirstOrDefaultAsync();
     }
-
-    public async Task<object?> GetGameReviewsAsync(int gameId, int pageNumber = 1, int resultSize = 10) {
-        var query = await _context.Games
-            .Include(g => g.Reviews)
-            .Where(g => g.Id == gameId)
-            .Select(g => new {
-                g.Id,
-                g.Title,
-                Reviews = g.Reviews!
-                    .Where(r => r.GameId == g.Id)
-                    .OrderByDescending(t => t.CreatedAt)
-                    .Skip((pageNumber - 1) * resultSize)
-                    .Take(resultSize)
-                    .Select(r => new {
-                        r.Id,
-                        r.GeneralScore,
-                        r.GameplayScore,
-                        r.GraphicsScore,
-                        r.AudioScore,
-                        r.Comment,
-                        Username = r.UserGameVibes != null ? r.UserGameVibes.UserName : "NoUsername",
-                        r.CreatedAt,
-                    })
-                    .ToArray()
-            })
-        .ToArrayAsync();
-
-        int totalResults = await _context.Reviews!.Where(r => r.GameId == gameId).CountAsync();
-
-        return new {
-            TotalResults = totalResults,
-            PageSize = resultSize,
-            CurrentPage = pageNumber,
-            TotalPages = (int)Math.Ceiling(totalResults / (double)resultSize),
-            Data = query
-        };
-    }
-
 
     public async Task<(Game?, bool)[]> InitGamesBySteamIdsAsync(ApplicationDbContext applicationDbContext, HashSet<int> steamGamesToInitID) {
         var tasks = steamGamesToInitID

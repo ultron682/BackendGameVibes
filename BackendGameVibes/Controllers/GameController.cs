@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using BackendGameVibes.Models.Steam;
 using Swashbuckle.AspNetCore.Annotations;
 using BackendGameVibes.Models.Games;
-using System.Security.Claims;
 
 namespace BackendGameVibes.Controllers;
 [ApiController]
@@ -36,17 +35,6 @@ public class GameController : ControllerBase {
         }
         else {
             return Ok(game);
-        }
-    }
-
-    [HttpGet("{id:int}/reviews")]
-    public async Task<ActionResult> GetGameReviews(int id, int pageNumber = 1, int resultSize = 10) {
-        var gameReviews = await _gameService.GetGameReviewsAsync(id, pageNumber, resultSize);
-        if (gameReviews == null) {
-            return NotFound();
-        }
-        else {
-            return Ok(gameReviews);
         }
     }
 

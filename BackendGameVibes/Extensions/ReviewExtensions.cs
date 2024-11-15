@@ -11,12 +11,13 @@ namespace BackendGameVibes.Extensions {
                 r.AudioScore,
                 r.Comment,
                 r.UserGameVibesId,
-                Username = r.UserGameVibes != null ? r.UserGameVibes.UserName : "NoUsername",
-                UserForumRoleName = r.UserGameVibes != null ? r.UserGameVibes.ForumRole!.Name : "NoRank",
+                r.CreatedAt,
+                r.UpdatedAt,
+                r.GameId,
                 GameTitle = r.Game != null ? r.Game.Title : "NoData",
                 GameCoverImageUrl = r.Game != null ? r.Game.CoverImage : "NoData",
-                r.CreatedAt,
-                r.UpdatedAt
+                Username = r.UserGameVibes != null ? r.UserGameVibes.UserName : "NoUsername",
+                UserForumRoleName = r.UserGameVibes != null ? r.UserGameVibes.ForumRole!.Name : "NoRank",
             });
         }
     }
