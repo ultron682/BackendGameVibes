@@ -7,8 +7,11 @@ using BackendGameVibes.Models.DTOs.Reported;
 using BackendGameVibes.Models.Reviews;
 using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.Models.DTOs;
+using BackendGameVibes.Extensions;
 
 namespace BackendGameVibes.Services;
+
+
 public class ReviewService : IReviewService {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
@@ -26,18 +29,8 @@ public class ReviewService : IReviewService {
             .Skip((pageNumber - 1) * resultSize)
             .Take(resultSize)
             .Include(r => r.UserGameVibes)
-            .Select(r => new {
-                r.Id,
-                r.GeneralScore,
-                r.GameplayScore,
-                r.GraphicsScore,
-                r.AudioScore,
-                r.Comment,
-                Username = r.UserGameVibes != null ? r.UserGameVibes.UserName : "NoUsername",
-                GameTitle = r.Game != null ? r.Game.Title : "NoData",
-                r.CreatedAt,
-            })
-        .ToArrayAsync();
+            .SelectReviewColumns()
+            .ToArrayAsync();
 
         int totalResults = await _context.Reviews.CountAsync();
 
@@ -58,17 +51,7 @@ public class ReviewService : IReviewService {
             .OrderByDescending(t => t.CreatedAt)
             .Skip((pageNumber - 1) * resultSize)
             .Take(resultSize)
-            .Select(r => new {
-                r.Id,
-                r.GeneralScore,
-                r.GameplayScore,
-                r.GraphicsScore,
-                r.AudioScore,
-                r.Comment,
-                Username = r.UserGameVibes != null ? r.UserGameVibes.UserName : "NoUsername",
-                GameTitle = r.Game != null ? r.Game.Title : "NoData",
-                r.CreatedAt,
-            })
+            .SelectReviewColumns()
             .ToArrayAsync();
 
         int totalResults = await _context.Reviews.Where(r => r.Comment!.ToLower().Contains(searchPhrase)).CountAsync();
@@ -87,17 +70,7 @@ public class ReviewService : IReviewService {
             .Include(r => r.UserGameVibes)
             .Include(r => r.Game)
             .Where(r => r.Id == id)
-            .Select(r => new {
-                r.Id,
-                r.GeneralScore,
-                r.GameplayScore,
-                r.GraphicsScore,
-                r.AudioScore,
-                r.Comment,
-                Username = r.UserGameVibes != null ? r.UserGameVibes.UserName : "NoUsername",
-                GameTitle = r.Game != null ? r.Game.Title : "NoData",
-                r.CreatedAt,
-            })
+            .SelectReviewColumns()
             .FirstOrDefaultAsync();
 
 
@@ -109,13 +82,7 @@ public class ReviewService : IReviewService {
             .Include(r => r.Game)
             .Include(r => r.UserGameVibes)
             .AsSplitQuery()
-            .Select(r => new {
-                r.UserGameVibesId,
-                r.GameId,
-                r.Game!.Title,
-                Username = r.UserGameVibes != null ? r.UserGameVibes.UserName : "NoUsername",
-                r.Comment
-            })
+            .SelectReviewColumns()
             .OrderBy(r => EF.Functions.Random())
             .Take(5)
             .ToArrayAsync();
