@@ -152,14 +152,17 @@ namespace BackendGameVibes.Services {
                     u.Id,
                     Reviews = u.UserReviews.Select(r => new {
                         r.Id,
-                        r.GameId,
-                        GameTitle = r.Game != null ? r.Game.Title : "NoData",
                         r.GeneralScore,
                         r.GameplayScore,
                         r.GraphicsScore,
                         r.AudioScore,
                         r.Comment,
-                        r.CreatedAt
+                        r.CreatedAt,
+                        r.UpdatedAt,
+                        r.GameId,
+                        GameTitle = r.Game != null ? r.Game.Title : "NoData",
+                        GameCoverImageUrl = r.Game != null ? r.Game.CoverImage : "NoData",
+                        UserForumRoleName = r.UserGameVibes != null ? r.UserGameVibes.ForumRole!.Name : "NoRank",
                     }).ToArray(),
                     UserReportedReviews = u.UserReportedReviews.Select(rr => new {
                         rr.Id,
