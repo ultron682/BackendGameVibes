@@ -9,6 +9,7 @@ using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.IServices.Forum;
+using System.Net.Http;
 
 namespace BackendGameVibes.Helpers;
 
@@ -173,6 +174,7 @@ public class DbInitializer {
     }
 
     public static async Task InitializeAsync(AsyncServiceScope scope, ApplicationDbContext applicationDbContext) {
+
             using var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserGameVibes>>();
             using var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
@@ -185,6 +187,7 @@ public class DbInitializer {
             using var gameService = scope.ServiceProvider.GetRequiredService<IGameService>();
             using var threadService = scope.ServiceProvider.GetService<IForumThreadService>();
             using var postService = scope.ServiceProvider.GetService<IForumPostService>();
+            using var httpClient = scope.ServiceProvider.GetRequiredService<IHttpClientFactory>().CreateClient();
             Random random = new();
             DateTime startTime = DateTime.Now;
             Console.WriteLine("Start Init DB");
