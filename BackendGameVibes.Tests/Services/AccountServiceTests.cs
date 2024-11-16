@@ -149,6 +149,35 @@ public class AccountServiceTests
         _mockContext.Verify(c => c.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    [Fact]
+    public async Task UpdateProfilePictureAsync_ShouldUpdatePicture_WhenUserExists()
+    {
+        // Arrange
+        var userId = "user1";
+        var imageData = new byte[] { 0x01, 0x02 };
+
+        var user = new UserGameVibes
+        {
+            Id = userId,
+            ProfilePicture = new ProfilePicture()
+        };
+
+        _mockContext.Setup(c => c.Users)
+            .ReturnsDbSet(new List<UserGameVibes> { user });
+
+        _mockUserManager
+            .Setup(um => um.UpdateAsync(user))
+            .ReturnsAsync(IdentityResult.Success);
+
+        // Act
+        var result = await _accountService.UpdateProfilePictureAsync(userId, imageData);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(imageData, user.ProfilePicture!.ImageData);
+
+        _mockUserManager.Verify(um => um.UpdateAsync(user), Times.Once);
+    }
 
 
 }
