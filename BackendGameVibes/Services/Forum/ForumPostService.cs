@@ -15,12 +15,12 @@ namespace BackendGameVibes.Services.Forum {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly IForumExperienceService _forumExperienceService;
-        private readonly JwtTokenService _jwtTokenService;
+        private readonly IJwtTokenService _jwtTokenService;
 
         public ForumPostService(ApplicationDbContext context,
             IMapper mapper,
             IForumExperienceService forumExperienceService,
-            JwtTokenService jwtTokenService) {
+            IJwtTokenService jwtTokenService) {
             _context = context;
             _mapper = mapper;
             _forumExperienceService = forumExperienceService;
