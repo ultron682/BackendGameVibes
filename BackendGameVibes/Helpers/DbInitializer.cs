@@ -326,6 +326,22 @@ public class DbInitializer {
             1113000, // Persona 4 Golden
             1329500, // SpiderHeck
             1150690, // OMORI
+            814380, // Sekiro™: Shadows Die Twice
+            3151670, // Trombone Champ: Unflattened
+            213670, // South Park™: The Stick of Truth™
+            488790, // South Park The Fractured But Whole
+            367520, // Hollow Knight
+            851850, // DRAGON BALL Z: KAKAROT
+            252950, // Rocket League
+            1139900, // Ghostrunner
+            391720, // Layers of Fear (2016)
+            412020, // Metro Exodus
+            1370140, // Kao the Kangaroo
+            349040, // NARUTO SHIPPUDEN: Ultimate Ninja STORM 4
+            213610, // Sonic Adventure™ 2 
+            1920480, // River City Girls 2
+            1091500, // Cyberpunk 2077
+            1158850, // The Great Ace Attorney Chronicles
             // Upcoming games:
             3191990, // Tiny House Simulator 2024-11-05
             2651280, // Marvel's Spider-Man 2
