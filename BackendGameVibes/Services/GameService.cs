@@ -346,7 +346,7 @@ public class GameService : IGameService {
             return null;
         }
 
-        return GetGameDetailsAsync(game.Id);
+        return await GetGameDetailsAsync(game.Id);
     }
 
     public async Task<bool?> RemoveGameAsync(int gameId) {
