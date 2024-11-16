@@ -121,7 +121,34 @@ public class AccountServiceTests
         _mockForumExperienceService.Verify(f => f.AddNewFriendPoints(userId), Times.Once);
     }
 
-    
+    [Fact]
+    public async Task RevokeFriendRequestAsync_ShouldSetRequestToRejected_WhenRequestExists()
+    {
+        // Arrange
+        var userId = "user1";
+        var friendId = "user2";
+
+        var friendRequest = new FriendRequest
+        {
+            SenderUserId = friendId,
+            ReceiverUserId = userId,
+            IsAccepted = null
+        };
+
+        _mockContext.Setup(c => c.FriendRequests)
+            .ReturnsDbSet(new List<FriendRequest> { friendRequest });
+
+        // Act
+        var result = await _accountService.RevokeFriendRequestAsync(userId, friendId);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(false, friendRequest.IsAccepted);
+
+        _mockContext.Verify(c => c.FriendRequests.Update(friendRequest), Times.Once);
+        _mockContext.Verify(c => c.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
 
 
 }
