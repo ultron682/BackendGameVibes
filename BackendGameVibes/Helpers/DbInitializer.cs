@@ -309,17 +309,23 @@ public class DbInitializer {
             43110, // Metro 2033
             105600, // Terraria
             736260, // Baba is you
-		 253230, // A Hat in Time
-		 1145360, // Hades
-		 1790600, // Dragon Ball: Sparking! ZERO
-		 927380, // Yakuza Kiwami 2
-		 1687950, // Persona 5 Royal
-		 567640, // Danganronpa V3: Killing Harmony
-		 1533420, // Neon White
-		 431240, // Golf With Your Friends
-		 803600, // Disgaea 5 Complete
-		 787480, // Phoenix Wright: Ace Attorney Trilogy
-		 587620, // Okami HD
+		    253230, // A Hat in Time
+		    1145360, // Hades
+		    1790600, // Dragon Ball: Sparking! ZERO
+		     927380, // Yakuza Kiwami 2
+		     1687950, // Persona 5 Royal
+		    567640, // Danganronpa V3: Killing Harmony
+		    1533420, // Neon White
+		    431240, // Golf With Your Friends
+		    803600, // Disgaea 5 Complete
+		    787480, // Phoenix Wright: Ace Attorney Trilogy
+		    587620, // Okami HD
+            2378900, // The Coffin of Andy and Leyley
+            837470, // Untitled Goose Game
+            534380, // Dying Light 2: Reloaded Edition
+            1113000, // Persona 4 Golden
+            1329500, // SpiderHeck
+            1150690, // OMORI
             // Upcoming games:
             3191990, // Tiny House Simulator 2024-11-05
             2651280, // Marvel's Spider-Man 2
