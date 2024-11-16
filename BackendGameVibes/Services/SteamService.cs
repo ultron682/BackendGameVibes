@@ -1,5 +1,4 @@
-﻿using BackendGameVibes.Models.Games;
-using BackendGameVibes.Models.Steam;
+﻿using BackendGameVibes.Models.Steam;
 using System.Text.Json;
 
 namespace BackendGameVibes.Services {
@@ -13,16 +12,16 @@ namespace BackendGameVibes.Services {
             InitSteamApi();
         }
 
-        private async void InitSteamApi() {
-            Console.WriteLine("Started init Steam games");
+        public async void InitSteamApi() {
+            Console.WriteLine("Start init Steam games");
             steamGames = await GetAllGameIds();
-            Console.WriteLine("Finished map SteamId to names");
+            Console.WriteLine("Finish init Steam games");
         }
 
         public SteamApp[]? FindSteamApp(string name) {
             name = name.ToLower();
             if (steamGames != null) {
-                return steamGames.Where(s => s.Name.ToLower().Contains(name)).Select(s => s).ToArray();
+                return steamGames.Where(s => s.Name!.ToLower().Contains(name)).Select(s => s).ToArray();
             }
             else {
                 Console.WriteLine("SteamGames empty!!!!");
@@ -73,10 +72,15 @@ namespace BackendGameVibes.Services {
                     };
 
                     var result = JsonSerializer.Deserialize<Dictionary<string, SteamAppData>>(jsonString, options);
-
-                    if (result[id.ToString()].Success) {
-                        Console.WriteLine("Downloaded game: " + id);
-                        return result[id.ToString()].Data;
+                    if (result != null) {
+                        if (result[id.ToString()].Success) {
+                            Console.WriteLine("Downloaded game: " + id);
+                            return result[id.ToString()].Data;
+                        }
+                    }
+                    else {
+                        Console.WriteLine("Game not found: " + id);
+                        return null;
                     }
                 }
             }

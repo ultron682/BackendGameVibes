@@ -1,14 +1,21 @@
-﻿namespace BackendGameVibes {
+﻿using BackendGameVibes.Services;
+
+namespace BackendGameVibes {
     public class BackgroundServiceRefresh : IDisposable, IHostedService {
         private Timer? _timer;
+        private readonly SteamService _steamService;
+
+        public BackgroundServiceRefresh(SteamService steamService) {
+            _steamService = steamService;
+        }
 
         public Task StartAsync(CancellationToken cancellationToken) {
-            _timer = new Timer(RefreshWork, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+            _timer = new Timer(RefreshSteamGames, null, TimeSpan.Zero, TimeSpan.FromDays(1));
             return Task.CompletedTask;
         }
 
-        private void RefreshWork(object? state) {
-            Console.WriteLine("Do roboty moi kopacze złota");
+        private void RefreshSteamGames(object? state) {
+            _steamService.InitSteamApi();
         }
 
         public Task StopAsync(CancellationToken cancellationToken) {

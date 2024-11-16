@@ -88,15 +88,18 @@ public class GameControllerTests {
     }
 
     [Fact]
-    public async Task GetFilteredGames_ReturnsOK_WhenGamesFound() {
+    public async Task GetFilteredGames_ReturnsOK_WhenGamesFound()
+    {
         // Arrange
         var filters = new FiltersGamesDTO();
-        _gameServiceMock.Setup(service => service.GetFilteredGamesAsync(filters)).ReturnsAsync(new Game[] { new Game() { Title = "test", Description = "test" }, new Game() { Title = "test2", Description = "test2" } });
+        _gameServiceMock
+            .Setup(service => service.GetFilteredGamesAsync(filters, 1, 10))
+            .ReturnsAsync(new Game[] { new Game() { Title = "test", Description = "test" }, new Game() { Title = "test2", Description = "test2" } });
 
         // Act
         var result = await _controller.GetFilteredGames(filters);
 
         // Assert
-        Assert.IsType<ActionResult<IEnumerable<object>>>(result);
+        Assert.IsAssignableFrom<ActionResult>(result);
     }
 }

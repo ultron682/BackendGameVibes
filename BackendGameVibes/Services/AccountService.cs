@@ -25,14 +25,14 @@ namespace BackendGameVibes.Services {
         private readonly MailService _mail_Service;
         private readonly HtmlTemplateService _htmlTemplateService;
         private readonly IForumExperienceService _forumExperienceService;
-        private readonly ActionCodesService _actionCodesService;
-        private readonly JwtTokenService _jwtTokenService;
+        private readonly IActionCodesService _actionCodesService;
+        private readonly IJwtTokenService _jwtTokenService;
 
         public AccountService(ApplicationDbContext context, UserManager<UserGameVibes> userManager,
             SignInManager<UserGameVibes> signInManager, IConfiguration configuration, MailService mail_Service,
             HtmlTemplateService htmlTemplateService, RoleManager<IdentityRole> roleManager,
-            IForumExperienceService forumExperienceService, ActionCodesService actionCodesService,
-            JwtTokenService jwtTokenService) {
+            IForumExperienceService forumExperienceService, IActionCodesService actionCodesService,
+            IJwtTokenService jwtTokenService) {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
@@ -245,15 +245,17 @@ namespace BackendGameVibes.Services {
                     u.Description,
                     Reviews = u.UserReviews.Select(r => new {
                         r.Id,
-                        r.GameId,
-                        GameTitle = r.Game != null ? r.Game.Title : "NoData",
                         r.GeneralScore,
                         r.GameplayScore,
                         r.GraphicsScore,
                         r.AudioScore,
                         r.Comment,
                         r.CreatedAt,
-
+                        r.UpdatedAt,
+                        r.GameId,
+                        GameTitle = r.Game != null ? r.Game.Title : "NoData",
+                        GameCoverImageUrl = r.Game != null ? r.Game.CoverImage : "NoData",
+                        UserForumRoleName = r.UserGameVibes != null ? r.UserGameVibes.ForumRole!.Name : "NoRank",
                     }).ToArray(),
                     Friends = u.UserFriends.Select(f => new {
                         f.FriendId,
@@ -266,18 +268,17 @@ namespace BackendGameVibes.Services {
                         t.CreatedDateTime,
                         t.LastUpdatedDateTime
                     }).OrderByDescending(p => p.LastUpdatedDateTime).Take(5).ToArray() : Array.Empty<object>(),
-                    UserForumPosts = u.UserForumPosts != null ? u.UserForumPosts
-                    .ToList()
-                    .Select(p => new {
-                        p.Id,
-                        p.Content,
-                        p.CreatedDateTime,
-                        p.LastUpdatedDateTime,
-                        p.LikesCount,
-                        p.DisLikesCount,
-                        p.ThreadId,
-                        threadTitle = p.Thread != null ? p.Thread.Title : "NoData"
-                    }).ToArray() : Array.Empty<object>(),
+                    UserForumPosts = u.UserForumPosts!
+                        .Select(p => new {
+                            p.Id,
+                            p.Content,
+                            p.CreatedDateTime,
+                            p.LastUpdatedDateTime,
+                            p.LikesCount,
+                            p.DisLikesCount,
+                            p.ThreadId,
+                            threadTitle = p.Thread != null ? p.Thread.Title : "NoData"
+                        }).ToArray(),
                     UserFollowedGames = u.UserFollowedGames != null ? u.UserFollowedGames.Select(g => new {
                         g.Id,
                         g.Title
