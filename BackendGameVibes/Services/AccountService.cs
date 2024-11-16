@@ -27,12 +27,13 @@ namespace BackendGameVibes.Services {
         private readonly IForumExperienceService _forumExperienceService;
         private readonly IActionCodesService _actionCodesService;
         private readonly IJwtTokenService _jwtTokenService;
+        private readonly HttpClient _httpClient;
 
         public AccountService(ApplicationDbContext context, UserManager<UserGameVibes> userManager,
             SignInManager<UserGameVibes> signInManager, IConfiguration configuration, MailService mail_Service,
             HtmlTemplateService htmlTemplateService, RoleManager<IdentityRole> roleManager,
             IForumExperienceService forumExperienceService, IActionCodesService actionCodesService,
-            IJwtTokenService jwtTokenService) {
+            IJwtTokenService jwtTokenService, HttpClient httpClient) {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
@@ -43,15 +44,28 @@ namespace BackendGameVibes.Services {
             _forumExperienceService = forumExperienceService;
             _actionCodesService = actionCodesService;
             _jwtTokenService = jwtTokenService;
+            _httpClient = httpClient;
+            _httpClient.Timeout = TimeSpan.FromSeconds(5);
         }
 
         public async Task<IdentityResult> RegisterUserAsync(RegisterDTO model) {
             var user = new UserGameVibes { UserName = model.UserName, Email = model.Email };
             if (user.ProfilePicture == null) {
-                var defaultImagePath = Path.Combine("wwwroot/Images", "default-profile.jpg");
-                var newProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultImagePath), ImageFormat = "image/blob" };
+                try {
+                    string randomColorHex = new Random().Next(0, 16777215).ToString("X");
+                    var defaultProfilePictureUrl = $"https://ui-avatars.com/api/?background={randomColorHex}&bold=true&size=128&color=fff&name=" + model.UserName;
+                    var defaultProfilePicture = await _httpClient.GetAsync(defaultProfilePictureUrl, CancellationToken.None);
+                    var profilePictureBlob = await defaultProfilePicture.Content.ReadAsByteArrayAsync();
 
-                user.ProfilePicture = newProfilePicture;
+                    user.ProfilePicture = new ProfilePicture { ImageData = profilePictureBlob, ImageFormat = "image/png" };
+                }
+                catch (Exception) {
+                    Console.WriteLine("Error while downloading default profile picture");
+                    var defaultImagePath = Path.Combine("wwwroot/Images", "default-profile.jpg");
+                    var newProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultImagePath), ImageFormat = "image/blob" };
+
+                    user.ProfilePicture = newProfilePicture;
+                }
             }
 
             IdentityResult userResult = await _userManager.CreateAsync(user, model.Password);
