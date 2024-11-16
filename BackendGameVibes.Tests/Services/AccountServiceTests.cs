@@ -83,7 +83,43 @@ public class AccountServiceTests
         );
     }
 
-    
+    [Fact]
+    public async Task ConfirmFriendRequestAsync_ShouldConfirmRequestAndAddFriend_WhenRequestExists()
+    {
+        // Arrange
+        var userId = "user1";
+        var friendId = "user2";
+
+        var friendRequest = new FriendRequest
+        {
+            SenderUserId = friendId,
+            ReceiverUserId = userId,
+            IsAccepted = null
+        };
+
+        _mockContext.Setup(c => c.FriendRequests)
+            .ReturnsDbSet(new List<FriendRequest> { friendRequest });
+
+
+        _mockContext.Setup(c => c.Friends)
+            .ReturnsDbSet(new List<Friend>());
+
+        _mockForumExperienceService
+            .Setup(f => f.AddNewFriendPoints(It.IsAny<string>()))
+            .ReturnsAsync(23); // points
+
+        // Act
+        var result = await _accountService.ConfirmFriendRequestAsync(userId, friendId);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(true, friendRequest.IsAccepted);
+
+        _mockContext.Verify(c => c.FriendRequests.Update(friendRequest), Times.Once);
+        _mockContext.Verify(c => c.Friends.AddRange(It.IsAny<Friend>(), It.IsAny<Friend>()), Times.Once);
+        _mockContext.Verify(c => c.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _mockForumExperienceService.Verify(f => f.AddNewFriendPoints(userId), Times.Once);
+    }
 
     
 
