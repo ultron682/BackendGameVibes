@@ -268,18 +268,17 @@ namespace BackendGameVibes.Services {
                         t.CreatedDateTime,
                         t.LastUpdatedDateTime
                     }).OrderByDescending(p => p.LastUpdatedDateTime).Take(5).ToArray() : Array.Empty<object>(),
-                    UserForumPosts = u.UserForumPosts != null ? u.UserForumPosts
-                    .ToList()
-                    .Select(p => new {
-                        p.Id,
-                        p.Content,
-                        p.CreatedDateTime,
-                        p.LastUpdatedDateTime,
-                        p.LikesCount,
-                        p.DisLikesCount,
-                        p.ThreadId,
-                        threadTitle = p.Thread != null ? p.Thread.Title : "NoData"
-                    }).ToArray() : Array.Empty<object>(),
+                    UserForumPosts = u.UserForumPosts!
+                        .Select(p => new {
+                            p.Id,
+                            p.Content,
+                            p.CreatedDateTime,
+                            p.LastUpdatedDateTime,
+                            p.LikesCount,
+                            p.DisLikesCount,
+                            p.ThreadId,
+                            threadTitle = p.Thread != null ? p.Thread.Title : "NoData"
+                        }).ToArray(),
                     UserFollowedGames = u.UserFollowedGames != null ? u.UserFollowedGames.Select(g => new {
                         g.Id,
                         g.Title
