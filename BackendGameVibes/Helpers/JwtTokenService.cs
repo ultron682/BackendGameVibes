@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using BackendGameVibes.IServices;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 namespace BackendGameVibes.Helpers {
-    public class JwtTokenService {
+    public class JwtTokenService : IJwtTokenService {
 
         private readonly IConfiguration _configuration;
         SymmetricSecurityKey key;

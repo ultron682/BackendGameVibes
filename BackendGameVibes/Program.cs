@@ -85,7 +85,7 @@ builder.Services.AddControllers()
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 builder.Services.AddHostedService<BackgroundServiceRefresh>();
-builder.Services.AddSingleton<JwtTokenService>();
+builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IGameService, GameService>();
@@ -97,7 +97,7 @@ builder.Services.AddScoped<IForumRoleService, ForumRoleService>();
 builder.Services.AddScoped<IForumThreadService, ForumThreadService>();
 builder.Services.AddScoped<IForumPostService, ForumPostService>();
 builder.Services.AddTransient<IForumExperienceService, ForumExperienceService>();
-builder.Services.AddScoped<ActionCodesService>();
+builder.Services.AddScoped<IActionCodesService, ActionCodesService>();
 builder.Services.AddHttpClient();
 
 

@@ -1,4 +1,5 @@
 ﻿using BackendGameVibes.Data;
+using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +7,7 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 
 namespace BackendGameVibes.Services {
-    public class ActionCodesService {
+    public class ActionCodesService : IActionCodesService {
         private readonly ApplicationDbContext _context;
         private readonly int[] ValidChars = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
