@@ -15,52 +15,68 @@ namespace BackendGameVibes.Data {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {
         }
 
-        public DbSet<Game> Games {
+        public virtual DbSet<Game> Games
+        {
             get; set;
         }
-        public DbSet<Platform> Platforms {
+        public virtual DbSet<Platform> Platforms
+        {
             get; set;
         }
-        public DbSet<Genre> Genres {
+        public virtual DbSet<Genre> Genres
+        {
             get; set;
         }
-        public DbSet<GameImage> GameImages {
+        public virtual DbSet<GameImage> GameImages
+        {
             get; set;
         }
-        public DbSet<Review> Reviews {
+        public virtual DbSet<Review> Reviews
+        {
             get; set;
         }
-        public DbSet<ForumThread> ForumThreads {
+        public virtual DbSet<ForumThread> ForumThreads
+        {
             get; set;
         }
-        public DbSet<ForumPost> ForumPosts {
+        public virtual DbSet<ForumPost> ForumPosts
+        {
             get; set;
         }
-        public DbSet<ForumSection> ForumSections {
+        public virtual DbSet<ForumSection> ForumSections
+        {
             get; set;
         }
-        public DbSet<ForumRole> ForumRoles {
+        public virtual DbSet<ForumRole> ForumRoles
+        {
             get; set;
         }
-        public DbSet<FriendRequest> FriendRequests {
+        public virtual DbSet<FriendRequest> FriendRequests
+        {
             get; set;
         }
-        public DbSet<Friend> Friends {
+        public virtual DbSet<Friend> Friends
+        {
             get; set;
         }
-        public DbSet<ReportedReview> ReportedReviews {
+        public virtual DbSet<ReportedReview> ReportedReviews
+        {
             get; set;
         }
-        public DbSet<ReportedPost> ReportedForumPosts {
+        public virtual DbSet<ReportedPost> ReportedForumPosts
+        {
             get; set;
         }
-        public DbSet<ProfilePicture> ProfilePictures {
+        public virtual DbSet<ProfilePicture> ProfilePictures
+        {
             get; set;
         }
-        public DbSet<ActionCode> ActiveActionCodes {
+        public virtual DbSet<ActionCode> ActiveActionCodes
+        {
             get; set;
         }
-        public DbSet<ForumPostInteraction> ForumPostInteractions {
+        public virtual DbSet<ForumPostInteraction> ForumPostInteractions
+        {
             get; set;
         }
 
