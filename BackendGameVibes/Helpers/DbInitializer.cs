@@ -174,7 +174,7 @@ public class DbInitializer {
     }
 
     public static async Task InitializeAsync(AsyncServiceScope scope, ApplicationDbContext applicationDbContext) {
-
+        try {
             using var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserGameVibes>>();
             using var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
@@ -188,6 +188,7 @@ public class DbInitializer {
             using var threadService = scope.ServiceProvider.GetService<IForumThreadService>();
             using var postService = scope.ServiceProvider.GetService<IForumPostService>();
             using var httpClient = scope.ServiceProvider.GetRequiredService<IHttpClientFactory>().CreateClient();
+
             Random random = new();
             DateTime startTime = DateTime.Now;
             Console.WriteLine("Start Init DB");
@@ -513,5 +514,9 @@ public class DbInitializer {
 
 
             Console.WriteLine("\nFinished Init DB");
+        }
+        catch (Exception e) {
+            Console.WriteLine("Error on init DB: " + e.Message);
+        }
     }
 }
