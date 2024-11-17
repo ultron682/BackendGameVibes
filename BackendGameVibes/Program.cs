@@ -8,6 +8,7 @@ using BackendGameVibes.Models.Points;
 using BackendGameVibes.Models.User;
 using BackendGameVibes.Services;
 using BackendGameVibes.Services.Forum;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -85,7 +86,6 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
-builder.Services.AddHealthChecks();
 
 builder.Services.AddHostedService<BackgroundServiceRefresh>();
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
@@ -103,8 +103,17 @@ builder.Services.AddTransient<IForumExperienceService, ForumExperienceService>()
 builder.Services.AddScoped<IActionCodesService, ActionCodesService>();
 builder.Services.AddHttpClient();
 
+builder.Services.AddHealthChecks()
+    .AddCheck<GameVibesHealthDbCheck>("game_vibes_db_health", tags: ["db"])
+    .AddCheck<GameVibesHealthInternetCheck>("game_vibes_internet_health", tags: ["internet"]);
+
 
 var app = builder.Build();
+
+app.MapHealthChecks("api/health", new HealthCheckOptions {
+    Predicate = _ => true,
+    ResponseWriter = CustomHealthCheckResponseWriter.WriteCustomHealthCheckResponse
+});
 
 // Always available Swagger
 app.UseSwagger();
@@ -123,7 +132,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseHealthChecks("/health");
+
 
 app.Services.GetService<SteamService>(); // on start backend download steam games IDs
 
