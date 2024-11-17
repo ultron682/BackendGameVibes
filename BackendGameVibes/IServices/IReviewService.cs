@@ -13,6 +13,6 @@ public interface IReviewService : IDisposable {
     Task<object[]> GetLandingReviewsAsync();
     Task<ReportedReview?> ReportReviewAsync(string userId, ReportReviewDTO reportedReviewDTO);
     Task<ReportedReview?> FinishReportReviewAsync(int id, bool toRemove);
-    Task<Review?> UpdateReviewByIdAsync(int reviewId, string userId, ReviewUpdateDTO reviewUpdateDTO);
+    Task<object?> UpdateReviewByIdAsync(int reviewId, string userId, ReviewUpdateDTO reviewUpdateDTO);
     Task<object?> GetGameReviewsAsync(int gameId, int pageNumber = 1, int resultSize = 10);
 }

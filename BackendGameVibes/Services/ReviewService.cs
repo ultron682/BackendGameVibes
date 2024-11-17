@@ -184,7 +184,7 @@ public class ReviewService : IReviewService {
         return reportedReview;
     }
 
-    public async Task<Review?> UpdateReviewByIdAsync(int reviewId, string userId, ReviewUpdateDTO reviewUpdateDTO) {
+    public async Task<object?> UpdateReviewByIdAsync(int reviewId, string userId, ReviewUpdateDTO reviewUpdateDTO) {
         var review = await _context.Reviews
            .FirstOrDefaultAsync(r => r.Id == reviewId && r.UserGameVibesId == userId);
 
@@ -205,7 +205,7 @@ public class ReviewService : IReviewService {
             await CalculateAndUpdateRatingForGame(review.GameId);
         }
 
-        return review;
+        return await GetReviewByIdAsync(reviewId);
     }
 
     private async Task CalculateAndUpdateRatingForGame(int? gameId) {

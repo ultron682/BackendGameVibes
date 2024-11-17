@@ -71,7 +71,7 @@ public class ReviewController : ControllerBase {
 
         Review? review = await _reviewService.AddReviewAsync(newReview);
         if (review != null)
-            return CreatedAtAction(nameof(GetReviewById), new { id = newReview.Id }, review);
+            return await GetReviewById(review.Id);
         else
             return BadRequest("No gameId in db");
     }
@@ -120,7 +120,7 @@ public class ReviewController : ControllerBase {
         if (userId == null)
             return Unauthorized("User not authenticated, claim not found");
 
-        Review? review = await _reviewService.UpdateReviewByIdAsync(reviewId, userId, reviewUpdateDTO);
+        object? review = await _reviewService.UpdateReviewByIdAsync(reviewId, userId, reviewUpdateDTO);
         if (review == null) {
             return NotFound();
         }
