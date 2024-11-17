@@ -383,8 +383,8 @@ public class DbInitializer {
 		        253230, // A Hat in Time
 		        1145360, // Hades
 		        1790600, // Dragon Ball: Sparking! ZERO
-		         927380, // Yakuza Kiwami 2
-		         1687950, // Persona 5 Royal
+		        927380, // Yakuza Kiwami 2
+		        1687950, // Persona 5 Royal
 		        567640, // Danganronpa V3: Killing Harmony
 		        1533420, // Neon White
 		        431240, // Golf With Your Friends
