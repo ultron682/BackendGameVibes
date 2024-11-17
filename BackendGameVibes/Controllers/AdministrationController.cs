@@ -226,7 +226,7 @@ public class AdministrationController : ControllerBase {
     [Authorize(Policy = "modOrAdmin")]
     [SwaggerOperation("modOrAdmin")]
     public async Task<IActionResult> UpdateUserProfilePicture(string userId, IFormFile profilePicture) {
-        if (userId.IsNullOrEmpty())
+        if (string.IsNullOrEmpty(userId))
             return Unauthorized("User not authenticated");
 
         if (profilePicture == null || profilePicture.Length == 0)

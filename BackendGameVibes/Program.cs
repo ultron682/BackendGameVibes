@@ -55,7 +55,9 @@ builder.Services
 builder.Services.AddAuthenticationGameVibesJwt(builder.Configuration);
 
 builder.Services.AddAuthorizationGameVibes();
+
 builder.Services.AddMemoryCache();
+
 builder.Services.Configure<IdentityOptions>(options => {
     // Password settings.
     options.Password.RequireDigit = true;
@@ -83,6 +85,7 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
+builder.Services.AddHealthChecks();
 
 builder.Services.AddHostedService<BackgroundServiceRefresh>();
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
@@ -119,6 +122,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseHealthChecks("/health");
 
 app.Services.GetService<SteamService>(); // on start backend download steam games IDs
 
