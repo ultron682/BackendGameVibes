@@ -132,12 +132,15 @@ public class ReviewService : IReviewService {
 
     public async Task<bool> DeleteReviewAsync(string userId, int id) {
         var review = await _context.Reviews.FindAsync(id);
+
         if (review != null) {
+            int? reviewGameId = review.GameId;
+
             if (review.UserGameVibesId == userId) {
                 _context.Reviews.Remove(review);
                 await _context.SaveChangesAsync();
 
-                await CalculateAndUpdateRatingForGame(review.GameId);
+                await CalculateAndUpdateRatingForGame(reviewGameId);
                 return true;
             }
         }
