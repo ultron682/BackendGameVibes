@@ -210,6 +210,7 @@ public class ReviewService : IReviewService {
 
     private async Task CalculateAndUpdateRatingForGame(int? gameId) {
         var game = await _context.Games
+            .Include(g => g.Reviews)
             .FirstOrDefaultAsync(g => g.Id == gameId);
 
         if (game != null) {
