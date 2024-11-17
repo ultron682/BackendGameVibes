@@ -1,7 +1,4 @@
-﻿using BackendGameVibes.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using System.Data.Common;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace BackendGameVibes.Helpers {
     public class GameVibesHealthInternetCheck : IHealthCheck {
