@@ -29,6 +29,5 @@ FROM base AS final
 WORKDIR /app
 #COPY "./BackendGameVibes/GameVibesDatabase.db" .
 # HEALTHCHECK CMD curl --fail http://localhost:5000/api/health || exit
-COPY .-- From=publish./app/publish ..
 COPY --from=publish /app/publish .
 CMD ["dotnet", "BackendGameVibes.dll"]
