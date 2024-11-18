@@ -61,8 +61,7 @@ namespace BackendGameVibes.Services {
                 }
                 catch (Exception) {
                     Console.WriteLine("Error while downloading default profile picture");
-                    var defaultImagePath = Path.Combine("wwwroot/Images", "default-profile.jpg");
-                    var newProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultImagePath), ImageFormat = "image/blob" };
+                    ProfilePicture newProfilePicture = await GetDefaultProfilePicture();
 
                     user.ProfilePicture = newProfilePicture;
                 }
@@ -74,6 +73,12 @@ namespace BackendGameVibes.Services {
                 await _userManager.AddToRoleAsync(user, "user");
 
             return userResult;
+        }
+
+        private static async Task<ProfilePicture> GetDefaultProfilePicture() {
+            var defaultImagePath = Path.Combine("wwwroot/Images", "default-profile.jpg");
+            var newProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultImagePath), ImageFormat = "image/blob", UploadedDate = DateTime.Now };
+            return newProfilePicture;
         }
 
         public async Task<UserGameVibes?> GetUserByEmailAsync(string email) {
@@ -733,11 +738,15 @@ namespace BackendGameVibes.Services {
                 return null;
             }
 
-            var profilePicture = user.ProfilePicture ?? null;
-            if (profilePicture != null) {
-                return new { profilePicture.ImageFormat, profilePicture.ImageData, profilePicture.UploadedDate };
+            if (user.ProfilePicture == null) {
+                user.ProfilePicture = await GetDefaultProfilePicture();
             }
-            return null;
+
+            return new {
+                user.ProfilePicture.ImageFormat,
+                user.ProfilePicture.ImageData,
+                user.ProfilePicture.UploadedDate
+            };
         }
 
         public void Dispose() {
