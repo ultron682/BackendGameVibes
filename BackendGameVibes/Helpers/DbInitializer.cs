@@ -9,7 +9,6 @@ using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.IServices.Forum;
-using System.Net.Http;
 
 namespace BackendGameVibes.Helpers;
 
@@ -274,6 +273,7 @@ public class DbInitializer {
                         Email = $"test{i}@test.com",
                         EmailConfirmed = true,
                         Description = "Hello, I'm good player. Test description",
+                        ProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultProfileImagePath) }
                     };
 
                     try {
