@@ -257,6 +257,7 @@ public class DbInitializer {
                         Email = "test@test.com",
                         EmailConfirmed = true,
                         Description = "Hello, I jestem GOD of the INNYCH GRACZY",
+                        ProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultProfileImagePath) }
                     }
                 ];
 
