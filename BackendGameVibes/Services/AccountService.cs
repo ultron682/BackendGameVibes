@@ -142,6 +142,7 @@ namespace BackendGameVibes.Services {
                     u.LockoutEnabled,
                     u.AccessFailedCount,
                     u.Description,
+                    u.LastActivityDate,
                     Roles = userRoles.ToArray(),
                 })
                 .FirstOrDefaultAsync(u => u.Id == userGameVibes.Id);
@@ -262,6 +263,7 @@ namespace BackendGameVibes.Services {
                     ForumRole = new { u.ForumRole!.Id, u.ForumRole.Name, u.ForumRole.Threshold },
                     u.ExperiencePoints,
                     u.Description,
+                    u.LastActivityDate,
                     Reviews = u.UserReviews.Select(r => new {
                         r.Id,
                         r.GeneralScore,

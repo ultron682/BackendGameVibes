@@ -5,6 +5,6 @@
         public string? ImageFormat { get; set; } // "jpg" || "png"
         public string? UserId { get; set; }
         public UserGameVibes? User { get; set; }
-        public DateTime? UploadedDate { get; set; } = DateTime.UtcNow;
+        public DateTime? UploadedDate { get; set; } = DateTime.Now;
     }
 }
