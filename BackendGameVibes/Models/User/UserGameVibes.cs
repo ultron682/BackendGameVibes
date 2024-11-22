@@ -19,6 +19,9 @@ namespace BackendGameVibes.Models.User {
         public int? ForumRoleId {
             get; set;
         }
+        public DateTime? LastActivityDate {
+            get; set;
+        }
 
         public List<Review> UserReviews {
             get; set;
