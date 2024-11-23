@@ -15,68 +15,52 @@ namespace BackendGameVibes.Data {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {
         }
 
-        public virtual DbSet<Game> Games
-        {
+        public virtual DbSet<Game> Games {
             get; set;
         }
-        public virtual DbSet<Platform> Platforms
-        {
+        public virtual DbSet<Platform> Platforms {
             get; set;
         }
-        public virtual DbSet<Genre> Genres
-        {
+        public virtual DbSet<Genre> Genres {
             get; set;
         }
-        public virtual DbSet<GameImage> GameImages
-        {
+        public virtual DbSet<GameImage> GameImages {
             get; set;
         }
-        public virtual DbSet<Review> Reviews
-        {
+        public virtual DbSet<Review> Reviews {
             get; set;
         }
-        public virtual DbSet<ForumThread> ForumThreads
-        {
+        public virtual DbSet<ForumThread> ForumThreads {
             get; set;
         }
-        public virtual DbSet<ForumPost> ForumPosts
-        {
+        public virtual DbSet<ForumPost> ForumPosts {
             get; set;
         }
-        public virtual DbSet<ForumSection> ForumSections
-        {
+        public virtual DbSet<ForumSection> ForumSections {
             get; set;
         }
-        public virtual DbSet<ForumRole> ForumRoles
-        {
+        public virtual DbSet<ForumRole> ForumRoles {
             get; set;
         }
-        public virtual DbSet<FriendRequest> FriendRequests
-        {
+        public virtual DbSet<FriendRequest> FriendRequests {
             get; set;
         }
-        public virtual DbSet<Friend> Friends
-        {
+        public virtual DbSet<Friend> Friends {
             get; set;
         }
-        public virtual DbSet<ReportedReview> ReportedReviews
-        {
+        public virtual DbSet<ReportedReview> ReportedReviews {
             get; set;
         }
-        public virtual DbSet<ReportedPost> ReportedForumPosts
-        {
+        public virtual DbSet<ReportedPost> ReportedForumPosts {
             get; set;
         }
-        public virtual DbSet<ProfilePicture> ProfilePictures
-        {
+        public virtual DbSet<ProfilePicture> ProfilePictures {
             get; set;
         }
-        public virtual DbSet<ActionCode> ActiveActionCodes
-        {
+        public virtual DbSet<ActionCode> ActiveActionCodes {
             get; set;
         }
-        public virtual DbSet<ForumPostInteraction> ForumPostInteractions
-        {
+        public virtual DbSet<ForumPostInteraction> ForumPostInteractions {
             get; set;
         }
 
@@ -102,14 +86,16 @@ namespace BackendGameVibes.Data {
                 ent.Property(u => u.ForumRoleId)
                     .HasDefaultValue(1);
 
-                ent
-                    .HasMany(u => u.UserReviews)
+                ent.Property(u => u.LastActivityDate)
+                    .HasColumnType("datetime(6)")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+                ent.HasMany(u => u.UserReviews)
                     .WithOne(r => r.UserGameVibes)
                     .HasForeignKey(u => u.UserGameVibesId)
                     .OnDelete(DeleteBehavior.SetNull);
 
-                ent
-                    .HasMany(u => u.UserFollowedGames)
+                ent.HasMany(u => u.UserFollowedGames)
                     .WithMany(g => g.PlayersFollowing)
                     .UsingEntity(j => j.ToTable("UsersGamesFollow"));
             });

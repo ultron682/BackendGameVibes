@@ -3,6 +3,7 @@ using BackendGameVibes.Data;
 using BackendGameVibes.Helpers;
 using BackendGameVibes.IServices;
 using BackendGameVibes.IServices.Forum;
+using BackendGameVibes.Middlewares;
 using BackendGameVibes.Models;
 using BackendGameVibes.Models.Points;
 using BackendGameVibes.Models.User;
@@ -128,6 +129,9 @@ app.UseCors();
 app.UseRouting();
 
 app.UseAuthentication();
+
+app.UseMiddleware<UpdateLastActivityMiddleware>();
+
 app.UseAuthorization();
 
 app.MapControllers();

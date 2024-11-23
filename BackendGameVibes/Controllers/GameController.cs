@@ -16,6 +16,7 @@ public class GameController : ControllerBase {
         _gameService = gameService;
     }
 
+    [SwaggerOperation("SortedBy: Rating = 1, ReleaseDate = 2, Name = 3, FollowedPlayers = 4")]
     [HttpGet]
     public async Task<ActionResult> GetFilteredGames([FromQuery] FiltersGamesDTO filtersGamesDTO, int pageNumber = 1, int resultSize = 10) {
         var filteredGames = await _gameService.GetFilteredGamesAsync(filtersGamesDTO, pageNumber, resultSize);
