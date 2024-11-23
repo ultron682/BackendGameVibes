@@ -46,11 +46,14 @@ namespace BackendGameVibes.Services {
             user.ExperiencePoints += count;
 
             var forumRole = await _context.ForumRoles
-                .FirstOrDefaultAsync(fr => fr.Threshold <= user.ExperiencePoints);
+                .OrderByDescending(fr => fr.Threshold)
+                .FirstOrDefaultAsync(fr => user.ExperiencePoints >= fr.Threshold);
 
             if (forumRole != null) {
                 user.ForumRole = forumRole;
             }
+
+            _context.Users.Update(user);
 
             await _context.SaveChangesAsync();
             return user.ExperiencePoints;
