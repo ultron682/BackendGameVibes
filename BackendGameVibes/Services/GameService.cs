@@ -28,8 +28,10 @@ public class GameService : IGameService {
             .Where(g =>
                 (filtersGamesDTO.GenresIds == null || !filtersGamesDTO.GenresIds.Any() || g.Genres!.Any(genre => filtersGamesDTO.GenresIds.Contains(genre.Id))) &&
                 g.LastCalculatedRatingFromReviews >= filtersGamesDTO.RatingMin &&
-                g.LastCalculatedRatingFromReviews <= filtersGamesDTO.RatingMax
+                g.LastCalculatedRatingFromReviews <= filtersGamesDTO.RatingMax &&
+                (string.IsNullOrEmpty(filtersGamesDTO.Title) || g.Title != null && g.Title.ToLower().Contains(filtersGamesDTO.Title.ToLower()))
             );
+        
 
         int totalResults = await query.CountAsync();
 

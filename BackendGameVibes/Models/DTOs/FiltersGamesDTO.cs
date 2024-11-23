@@ -29,5 +29,8 @@ namespace BackendGameVibes.Models.DTOs {
         [DefaultValue("true")]
         public bool IsSortedAscending { get; set; }
 
+        [DefaultValue("")]
+        public String Title { get; set; } = "";
+
     }
 }
