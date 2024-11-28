@@ -28,10 +28,11 @@ public class GameServiceTests {
             .Options;
 
         _context = new ApplicationDbContext(options);
-        _steamServiceMock = new Mock<ISteamService>();
         _gamesDbSetMock = new Mock<DbSet<Game>>();
-        //_context.Setup(c => c.Games).Returns(_gamesDbSetMock.Object);
         _context.Database.EnsureCreated();
+
+        _steamServiceMock = new Mock<ISteamService>();
+
         _gameService = new GameService(_context, _steamServiceMock.Object);
     }
 
