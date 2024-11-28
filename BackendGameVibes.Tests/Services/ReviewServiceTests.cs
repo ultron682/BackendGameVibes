@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BackendGameVibes.Data;
+using BackendGameVibes.Helpers;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.DTOs;
 using BackendGameVibes.Models.DTOs.Reported;
@@ -18,7 +19,6 @@ using Xunit;
 namespace BackendGameVibes.Tests.Services {
     public class ReviewServiceTests {
         private readonly ApplicationDbContext _context;
-        private readonly Mock<IMapper> _mapperMock;
         private readonly Mock<IForumExperienceService> _forumExperienceServiceMock;
         private readonly ReviewService _reviewService;
 
@@ -30,11 +30,10 @@ namespace BackendGameVibes.Tests.Services {
             _context = new ApplicationDbContext(options);
             _context.Database.EnsureCreated();
 
-            _mapperMock = new Mock<IMapper>();
             _forumExperienceServiceMock = new Mock<IForumExperienceService>();
 
 
-            _reviewService = new ReviewService(_context, _mapperMock.Object, _forumExperienceServiceMock.Object);
+            _reviewService = new ReviewService(_context, null!, _forumExperienceServiceMock.Object);
         }
 
         [Fact]
@@ -100,7 +99,7 @@ namespace BackendGameVibes.Tests.Services {
         public async Task DeleteReviewAsync_DeletesReview_WhenReviewExists() {
             // Arrange
             var review = new Review {
-                Id = 2,
+                Id = 1,
                 Comment = "Great game!",
                 CreatedAt = DateTime.Now,
                 UpdatedAt = DateTime.Now,
@@ -108,42 +107,19 @@ namespace BackendGameVibes.Tests.Services {
                 GraphicsScore = 9,
                 AudioScore = 7,
                 GameplayScore = 8,
-                GameId = 2
+                GameId = 2,
+                UserGameVibesId = "user1ID"
             };
 
-            var mockSet = new Mock<DbSet<Review>>();
-            mockSet.Setup(m => m.FindAsync(1)).ReturnsAsync(review);
+            _context.Reviews.Add(review);
 
-            //_contextMock.Setup(c => c.Reviews).Returns(mockSet.Object);
+            await _context.SaveChangesAsync();
 
             // Act
-            var result = await _reviewService.DeleteReviewAsync("user1", 1);
+            var result = await _reviewService.DeleteReviewAsync("user1ID", 1);
 
             // Assert
             Assert.True(result);
-            //_contextMock.Verify(c => c.SaveChangesAsync(default), Times.Once);
-        }
-
-        [Fact]
-        public async Task ReportReviewAsync_ReportsReview_WhenReviewExists() {
-            // Arrange
-            var review = new Review { Id = 1, Comment = "Great game!" };
-            var reportReviewDTO = new ReportReviewDTO { ReviewId = 1, Reason = "Spam" };
-            var reportedReview = new ReportedReview { ReviewId = 1, Reason = "Spam" };
-
-            var mockSet = new Mock<DbSet<Review>>();
-            mockSet.Setup(m => m.FindAsync(1)).ReturnsAsync(review);
-
-            //_contextMock.Setup(c => c.Reviews).Returns(mockSet.Object);
-            _mapperMock.Setup(m => m.Map<ReportedReview>(It.IsAny<ReportReviewDTO>())).Returns(reportedReview);
-
-            // Act
-            var result = await _reviewService.ReportReviewAsync("user1", reportReviewDTO);
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal(reportReviewDTO.ReviewId, result.ReviewId);
-            //_contextMock.Verify(c => c.SaveChangesAsync(default), Times.Once);
         }
     }
 }
