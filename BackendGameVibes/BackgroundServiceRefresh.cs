@@ -1,11 +1,11 @@
-﻿using BackendGameVibes.Services;
+﻿using BackendGameVibes.IServices;
 
 namespace BackendGameVibes {
     public class BackgroundServiceRefresh : IDisposable, IHostedService {
         private Timer? _timer;
-        private readonly SteamService _steamService;
+        private readonly ISteamService _steamService;
 
-        public BackgroundServiceRefresh(SteamService steamService) {
+        public BackgroundServiceRefresh(ISteamService steamService) {
             _steamService = steamService;
         }
 

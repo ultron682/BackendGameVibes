@@ -7,12 +7,14 @@ using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.Extensions;
 
 namespace BackendGameVibes.Services;
+
+
 public class GameService : IGameService {
     private readonly ApplicationDbContext _context;
-    private readonly SteamService _steamService;
+    private readonly ISteamService _steamService;
 
 
-    public GameService(ApplicationDbContext context, SteamService steamService) {
+    public GameService(ApplicationDbContext context, ISteamService steamService) {
         _context = context;
         _steamService = steamService;
     }
@@ -31,7 +33,7 @@ public class GameService : IGameService {
                 g.LastCalculatedRatingFromReviews <= filtersGamesDTO.RatingMax &&
                 (string.IsNullOrEmpty(filtersGamesDTO.Title) || g.Title != null && g.Title.ToLower().Contains(filtersGamesDTO.Title.ToLower()))
             );
-        
+
 
         int totalResults = await query.CountAsync();
 

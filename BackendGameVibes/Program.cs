@@ -95,7 +95,7 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddTransient<MailService>();
 builder.Services.AddSingleton<HtmlTemplateService>();
-builder.Services.AddSingleton<SteamService>();
+builder.Services.AddSingleton<ISteamService, SteamService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IForumRoleService, ForumRoleService>();
 builder.Services.AddScoped<IForumThreadService, ForumThreadService>();
@@ -138,7 +138,8 @@ app.MapControllers();
 
 
 
-app.Services.GetService<SteamService>(); // on start backend download steam games IDs
+ISteamService? steamService = app.Services.GetService<ISteamService>(); // on start backend download steam games IDs
+await steamService!.InitSteamApi();
 
 using (var scope = app.Services.CreateAsyncScope()) {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
