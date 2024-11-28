@@ -211,7 +211,8 @@ namespace BackendGameVibes.Services {
                         t.Id,
                         t.Title,
                         t.CreatedDateTime,
-                        t.LastUpdatedDateTime
+                        t.LastUpdatedDateTime,
+                        t.UserOwnerId,
                     })
                     .ToArray()
                     : Array.Empty<object>(),
