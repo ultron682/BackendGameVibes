@@ -31,7 +31,7 @@ public class GameServiceTests {
         _steamServiceMock = new Mock<ISteamService>();
         _gamesDbSetMock = new Mock<DbSet<Game>>();
         //_context.Setup(c => c.Games).Returns(_gamesDbSetMock.Object);
-
+        _context.Database.EnsureCreated();
         _gameService = new GameService(_context, _steamServiceMock.Object);
     }
 
@@ -77,7 +77,6 @@ public class GameServiceTests {
             LastCalculatedRatingFromReviews = 4.5f
         };
 
-        await _context.Database.EnsureCreatedAsync();
         _context.Games.Add(game);
         await _context.SaveChangesAsync();
 
@@ -90,4 +89,22 @@ public class GameServiceTests {
         Assert.NotNull(castedResult!.Data);
         Assert.True(castedResult.Data.Length > 0);
     }
+
+    [Fact]
+    public async Task AddGameAsync_AddsGame_WhenNotExists() {
+        // Arrange
+        var steamGameId = 292030; // The Witcher 3
+
+        _steamServiceMock.Setup(s => s.GetInfoGame(It.IsAny<int>())).ReturnsAsync(new GameData() { name = "The Witcher 3" });
+
+        // Act
+        (Game? game, bool isCreated) = await _gameService.AddGameAsync(steamGameId);
+
+        // Assert
+        Assert.NotNull(game);
+        Assert.True(isCreated); // Nowa gra została dodana
+        Assert.Equal(steamGameId, game.SteamId);
+        Assert.Equal("The Witcher 3", game.Title);
+    }
+
 }
