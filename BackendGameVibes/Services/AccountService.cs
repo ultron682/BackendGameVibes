@@ -213,7 +213,7 @@ namespace BackendGameVibes.Services {
                         t.CreatedDateTime,
                         t.LastUpdatedDateTime,
                         t.UserOwnerId,
-                        t.Section,
+                        Section = t.Section!.Name,
                     })
                     .ToArray()
                     : Array.Empty<object>(),
