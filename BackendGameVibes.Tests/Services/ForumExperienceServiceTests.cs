@@ -8,123 +8,123 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moq;
 
-namespace BackendGameVibes.Tests.Services {
-    public class ForumExperienceServiceTests {
-        private readonly Mock<IOptions<ExperiencePointsSettings>> _pointsSettingsMock;
-        private readonly Mock<UserManager<UserGameVibes>> _userManagerMock;
-        private readonly ApplicationDbContext _dbContext;
+namespace BackendGameVibes.Tests.Services;
 
-        public ForumExperienceServiceTests() {
-            _pointsSettingsMock = new Mock<IOptions<ExperiencePointsSettings>>();
-            _userManagerMock = MockUserManager(new List<UserGameVibes>());
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
-            _dbContext = new ApplicationDbContext(options);
-        }
+public class ForumExperienceServiceTests {
+    private readonly Mock<IOptions<ExperiencePointsSettings>> _pointsSettingsMock;
+    private readonly Mock<UserManager<UserGameVibes>> _userManagerMock;
+    private readonly ApplicationDbContext _dbContext;
 
-        [Fact]
-        public async Task AddThreadPoints_IncreasesExperiencePointsAndUpdatesRole() {
-            // Arrange
-            const string userId = "test-user";
-            _pointsSettingsMock.Setup(p => p.Value).Returns(new ExperiencePointsSettings { OnAddThreadPoints = 10 });
+    public ForumExperienceServiceTests() {
+        _pointsSettingsMock = new Mock<IOptions<ExperiencePointsSettings>>();
+        _userManagerMock = MockUserManager(new List<UserGameVibes>());
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+        _dbContext = new ApplicationDbContext(options);
+    }
 
-            var user = new UserGameVibes {
-                Id = userId,
-                ExperiencePoints = 0,
-                ForumRole = null
-            };
+    [Fact]
+    public async Task AddThreadPoints_IncreasesExperiencePointsAndUpdatesRole() {
+        // Arrange
+        const string userId = "test-user";
+        _pointsSettingsMock.Setup(p => p.Value).Returns(new ExperiencePointsSettings { OnAddThreadPoints = 10 });
 
-            var newRole = new ForumRole { Id = 1, Name = "Newbie", Threshold = 10 };
+        var user = new UserGameVibes {
+            Id = userId,
+            ExperiencePoints = 0,
+            ForumRole = null
+        };
 
-            _dbContext.Users.Add(user);
-            _dbContext.ForumRoles.Add(newRole);
-            await _dbContext.SaveChangesAsync();
+        var newRole = new ForumRole { Id = 1, Name = "Newbie", Threshold = 10 };
 
-            var service = new ForumExperienceService(_pointsSettingsMock.Object, _userManagerMock.Object, _dbContext);
+        _dbContext.Users.Add(user);
+        _dbContext.ForumRoles.Add(newRole);
+        await _dbContext.SaveChangesAsync();
 
-            // Act
-            var newExperience = await service.AddThreadPoints(userId);
+        var service = new ForumExperienceService(_pointsSettingsMock.Object, _userManagerMock.Object, _dbContext);
 
-            // Assert
-            Assert.Equal(10, newExperience);
-            Assert.Equal(newRole, user.ForumRole);
-        }
+        // Act
+        var newExperience = await service.AddThreadPoints(userId);
 
-        [Fact]
-        public async Task AddPostPoints_IncreasesExperiencePointsWithoutChangingRole() {
-            // Arrange
-            const string userId = "test-user";
-            _pointsSettingsMock.Setup(p => p.Value).Returns(new ExperiencePointsSettings { OnAddPostPoints = 5 });
+        // Assert
+        Assert.Equal(10, newExperience);
+        Assert.Equal(newRole, user.ForumRole);
+    }
 
-            var user = new UserGameVibes {
-                Id = userId,
-                ExperiencePoints = 3,
-                ForumRole = new ForumRole { Id = 1, Name = "Beginner", Threshold = 0 }
-            };
+    [Fact]
+    public async Task AddPostPoints_IncreasesExperiencePointsWithoutChangingRole() {
+        // Arrange
+        const string userId = "test-user";
+        _pointsSettingsMock.Setup(p => p.Value).Returns(new ExperiencePointsSettings { OnAddPostPoints = 5 });
 
-            _dbContext.Users.Add(user);
-            await _dbContext.SaveChangesAsync();
+        var user = new UserGameVibes {
+            Id = userId,
+            ExperiencePoints = 3,
+            ForumRole = new ForumRole { Id = 1, Name = "Beginner", Threshold = 0 }
+        };
 
-            var service = new ForumExperienceService(_pointsSettingsMock.Object, _userManagerMock.Object, _dbContext);
+        _dbContext.Users.Add(user);
+        await _dbContext.SaveChangesAsync();
 
-            // Act
-            var newExperience = await service.AddPostPoints(userId);
+        var service = new ForumExperienceService(_pointsSettingsMock.Object, _userManagerMock.Object, _dbContext);
 
-            // Assert
-            Assert.Equal(8, newExperience);
-            Assert.Equal("Beginner", user.ForumRole.Name);
-        }
+        // Act
+        var newExperience = await service.AddPostPoints(userId);
 
-        [Fact]
-        public async Task AddReviewPoints_ReturnsMinusOne_WhenUserDoesNotExist() {
-            // Arrange
-            const string nonExistentUserId = "non-existent-user";
-            _pointsSettingsMock.Setup(p => p.Value).Returns(new ExperiencePointsSettings { OnAddReviewPoints = 15 });
+        // Assert
+        Assert.Equal(8, newExperience);
+        Assert.Equal("Beginner", user.ForumRole.Name);
+    }
 
-            var service = new ForumExperienceService(_pointsSettingsMock.Object, _userManagerMock.Object, _dbContext);
+    [Fact]
+    public async Task AddReviewPoints_ReturnsMinusOne_WhenUserDoesNotExist() {
+        // Arrange
+        const string nonExistentUserId = "non-existent-user";
+        _pointsSettingsMock.Setup(p => p.Value).Returns(new ExperiencePointsSettings { OnAddReviewPoints = 15 });
 
-            // Act
-            var result = await service.AddReviewPoints(nonExistentUserId);
+        var service = new ForumExperienceService(_pointsSettingsMock.Object, _userManagerMock.Object, _dbContext);
 
-            // Assert
-            Assert.Equal(-1, result);
-        }
+        // Act
+        var result = await service.AddReviewPoints(nonExistentUserId);
 
-        [Fact]
-        public async Task AddNewFriendPoints_IncreasesExperiencePointsAndChangesRole_WhenThresholdIsReached() {
-            // Arrange
-            const string userId = "test-user";
-            _pointsSettingsMock.Setup(p => p.Value).Returns(new ExperiencePointsSettings { OnAddNewFriendPoints = 20 });
+        // Assert
+        Assert.Equal(-1, result);
+    }
 
-            var user = new UserGameVibes {
-                Id = userId,
-                ExperiencePoints = 80,
-                ForumRole = new ForumRole { Id = 1, Name = "Intermediate", Threshold = 50 }
-            };
+    [Fact]
+    public async Task AddNewFriendPoints_IncreasesExperiencePointsAndChangesRole_WhenThresholdIsReached() {
+        // Arrange
+        const string userId = "test-user";
+        _pointsSettingsMock.Setup(p => p.Value).Returns(new ExperiencePointsSettings { OnAddNewFriendPoints = 20 });
 
-            var advancedRole = new ForumRole { Id = 2, Name = "Advanced", Threshold = 100 };
+        var user = new UserGameVibes {
+            Id = userId,
+            ExperiencePoints = 80,
+            ForumRole = new ForumRole { Id = 1, Name = "Intermediate", Threshold = 50 }
+        };
 
-            _dbContext.Users.Add(user);
-            _dbContext.ForumRoles.Add(advancedRole);
-            await _dbContext.SaveChangesAsync();
+        var advancedRole = new ForumRole { Id = 2, Name = "Advanced", Threshold = 100 };
 
-            var service = new ForumExperienceService(_pointsSettingsMock.Object, _userManagerMock.Object, _dbContext);
+        _dbContext.Users.Add(user);
+        _dbContext.ForumRoles.Add(advancedRole);
+        await _dbContext.SaveChangesAsync();
 
-            // Act
-            var newExperience = await service.AddNewFriendPoints(userId);
+        var service = new ForumExperienceService(_pointsSettingsMock.Object, _userManagerMock.Object, _dbContext);
 
-            // Assert
-            Assert.Equal(100, newExperience);
-            Assert.Equal("Advanced", user.ForumRole.Name);
-        }
+        // Act
+        var newExperience = await service.AddNewFriendPoints(userId);
 
-        private Mock<UserManager<UserGameVibes>> MockUserManager(List<UserGameVibes> users) {
-            var store = new Mock<IUserStore<UserGameVibes>>();
-            var mock = new Mock<UserManager<UserGameVibes>>(store.Object, null, null, null, null, null, null, null, null);
+        // Assert
+        Assert.Equal(100, newExperience);
+        Assert.Equal("Advanced", user.ForumRole.Name);
+    }
 
-            mock.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((string id) => users.FirstOrDefault(u => u.Id == id));
-            return mock;
-        }
+    private Mock<UserManager<UserGameVibes>> MockUserManager(List<UserGameVibes> users) {
+        var store = new Mock<IUserStore<UserGameVibes>>();
+        var mock = new Mock<UserManager<UserGameVibes>>(store.Object, null, null, null, null, null, null, null, null);
+
+        mock.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((string id) => users.FirstOrDefault(u => u.Id == id));
+        return mock;
     }
 }
