@@ -139,7 +139,7 @@ app.MapControllers();
 
 
 ISteamService? steamService = app.Services.GetService<ISteamService>(); // on start backend download steam games IDs
-await steamService!.InitSteamApi();
+_ = steamService!.InitSteamApi();
 
 using (var scope = app.Services.CreateAsyncScope()) {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();

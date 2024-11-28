@@ -5,6 +5,7 @@ using BackendGameVibes.Models.DTOs;
 using BackendGameVibes.Models.Steam;
 using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.Extensions;
+using BackendGameVibes.Models.DTOs.Responses;
 
 namespace BackendGameVibes.Services;
 
@@ -23,7 +24,7 @@ public class GameService : IGameService {
         return _steamService.FindSteamApp(searchingName) ?? [];
     }
 
-    public async Task<object?> GetFilteredGamesAsync(FiltersGamesDTO filtersGamesDTO, int pageNumber = 1, int resultSize = 10) {
+    public async Task<FilteredGamesResponse?> GetFilteredGamesAsync(FiltersGamesDTO filtersGamesDTO, int pageNumber = 1, int resultSize = 10) {
         var query = _context.Games
             .Include(g => g.Genres)
             .Include(g => g.Platforms)
@@ -73,9 +74,9 @@ public class GameService : IGameService {
             .ToArrayAsync();
 
 
-        return new {
+        return new FilteredGamesResponse {
             SortedBy = filtersGamesDTO.SortedBy.ToString()!.ToLower(),
-            filtersGamesDTO.IsSortedAscending,
+            IsSortedAscending = filtersGamesDTO.IsSortedAscending,
             TotalResults = totalResults,
             PageSize = resultSize,
             CurrentPage = pageNumber,
