@@ -1,11 +1,14 @@
 ﻿using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
+using BackendGameVibes.Models.DTOs;
+using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.Steam;
 using BackendGameVibes.Services;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,18 +16,23 @@ using System.Threading.Tasks;
 namespace BackendGameVibes.Tests.Services;
 
 public class GameServiceTests {
-    private readonly Mock<ApplicationDbContext> _dbContextMock;
+    private readonly ApplicationDbContext _context;
     private readonly Mock<ISteamService> _steamServiceMock;
     private readonly GameService _gameService;
+    private readonly Mock<DbSet<Game>> _gamesDbSetMock;
+
 
     public GameServiceTests() {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
 
-        _dbContextMock = new Mock<ApplicationDbContext>(options);
+        _context = new ApplicationDbContext(options);
         _steamServiceMock = new Mock<ISteamService>();
-        _gameService = new GameService(_dbContextMock.Object, _steamServiceMock.Object);
+        _gamesDbSetMock = new Mock<DbSet<Game>>();
+        //_context.Setup(c => c.Games).Returns(_gamesDbSetMock.Object);
+
+        _gameService = new GameService(_context, _steamServiceMock.Object);
     }
 
     [Fact]
@@ -33,8 +41,6 @@ public class GameServiceTests {
         var searchResult = new[] {
             new SteamApp { Name = "Test Game" }
         };
-
-        // Setup mock, aby zwrócić dane
         _steamServiceMock.Setup(s => s.FindSteamApp(It.IsAny<string>())).Returns(searchResult);
 
         // Act
@@ -56,5 +62,32 @@ public class GameServiceTests {
 
         // Assert
         Assert.Empty(result); // Powinno zwrócić pustą tablicę
+    }
+
+    [Fact]
+    public async Task GetFilteredGamesAsync_ReturnsCorrectData() {
+        // Arrange
+        var filters = new FiltersGamesDTO {
+            RatingMin = 0,
+            RatingMax = 5,
+        };
+
+        var game = new Game {
+            Title = "Test Game",
+            LastCalculatedRatingFromReviews = 4.5f
+        };
+
+        await _context.Database.EnsureCreatedAsync();
+        _context.Games.Add(game);
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result = await _gameService.GetFilteredGamesAsync(filters);
+
+        // Assert
+        var castedResult = result as dynamic;
+        Assert.NotNull(castedResult);
+        Assert.NotNull(castedResult!.Data);
+        Assert.True(castedResult.Data.Length > 0);
     }
 }
