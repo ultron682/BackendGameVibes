@@ -107,4 +107,23 @@ public class GameServiceTests {
         Assert.Equal("The Witcher 3", game.Title);
     }
 
+    [Fact]
+    public async Task AddGameAsync_ReturnsExistingGame_WhenAlreadyExists() {
+        // Arrange
+        var steamGameId = 12345;
+        var existingGame = new Game {
+            SteamId = steamGameId,
+            Title = "Existing Game"
+        };
+        _context.Games.Add(existingGame);
+        await _context.SaveChangesAsync();
+
+        // Act
+        var result = await _gameService.AddGameAsync(steamGameId);
+
+        // Assert
+        Assert.NotNull(result.Item1);
+        Assert.False(result.Item2); // Gra już istnieje, więc nie powinna zostać dodana
+        Assert.Equal("Existing Game", result.Item1!.Title);
+    }
 }
