@@ -213,16 +213,23 @@ public class GameService : IGameService {
 
         game.Title = steamGameData.name;
         game.Description = steamGameData.detailed_description != null ? steamGameData.detailed_description : "Brak opisu";
-        try {
-            DateTime parsedDate = DateTime.ParseExact(steamGameData.release_date.Date, "d MMMM yyyy", new System.Globalization.CultureInfo("pl-PL"));
-            game.ReleaseDate = DateOnly.FromDateTime(parsedDate);
+
+        if (steamGameData.release_date != null) {
+            try {
+                DateTime parsedDate = DateTime.ParseExact(steamGameData.release_date.Date, "d MMMM yyyy", new System.Globalization.CultureInfo("pl-PL"));
+                game.ReleaseDate = DateOnly.FromDateTime(parsedDate);
+            }
+            catch { }
         }
-        catch {
+        else {
             game.ReleaseDate = DateOnly.FromDateTime(DateTime.Now);
         }
+
         //game.CoverImage = steamGameData.header_image;
         game.CoverImage = @$"https://steamcdn-a.akamaihd.net/steam/apps/{game.SteamId}/library_600x900_2x.jpg";
-        game.GameImages = steamGameData.screenshots.Select(s => new GameImage { ImagePath = s.path_full }).ToList();
+
+        if (steamGameData.screenshots != null)
+            game.GameImages = steamGameData.screenshots.Select(s => new GameImage { ImagePath = s.path_full }).ToList();
 
         List<Models.Steam.Genre> steamGenres = steamGameData.genres != null ? steamGameData.genres.ToList() : [];
         List<int> dbGenreIds = _context.Genres.Select(g => g.Id).ToList();
@@ -245,14 +252,17 @@ public class GameService : IGameService {
         await _context.SaveChangesAsync();
 
         List<int> platformsIds = [];
-        if (steamGameData.platforms.Windows)
-            platformsIds.Add(1);
-        else if (steamGameData.platforms.Windows)
-            platformsIds.Add(2);
-        else if (steamGameData.platforms.Mac)
-            platformsIds.Add(3);
+        if (steamGameData.platforms != null) {
 
-        game.Platforms = await _context.Platforms.Where(p => platformsIds.Contains(p.Id)).ToListAsync();
+            if (steamGameData.platforms.Windows)
+                platformsIds.Add(1);
+            else if (steamGameData.platforms.Windows)
+                platformsIds.Add(2);
+            else if (steamGameData.platforms.Mac)
+                platformsIds.Add(3);
+
+            game.Platforms = await _context.Platforms.Where(p => platformsIds.Contains(p.Id)).ToListAsync();
+        }
 
         _context.Games.Add(game);
         await _context.SaveChangesAsync();
