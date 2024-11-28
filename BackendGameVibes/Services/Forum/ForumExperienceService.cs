@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace BackendGameVibes.Services {
+namespace BackendGameVibes.Services.Forum {
     public class ForumExperienceService : IForumExperienceService {
         private readonly IOptions<ExperiencePointsSettings> _pointsSettings;
         private readonly UserManager<UserGameVibes> _userManager;
