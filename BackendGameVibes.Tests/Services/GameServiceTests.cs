@@ -119,11 +119,11 @@ public class GameServiceTests {
         await _context.SaveChangesAsync();
 
         // Act
-        var result = await _gameService.AddGameAsync(steamGameId);
+        (Game? game, bool isCreated) = await _gameService.AddGameAsync(steamGameId);
 
         // Assert
-        Assert.NotNull(result.Item1);
-        Assert.False(result.Item2); // Gra już istnieje, więc nie powinna zostać dodana
-        Assert.Equal("Existing Game", result.Item1!.Title);
+        Assert.NotNull(game);
+        Assert.False(isCreated); // Gra już istnieje, więc nie powinna zostać dodana
+        Assert.Equal("Existing Game", game!.Title);
     }
 }
