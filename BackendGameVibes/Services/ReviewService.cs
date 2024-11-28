@@ -127,7 +127,6 @@ public class ReviewService : IReviewService {
         else {
             return null;
         }
-
     }
 
     public async Task<bool> DeleteReviewAsync(string userId, int id) {

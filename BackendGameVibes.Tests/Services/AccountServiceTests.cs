@@ -24,8 +24,7 @@ using MailService = BackendGameVibes.Services.MailService;
 
 namespace BackendGameVibes.Tests.Services;
 
-public class AccountServiceTests
-{
+public class AccountServiceTests {
     private readonly Mock<ApplicationDbContext> _mockContext;
     private readonly Mock<UserManager<UserGameVibes>> _mockUserManager;
     private readonly Mock<SignInManager<UserGameVibes>> _mockSignInManager;
@@ -37,8 +36,7 @@ public class AccountServiceTests
     private readonly Mock<IJwtTokenService> _mockJwtTokenService;
     private readonly AccountService _accountService;
 
-    public AccountServiceTests()
-    {
+    public AccountServiceTests() {
         // Mockowanie DbContext
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(databaseName: "TestDatabase")
@@ -74,24 +72,23 @@ public class AccountServiceTests
             _mockUserManager.Object,
             _mockSignInManager.Object,
             _mockConfiguration.Object,
-            null, // mail
+            null!, // mail
             _mockHtmlTemplateService.Object,
             _mockRoleManager.Object,
             _mockForumExperienceService.Object,
             _mockActionCodesService.Object,
-            _mockJwtTokenService.Object
+            _mockJwtTokenService.Object,
+            new HttpClient()
         );
     }
 
     [Fact]
-    public async Task ConfirmFriendRequestAsync_ShouldConfirmRequestAndAddFriend_WhenRequestExists()
-    {
+    public async Task ConfirmFriendRequestAsync_ShouldConfirmRequestAndAddFriend_WhenRequestExists() {
         // Arrange
         var userId = "user1";
         var friendId = "user2";
 
-        var friendRequest = new FriendRequest
-        {
+        var friendRequest = new FriendRequest {
             SenderUserId = friendId,
             ReceiverUserId = userId,
             IsAccepted = null
@@ -122,14 +119,12 @@ public class AccountServiceTests
     }
 
     [Fact]
-    public async Task RevokeFriendRequestAsync_ShouldSetRequestToRejected_WhenRequestExists()
-    {
+    public async Task RevokeFriendRequestAsync_ShouldSetRequestToRejected_WhenRequestExists() {
         // Arrange
         var userId = "user1";
         var friendId = "user2";
 
-        var friendRequest = new FriendRequest
-        {
+        var friendRequest = new FriendRequest {
             SenderUserId = friendId,
             ReceiverUserId = userId,
             IsAccepted = null
@@ -150,14 +145,12 @@ public class AccountServiceTests
     }
 
     [Fact]
-    public async Task UpdateProfilePictureAsync_ShouldUpdatePicture_WhenUserExists()
-    {
+    public async Task UpdateProfilePictureAsync_ShouldUpdatePicture_WhenUserExists() {
         // Arrange
         var userId = "user1";
         var imageData = new byte[] { 0x01, 0x02 };
 
-        var user = new UserGameVibes
-        {
+        var user = new UserGameVibes {
             Id = userId,
             ProfilePicture = new ProfilePicture()
         };

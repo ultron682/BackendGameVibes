@@ -9,7 +9,6 @@ using System.Security.Cryptography;
 namespace BackendGameVibes.Services {
     public class ActionCodesService : IActionCodesService {
         private readonly ApplicationDbContext _context;
-        private readonly int[] ValidChars = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
         public ActionCodesService(ApplicationDbContext applicationDbContext) {
             _context = applicationDbContext;
