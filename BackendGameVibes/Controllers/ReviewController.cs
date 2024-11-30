@@ -26,30 +26,40 @@ public class ReviewController : ControllerBase {
     [HttpGet]
     public async Task<IActionResult> GetAllReviews(int pageNumber = 1, int resultSize = 10) {
         var reviews = await _reviewService.GetAllReviewsAsync(pageNumber, resultSize);
+
+        if (reviews == null) {
+            return NotFound();
+        }
+
         return Ok(reviews);
     }
 
     [HttpPost("search-phrase")]
     public async Task<IActionResult> GetFilteredReviews([Required] ValueModel searchPhrase, int pageNumber = 1, int resultSize = 10) {
         var reviews = await _reviewService.GetFilteredReviewsAsync(searchPhrase.Value!, pageNumber, resultSize);
+
         if (reviews == null) {
             return NotFound();
         }
+
         return Ok(reviews);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetReviewById(int id) {
         var review = await _reviewService.GetReviewByIdAsync(id);
+
         if (review == null) {
             return NotFound();
         }
+
         return Ok(review);
     }
 
     [HttpGet("game/{gameId:int}")]
     public async Task<ActionResult> GetGameReviews(int gameId, int pageNumber = 1, int resultSize = 10) {
         var gameReviews = await _reviewService.GetGameReviewsAsync(gameId, pageNumber, resultSize);
+
         if (gameReviews == null) {
             return NotFound();
         }
