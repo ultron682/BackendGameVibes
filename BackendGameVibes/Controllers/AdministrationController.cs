@@ -1,23 +1,18 @@
-﻿using AutoMapper;
-using BackendGameVibes.Data;
+﻿using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.DTOs.Account;
 using BackendGameVibes.Models.User;
+using BackendGameVibes.IServices.Forum;
+using BackendGameVibes.Models.DTOs;
+using BackendGameVibes.Models.Forum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.IdentityModel.Tokens;
-using BackendGameVibes.IServices.Forum;
-using BackendGameVibes.Models.DTOs;
-using BackendGameVibes.Models.Forum;
 using System.Data;
-using BackendGameVibes.Services.Forum;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using System;
+using AutoMapper;
 
 
 namespace BackendGameVibes.Controllers;
@@ -27,9 +22,7 @@ namespace BackendGameVibes.Controllers;
 public class AdministrationController : ControllerBase {
     private readonly UserManager<UserGameVibes> _userManager;
     private readonly ApplicationDbContext _context;
-    private readonly IMapper _mapper;
     private readonly IAccountService _accountService;
-    private readonly IHostApplicationLifetime _applicationLifetime;
     private readonly IRoleService _roleService;
     private readonly IForumPostService _forumPostService;
     private readonly IForumThreadService _forumThreadService;
@@ -49,10 +42,8 @@ public class AdministrationController : ControllerBase {
         IGameService gameService,
         IForumRoleService forumRoleService) {
         _context = context;
-        _mapper = mapper;
         _accountService = accountService;
         _userManager = userManager;
-        _applicationLifetime = applicationLifetime;
         _roleService = roleService;
         _forumPostService = forumPostService;
         _forumThreadService = forumThreadService;
@@ -65,8 +56,6 @@ public class AdministrationController : ControllerBase {
     [HttpGet("users")]
     [Authorize("admin")]
     public async Task<IActionResult> GetAllUsersWithRoles() {
-        //var userRoles = await _userManager.GetRolesAsync(_userManager.FindByIdAsync());
-
         var users = await _context.Users
             .Select(u => new {
                 u.Id,
