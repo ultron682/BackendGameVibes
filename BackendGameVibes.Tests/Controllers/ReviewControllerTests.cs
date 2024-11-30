@@ -25,6 +25,11 @@ namespace BackendGameVibes.Tests.Controllers {
             _reviewServiceMock = new Mock<IReviewService>();
             _mapperMock = new Mock<IMapper>();
             _controller = new ReviewController(_reviewServiceMock.Object, _mapperMock.Object);
+
+            _controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            _controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
+                new Claim(ClaimTypes.NameIdentifier, "user1")
+            }));
         }
 
         [Fact]
@@ -93,13 +98,8 @@ namespace BackendGameVibes.Tests.Controllers {
                 GameplayScore = 6,
                 GeneralScore = 7,
                 GraphicsScore = 4,
-                UserGameVibesId = "userid"
+                UserGameVibesId = "user1"
             };
-
-            _controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            _controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                new Claim(ClaimTypes.NameIdentifier, "userid")
-            }));
 
             _mapperMock.Setup(m => m.Map<Review>(reviewDto)).Returns(review);
             _reviewServiceMock.Setup(s => s.AddReviewAsync(review)).ReturnsAsync(review);
@@ -120,11 +120,6 @@ namespace BackendGameVibes.Tests.Controllers {
             // Arrange
             _reviewServiceMock.Setup(s => s.DeleteReviewAsync("user1", 1)).ReturnsAsync(true);
 
-            _controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            _controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                new Claim(ClaimTypes.NameIdentifier, "user1")
-            }));
-
             // Act
             var result = await _controller.DeleteReview(1);
 
@@ -136,11 +131,6 @@ namespace BackendGameVibes.Tests.Controllers {
         public async Task DeleteReview_ReturnsNotFound_WhenReviewIsNotDeleted() {
             // Arrange
             _reviewServiceMock.Setup(s => s.DeleteReviewAsync("user1", 1)).ReturnsAsync(false);
-
-            _controller.ControllerContext.HttpContext = new DefaultHttpContext();
-            _controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
-                new Claim(ClaimTypes.NameIdentifier, "user1")
-            }));
 
             // Act
             var result = await _controller.DeleteReview(1);
