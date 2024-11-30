@@ -74,6 +74,47 @@ namespace BackendGameVibes.Tests.Controllers {
             Assert.IsType<NotFoundResult>(result);
         }
 
+        [Fact]
+        public async Task AddReview_ReturnsOkResult_WhenReviewIsAdded() {
+            // Arrange
+            var reviewDto = new ReviewDTO {
+                Comment = "Test content",
+                GameId = 1,
+                AudioScore = 2,
+                GameplayScore = 6,
+                GeneralScore = 7,
+                GraphicsScore = 4
+            };
+            var review = new Review {
+                Id = 1,
+                Comment = "Test content",
+                GameId = 1,
+                AudioScore = 2,
+                GameplayScore = 6,
+                GeneralScore = 7,
+                GraphicsScore = 4,
+                UserGameVibesId = "userid"
+            };
+
+            _controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            _controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
+                new Claim(ClaimTypes.NameIdentifier, "userid")
+            }));
+
+            _mapperMock.Setup(m => m.Map<Review>(reviewDto)).Returns(review);
+            _reviewServiceMock.Setup(s => s.AddReviewAsync(review)).ReturnsAsync(review);
+            _reviewServiceMock.Setup(s => s.GetReviewByIdAsync(review.Id)).ReturnsAsync(review);
+
+
+            // Act
+            var result = await _controller.AddReview(reviewDto);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var addedReview = Assert.IsType<Review>(okResult.Value);
+            Assert.Equal(review.Id, addedReview.Id);
+        }
+
 
     }
 }
