@@ -7,7 +7,6 @@ using System.Security.Claims;
 using BackendGameVibes.IServices.Forum;
 using System.ComponentModel.DataAnnotations;
 using Swashbuckle.AspNetCore.Annotations;
-using Microsoft.Extensions.Hosting;
 
 
 namespace BackendGameVibes.Controllers;
