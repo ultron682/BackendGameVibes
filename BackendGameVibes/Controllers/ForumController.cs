@@ -7,6 +7,7 @@ using System.Security.Claims;
 using BackendGameVibes.IServices.Forum;
 using System.ComponentModel.DataAnnotations;
 using Swashbuckle.AspNetCore.Annotations;
+using Microsoft.Extensions.Hosting;
 
 
 namespace BackendGameVibes.Controllers;
@@ -105,7 +106,12 @@ public class ForumController : ControllerBase {
 
     [HttpGet("posts/{id:int}")]
     public async Task<ActionResult<object>> GetPostById(int id) {
-        return Ok(await _postService.GetPostByIdAsync(id));
+        var post = await _postService.GetPostByIdAsync(id);
+
+        if (post == null)
+            return NotFound();
+
+        return Ok(post);
     }
 
     [HttpPost("posts")]
@@ -123,7 +129,7 @@ public class ForumController : ControllerBase {
             return Ok(forumPost);
         }
         else {
-            return BadRequest("Wrong ForumThreadDTO");
+            return BadRequest("Wrong ForumPostDTO");
         }
     }
 
@@ -198,7 +204,13 @@ public class ForumController : ControllerBase {
 
     [HttpGet("thread-section-names")]
     public async Task<ActionResult<IEnumerable<object>>> GetSections() {
-        return Ok(await _threadService.GetForumSectionsAsync());
+        var forumSections = await _threadService.GetForumSectionsAsync();
+
+        if (forumSections == null) {
+            return NotFound();
+        }
+
+        return Ok(forumSections);
     }
 
     [HttpGet("forum-roles")]
