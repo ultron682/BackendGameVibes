@@ -62,6 +62,18 @@ namespace BackendGameVibes.Tests.Controllers {
             Assert.Equal(review, okResult.Value);
         }
 
+        [Fact]
+        public async Task GetReviewById_ReturnsNotFound_WhenReviewDoesNotExist() {
+            // Arrange
+            _reviewServiceMock.Setup(s => s.GetReviewByIdAsync(1)).ReturnsAsync((Review?)null);
+
+            // Act
+            var result = await _controller.GetReviewById(1);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
 
     }
 }
