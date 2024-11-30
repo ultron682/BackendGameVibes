@@ -48,6 +48,20 @@ namespace BackendGameVibes.Tests.Controllers {
             Assert.Equal(getAllReviewsResponse, okResult.Value);
         }
 
+        [Fact]
+        public async Task GetReviewById_ReturnsOkResult_WhenReviewExists() {
+            // Arrange
+            var review = new Review { Id = 1 };
+            _reviewServiceMock.Setup(s => s.GetReviewByIdAsync(1)).ReturnsAsync(review);
+
+            // Act
+            var result = await _controller.GetReviewById(1);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(review, okResult.Value);
+        }
+
 
     }
 }
