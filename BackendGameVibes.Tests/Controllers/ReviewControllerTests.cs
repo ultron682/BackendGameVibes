@@ -115,6 +115,23 @@ namespace BackendGameVibes.Tests.Controllers {
             Assert.Equal(review.Id, addedReview.Id);
         }
 
+        [Fact]
+        public async Task DeleteReview_ReturnsOkResult_WhenReviewIsDeleted() {
+            // Arrange
+            _reviewServiceMock.Setup(s => s.DeleteReviewAsync("user1", 1)).ReturnsAsync(true);
+
+            _controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            _controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
+                new Claim(ClaimTypes.NameIdentifier, "user1")
+            }));
+
+            // Act
+            var result = await _controller.DeleteReview(1);
+
+            // Assert
+            Assert.IsType<OkResult>(result);
+        }
+
 
     }
 }
