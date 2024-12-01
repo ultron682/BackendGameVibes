@@ -77,5 +77,20 @@ namespace BackendGameVibes.Tests.Controllers {
             Assert.IsType<OkResult>(result);
         }
 
+        [Fact]
+        public async Task DeleteUser_InvalidUserId_ReturnsNotFoundResult() {
+            // Arrange
+            var userId = "nonexistent-user-id";
+
+            _mockUserManager.Setup(m => m.FindByIdAsync(userId)).ReturnsAsync((UserGameVibes)null);
+
+            // Act
+            var result = await _controller.DeleteUser(userId);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+
     }
 }
