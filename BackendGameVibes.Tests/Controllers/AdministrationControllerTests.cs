@@ -3,11 +3,13 @@ using BackendGameVibes.Controllers;
 using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.IServices.Forum;
+using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Moq;
+using Moq.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +18,6 @@ using System.Threading.Tasks;
 
 namespace BackendGameVibes.Tests.Controllers {
     public class AdministrationControllerTests {
-        private readonly Mock<ApplicationDbContext> _mockContext;
         private readonly Mock<UserManager<UserGameVibes>> _mockUserManager;
         private readonly Mock<IHostApplicationLifetime> _mockApplicationLifetime;
         private readonly Mock<IMapper> _mockMapper;
@@ -105,6 +106,27 @@ namespace BackendGameVibes.Tests.Controllers {
 
             // Assert
             Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task GetAllUsersWithRoles_ShouldReturnUsersWithRoles() {
+            // Arrange
+            var users = new List<UserGameVibes>
+            {
+                new UserGameVibes { Id = "1", Email = "user1@test.com", UserName = "User1", ForumRole = new ForumRole { Name = "Role1" }, ExperiencePoints = 100 },
+                new UserGameVibes { Id = "2", Email = "user2@test.com", UserName = "User2", ForumRole = new ForumRole { Name = "Role2" }, ExperiencePoints = 200 }
+            };
+
+            _mockUserManager.Setup(um => um.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((string id) => users.First(u => u.Id == id));
+            _mockUserManager.Setup(um => um.GetRolesAsync(It.IsAny<UserGameVibes>())).ReturnsAsync((UserGameVibes user) => new List<string> { user.ForumRole!.Name });
+
+            // Act
+            var result = await _controller.GetAllUsersWithRoles();
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var returnedUsers = Assert.IsType<List<object>>(okResult.Value);
+            Assert.Equal(2, returnedUsers.Count);
         }
     }
 }
