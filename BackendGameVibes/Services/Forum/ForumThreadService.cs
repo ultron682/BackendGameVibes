@@ -37,7 +37,7 @@ public class ForumThreadService : IForumThreadService {
                                 t.Title,
                                 t.CreatedDateTime,
                                 t.LastUpdatedDateTime,
-                                userIdOwner = t.UserOwnerId,
+                                t.UserOwnerId,
                                 usernameOwner = t.UserOwner!.UserName,
                                 LastPostContent = t.Posts!
                                     .OrderByDescending(p => p.CreatedDateTime)
@@ -66,9 +66,10 @@ public class ForumThreadService : IForumThreadService {
                 t.Title,
                 t.CreatedDateTime,
                 t.LastUpdatedDateTime,
-                userIdOwner = t.UserOwnerId,
+                t.UserOwnerId,
                 usernameOwner = t.UserOwner!.UserName,
-                section = t.Section!.Name,
+                sectionId = t.Section!.Id,
+                sectionColor = t.Section.HexColor,
                 LastPostContent = t.Posts!
                     .OrderByDescending(p => p.CreatedDateTime)
                     .Select(p => p.Content)
@@ -98,7 +99,8 @@ public class ForumThreadService : IForumThreadService {
                 t.LastUpdatedDateTime,
                 t.UserOwnerId,
                 usernameOwner = t.UserOwner!.UserName,
-                section = t.Section!.Name
+                sectionId = t.Section!.Id,
+                sectionColor = t.Section.HexColor,
             })
             .FirstOrDefaultAsync(t => t.Id == threadId);
 
@@ -126,7 +128,8 @@ public class ForumThreadService : IForumThreadService {
                 t.LastUpdatedDateTime,
                 t.UserOwnerId,
                 usernameOwner = t.UserOwner!.UserName,
-                section = t.Section!.Name,
+                sectionId = t.Section!.Id,
+                sectionColor = t.Section.HexColor,
                 LastPostContent = t.Posts!
                     .OrderByDescending(p => p.CreatedDateTime)
                     .Select(p => p.Content)
@@ -157,9 +160,10 @@ public class ForumThreadService : IForumThreadService {
                 t.Title,
                 t.CreatedDateTime,
                 t.LastUpdatedDateTime,
-                userIdOwner = t.UserOwnerId,
+                t.UserOwnerId,
                 usernameOwner = t.UserOwner!.UserName,
-                section = t.Section!.Name,
+                sectionId = t.Section!.Id,
+                sectionColor = t.Section.HexColor,
                 LastPostContent = t.Posts!
                     .OrderByDescending(p => p.CreatedDateTime)
                     .Select(p => p.Content)
@@ -191,9 +195,10 @@ public class ForumThreadService : IForumThreadService {
                 t.Title,
                 t.CreatedDateTime,
                 t.LastUpdatedDateTime,
-                userIdOwner = t.UserOwnerId,
+                t.UserOwnerId,
                 usernameOwner = t.UserOwner!.UserName,
-                section = t.Section!.Name,
+                sectionId = t.Section!.Id,
+                sectionColor = t.Section.HexColor,
                 LastPostContent = t.Posts!
                     .OrderByDescending(p => p.CreatedDateTime)
                     .Select(p => p.Content)

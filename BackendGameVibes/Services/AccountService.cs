@@ -214,6 +214,8 @@ namespace BackendGameVibes.Services {
                         t.LastUpdatedDateTime,
                         t.UserOwnerId,
                         Section = t.Section!.Name,
+                        sectionId = t.SectionId,
+                        sectionColor = t.Section != null ? t.Section.HexColor : "#ffffff",
                     })
                     .ToArray()
                     : Array.Empty<object>(),
@@ -285,10 +287,13 @@ namespace BackendGameVibes.Services {
                         f.FriendsSince
                     }).ToArray(),
                     UserForumThreads = u.UserForumThreads != null ? u.UserForumThreads.Select(t => new {
+
                         t.Id,
                         t.Title,
                         t.CreatedDateTime,
-                        t.LastUpdatedDateTime
+                        t.LastUpdatedDateTime,
+                        sectionId = t.SectionId,
+                        sectionColor = t.Section != null ? t.Section.HexColor : "#ffffff",
                     }).OrderByDescending(p => p.LastUpdatedDateTime).Take(5).ToArray() : Array.Empty<object>(),
                     UserForumPosts = u.UserForumPosts!
                         .Select(p => new {
