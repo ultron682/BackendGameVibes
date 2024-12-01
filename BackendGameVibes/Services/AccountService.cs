@@ -226,6 +226,7 @@ namespace BackendGameVibes.Services {
                             p.LikesCount,
                             p.DisLikesCount,
                             p.ThreadId,
+                            p.UserOwnerId,
                             threadTitle = p.Thread != null ? p.Thread.Title : "NoData"
                         }).ToArray(),
                     UserReportedPosts = u.UserReportedPosts.Select(rp => new {
@@ -298,6 +299,7 @@ namespace BackendGameVibes.Services {
                             p.LikesCount,
                             p.DisLikesCount,
                             p.ThreadId,
+                            p.UserOwnerId,
                             threadTitle = p.Thread != null ? p.Thread.Title : "NoData"
                         }).ToArray(),
                     UserFollowedGames = u.UserFollowedGames != null ? u.UserFollowedGames.Select(g => new {
