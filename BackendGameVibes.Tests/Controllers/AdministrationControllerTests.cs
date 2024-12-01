@@ -1,4 +1,14 @@
-﻿using System;
+﻿using AutoMapper;
+using BackendGameVibes.Controllers;
+using BackendGameVibes.Data;
+using BackendGameVibes.IServices;
+using BackendGameVibes.IServices.Forum;
+using BackendGameVibes.Models.User;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
+using Moq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,5 +16,66 @@ using System.Threading.Tasks;
 
 namespace BackendGameVibes.Tests.Controllers {
     public class AdministrationControllerTests {
+        private readonly Mock<ApplicationDbContext> _mockContext;
+        private readonly Mock<UserManager<UserGameVibes>> _mockUserManager;
+        private readonly Mock<IHostApplicationLifetime> _mockApplicationLifetime;
+        private readonly Mock<IMapper> _mockMapper;
+        private readonly Mock<IAccountService> _mockAccountService;
+        private readonly Mock<IRoleService> _mockRoleService;
+        private readonly Mock<IForumPostService> _mockForumPostService;
+        private readonly Mock<IForumThreadService> _mockForumThreadService;
+        private readonly Mock<IReviewService> _mockReviewService;
+        private readonly Mock<IGameService> _mockGameService;
+        private readonly Mock<IForumRoleService> _mockForumRoleService;
+
+        private readonly AdministrationController _controller;
+
+        public AdministrationControllerTests() {
+            // Mockowanie zależności
+            _mockUserManager = new Mock<UserManager<UserGameVibes>>(
+                Mock.Of<IUserStore<UserGameVibes>>(), null, null, null, null, null, null, null, null
+            );
+            _mockApplicationLifetime = new Mock<IHostApplicationLifetime>();
+            _mockMapper = new Mock<IMapper>();
+            _mockAccountService = new Mock<IAccountService>();
+            _mockRoleService = new Mock<IRoleService>();
+            _mockForumPostService = new Mock<IForumPostService>();
+            _mockForumThreadService = new Mock<IForumThreadService>();
+            _mockReviewService = new Mock<IReviewService>();
+            _mockGameService = new Mock<IGameService>();
+            _mockForumRoleService = new Mock<IForumRoleService>();
+
+            // Inicjalizacja kontrolera z mockami
+            _controller = new AdministrationController(
+                null,
+                _mockUserManager.Object,
+                _mockApplicationLifetime.Object,
+                _mockMapper.Object,
+                _mockAccountService.Object,
+                _mockRoleService.Object,
+                _mockForumPostService.Object,
+                _mockForumThreadService.Object,
+                _mockReviewService.Object,
+                _mockGameService.Object,
+                _mockForumRoleService.Object
+            );
+        }
+
+        [Fact]
+        public async Task DeleteUser_ValidUserId_ReturnsOkResult() {
+            // Arrange
+            var userId = "test-user-id";
+            var user = new UserGameVibes { Id = userId, UserName = "testuser" };
+
+            _mockUserManager.Setup(m => m.FindByIdAsync(userId)).ReturnsAsync(user);
+            _mockUserManager.Setup(m => m.DeleteAsync(user)).ReturnsAsync(IdentityResult.Success);
+
+            // Act
+            var result = await _controller.DeleteUser(userId);
+
+            // Assert
+            Assert.IsType<OkResult>(result);
+        }
+
     }
 }
