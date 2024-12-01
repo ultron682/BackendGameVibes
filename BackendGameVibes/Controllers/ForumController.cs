@@ -189,10 +189,30 @@ public class ForumController : ControllerBase {
 
         var result = new {
             threads = await _threadService.GetThreadsByPhraseAsync(phrase, pageNumber, resultSize),
-            posts = await _postService.GetPostsByPhraseAsync(phrase, pageNumber, resultSize)
+            posts = await _postService.GetPostsByPhraseAsync(phrase, null, pageNumber, resultSize)
         };
 
         return Ok(result);
+    }
+
+    [HttpGet("threads/search-phrase")]
+    public async Task<ActionResult> SearchThreadsByPhrase([Required, MinLength(3)] string phrase, int pageNumber = 1, int resultSize = 10)
+    {
+        phrase = phrase.ToLower();
+
+        var threads = await _threadService.GetThreadsByPhraseAsync(phrase, pageNumber, resultSize);
+
+        return Ok(threads);
+    }
+
+    [HttpGet("posts/search-phrase")]
+    public async Task<ActionResult> SearchPostsByPhrase([Required, MinLength(3)] string phrase, string? userAccessToken = null, int pageNumber = 1, int resultSize = 10)
+    {
+        phrase = phrase.ToLower();
+
+        var posts = await _postService.GetPostsByPhraseAsync(phrase, userAccessToken, pageNumber, resultSize);
+
+        return Ok(posts);
     }
 
 

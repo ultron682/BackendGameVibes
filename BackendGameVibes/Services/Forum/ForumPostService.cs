@@ -110,9 +110,13 @@ namespace BackendGameVibes.Services.Forum {
                 .FirstOrDefaultAsync(p => p.Id == postId);
         }
 
-        public async Task<object?> GetPostsByPhraseAsync(string phrase, int pageNumber = 1, int postsSize = 10) {
+        public async Task<object?> GetPostsByPhraseAsync(string phrase, string? userAccessToken = null, int pageNumber = 1, int postsSize = 10) {
+            string? userId = null;
+            if (userAccessToken != null)
+                userId = _jwtTokenService.GetTokenClaims(userAccessToken).userId ?? null;
             var query = await _context.ForumPosts
                 .Where(t => t.Content!.ToLower().Contains(phrase))
+                .Include(p => p.PostInteractions)
                 .OrderByDescending(t => t.CreatedDateTime)
                 .Skip((pageNumber - 1) * postsSize)
                 .Take(postsSize)
@@ -126,6 +130,7 @@ namespace BackendGameVibes.Services.Forum {
                     p.UserOwnerId,
                     username = p.UserOwner!.UserName,
                     usernameForumRole = p.UserOwner!.ForumRole,
+                    userPostInteraction = p.PostInteractions!.Where(i => i.UserId == userId)!.FirstOrDefault()
                 })
             .ToArrayAsync();
 
