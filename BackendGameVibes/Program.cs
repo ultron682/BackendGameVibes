@@ -89,19 +89,24 @@ builder.Services.AddControllers()
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 builder.Services.AddHostedService<BackgroundServiceRefresh>();
+
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
+builder.Services.AddSingleton<HtmlTemplateService>();
+builder.Services.AddSingleton<ISteamService, SteamService>();
+
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IGameService, GameService>();
-builder.Services.AddTransient<MailService>();
-builder.Services.AddSingleton<HtmlTemplateService>();
-builder.Services.AddSingleton<ISteamService, SteamService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IForumRoleService, ForumRoleService>();
 builder.Services.AddScoped<IForumThreadService, ForumThreadService>();
 builder.Services.AddScoped<IForumPostService, ForumPostService>();
-builder.Services.AddTransient<IForumExperienceService, ForumExperienceService>();
+builder.Services.AddScoped<IAdministrationService, AdministrationService>();
 builder.Services.AddScoped<IActionCodesService, ActionCodesService>();
+
+builder.Services.AddTransient<IForumExperienceService, ForumExperienceService>();
+builder.Services.AddTransient<MailService>();
+
 builder.Services.AddHttpClient();
 
 builder.Services.AddHealthChecks()
