@@ -91,6 +91,20 @@ namespace BackendGameVibes.Tests.Controllers {
             Assert.IsType<NotFoundResult>(result);
         }
 
+        [Fact]
+        public async Task DeleteUser_DeletionFails_ReturnsBadRequestResult() {
+            // Arrange
+            var userId = "test-user-id";
+            var user = new UserGameVibes { Id = userId, UserName = "testuser" };
 
+            _mockUserManager.Setup(m => m.FindByIdAsync(userId)).ReturnsAsync(user);
+            _mockUserManager.Setup(m => m.DeleteAsync(user)).ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "Deletion failed." }));
+
+            // Act
+            var result = await _controller.DeleteUser(userId);
+
+            // Assert
+            Assert.IsType<BadRequestResult>(result);
+        }
     }
 }
