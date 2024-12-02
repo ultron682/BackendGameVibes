@@ -13,6 +13,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using AutoMapper;
+using BackendGameVibes.Services;
 
 
 namespace BackendGameVibes.Controllers;
@@ -21,7 +22,6 @@ namespace BackendGameVibes.Controllers;
 [Route("api/administration")]
 public class AdministrationController : ControllerBase {
     private readonly UserManager<UserGameVibes> _userManager;
-    private readonly ApplicationDbContext _context;
     private readonly IAccountService _accountService;
     private readonly IRoleService _roleService;
     private readonly IForumPostService _forumPostService;
@@ -29,8 +29,9 @@ public class AdministrationController : ControllerBase {
     private readonly IReviewService _reviewService;
     private readonly IGameService _gameService;
     private readonly IForumRoleService _forumRoleService;
+    private readonly IAdministrationService _administrationService;
 
-    public AdministrationController(ApplicationDbContext context,
+    public AdministrationController(
         UserManager<UserGameVibes> userManager,
         IHostApplicationLifetime applicationLifetime,
         IMapper mapper,
@@ -40,8 +41,8 @@ public class AdministrationController : ControllerBase {
         IForumThreadService forumThreadService,
         IReviewService reviewService,
         IGameService gameService,
-        IForumRoleService forumRoleService) {
-        _context = context;
+        IForumRoleService forumRoleService,
+        IAdministrationService administrationService) {
         _accountService = accountService;
         _userManager = userManager;
         _roleService = roleService;
@@ -50,48 +51,13 @@ public class AdministrationController : ControllerBase {
         _reviewService = reviewService;
         _gameService = gameService;
         _forumRoleService = forumRoleService;
+        _administrationService = administrationService;
     }
 
-    // dane logowania konta admina w DbInitializer.cs
     [HttpGet("users")]
     [Authorize("admin")]
     public async Task<IActionResult> GetAllUsersWithRoles() {
-        var users = await _context.Users
-            .Select(u => new {
-                u.Id,
-                u.Email,
-                u.EmailConfirmed,
-                u.UserName,
-                ForumRoleName = u.ForumRole!.Name,
-                u.ExperiencePoints,
-                u.PhoneNumber,
-                u.PhoneNumberConfirmed,
-                u.AccessFailedCount,
-                u.Description
-            }).ToArrayAsync();
-
-
-        var usersWithRoles = new List<object>();
-
-        foreach (var user in users) {
-            var userGameVibes = await _userManager.FindByIdAsync(user!.Id)!;
-            var roles = await _userManager.GetRolesAsync(userGameVibes!);
-
-            usersWithRoles.Add(new {
-                user.Id,
-                user.Email,
-                user.EmailConfirmed,
-                user.UserName,
-                user.ForumRoleName,
-                user.ExperiencePoints,
-                user.PhoneNumber,
-                user.PhoneNumberConfirmed,
-                user.AccessFailedCount,
-                user.Description,
-                roles = roles.ToArray()
-            });
-        }
-
+        var usersWithRoles = await _administrationService.GetAllUsersWithRolesAsync();
         return Ok(usersWithRoles);
     }
 
@@ -141,73 +107,13 @@ public class AdministrationController : ControllerBase {
     [Authorize(Policy = "modOrAdmin")]
     [SwaggerOperation("modOrAdmin")]
     public async Task<IActionResult> UpdateUser(UserGameVibesDTO userDTO) {
-        UserGameVibes? userGameVibes = await _userManager.FindByIdAsync(userDTO.Id);
-        if (userGameVibes == null) {
-            return NotFound();
+        try {
+            var (user, roles) = await _administrationService.UpdateUserAsync(userDTO);
+            return Ok(new { user, roles });
         }
-
-        IList<string> userRoles = await _userManager.GetRolesAsync(userGameVibes);
-
-        if (userDTO.UserName != null)
-            userGameVibes.UserName = userDTO.UserName;
-        if (userDTO.Description != null)
-            userGameVibes.Description = userDTO.Description;
-        if (userDTO.ExperiencePoints != null)
-            userGameVibes.ExperiencePoints = userDTO.ExperiencePoints;
-        if (userDTO.ForumRoleId != null)
-            userGameVibes.ForumRoleId = userDTO.ForumRoleId;
-        if (userDTO.Email != null) {
-            var emailChangeToken = await _userManager.GenerateChangeEmailTokenAsync(userGameVibes, userDTO.Email);
-
-            var changeEmailResult = await _userManager.ChangeEmailAsync(userGameVibes, userDTO.Email, emailChangeToken);
-
-            if (!changeEmailResult.Succeeded) {
-                return BadRequest(changeEmailResult.Errors.ToArray());
-            }
+        catch (Exception ex) {
+            return BadRequest(ex.Message);
         }
-        if (userDTO.Password != null) {
-            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(userGameVibes);
-
-            var resetPasswordResult = await _userManager.ResetPasswordAsync(userGameVibes, resetToken, userDTO.Password);
-
-            if (!resetPasswordResult.Succeeded) {
-                return BadRequest(resetPasswordResult.Errors.ToArray());
-            }
-        }
-        if (string.IsNullOrEmpty(userDTO.PhoneNumber) == false) {
-            await _userManager.SetPhoneNumberAsync(userGameVibes, userDTO.PhoneNumber);
-        }
-        if (userDTO.PhoneNumberConfirmed != null) {
-            userGameVibes.PhoneNumberConfirmed = userDTO.PhoneNumberConfirmed ?? false;
-        }
-
-        if (string.IsNullOrEmpty(userDTO.RoleName) == false) {
-            foreach (string role in userRoles) {
-                await _userManager.RemoveFromRoleAsync(userGameVibes, role);
-            }
-
-            await _userManager.AddToRoleAsync(userGameVibes, userDTO.RoleName!);
-        }
-        if (userDTO.LockoutEnabled != null) {
-            await _userManager.SetLockoutEnabledAsync(userGameVibes, (userDTO.LockoutEnabled != null && userDTO.LockoutEnabled == true));
-        }
-
-        if (userDTO.LockoutEnd != null) {
-            await _userManager.SetLockoutEndDateAsync(userGameVibes, userDTO.LockoutEnd);
-        }
-
-        if (userDTO.AccessFailedCount != null) {
-            userGameVibes.AccessFailedCount = (int)userDTO.AccessFailedCount;
-        }
-
-        await _userManager.UpdateAsync(userGameVibes);
-
-        var currentRoles = await _userManager.GetRolesAsync(userGameVibes);
-
-        return Ok(new {
-            userGameVibes,
-            roles = currentRoles.ToArray()
-        });
     }
 
 
@@ -249,13 +155,11 @@ public class AdministrationController : ControllerBase {
     [Authorize(Policy = "modOrAdmin")]
     [SwaggerOperation("modOrAdmin")]
     public async Task<IActionResult> DeleteReview(int id) {
-        var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == id);
-        if (review == null) {
+        var success = await _administrationService.DeleteReviewAsync(id);
+        if (!success) {
             return NotFound();
         }
 
-        _context.Reviews.Remove(review);
-        await _context.SaveChangesAsync();
         return Ok("removed");
     }
 
@@ -263,13 +167,11 @@ public class AdministrationController : ControllerBase {
     [Authorize(Policy = "modOrAdmin")]
     [SwaggerOperation("modOrAdmin")]
     public async Task<IActionResult> DeletePost(int id) {
-        var post = await _context.ForumPosts.FirstOrDefaultAsync(p => p.Id == id);
-        if (post == null) {
+        var success = await _administrationService.DeletePostAsync(id);
+        if (!success) {
             return NotFound();
         }
 
-        _context.ForumPosts.Remove(post);
-        await _context.SaveChangesAsync();
         return Ok("removed");
     }
 
