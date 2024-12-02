@@ -28,6 +28,7 @@ namespace BackendGameVibes.Tests.Controllers {
         private readonly Mock<IReviewService> _mockReviewService;
         private readonly Mock<IGameService> _mockGameService;
         private readonly Mock<IForumRoleService> _mockForumRoleService;
+        private readonly Mock<IAdministrationService> _mockAdministrationService;
 
         private readonly AdministrationController _controller;
 
@@ -45,10 +46,9 @@ namespace BackendGameVibes.Tests.Controllers {
             _mockReviewService = new Mock<IReviewService>();
             _mockGameService = new Mock<IGameService>();
             _mockForumRoleService = new Mock<IForumRoleService>();
+            _mockAdministrationService = new Mock<IAdministrationService>();
 
-            // Inicjalizacja kontrolera z mockami
             _controller = new AdministrationController(
-                null,
                 _mockUserManager.Object,
                 _mockApplicationLifetime.Object,
                 _mockMapper.Object,
@@ -58,7 +58,8 @@ namespace BackendGameVibes.Tests.Controllers {
                 _mockForumThreadService.Object,
                 _mockReviewService.Object,
                 _mockGameService.Object,
-                _mockForumRoleService.Object
+                _mockForumRoleService.Object,
+                _mockAdministrationService.Object
             );
         }
 

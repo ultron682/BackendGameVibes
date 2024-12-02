@@ -238,5 +238,33 @@ namespace BackendGameVibes.Services {
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task AddGamePlatformAsync(ValueModel platformModel) {
+            _context.Platforms.Add(new Models.Games.Platform { Name = platformModel.Value });
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> UpdateGamePlatformAsync(int platformId, ValueModel platformModel) {
+            var platform = await _context.Platforms.FirstOrDefaultAsync(p => p.Id == platformId);
+            if (platform == null) {
+                return false;
+            }
+
+            platform.Name = platformModel.Value;
+            _context.Platforms.Update(platform);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RemoveGamePlatformAsync(int platformId) {
+            var platform = await _context.Platforms.FirstOrDefaultAsync(p => p.Id == platformId);
+            if (platform == null) {
+                return false;
+            }
+
+            _context.Platforms.Remove(platform);
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

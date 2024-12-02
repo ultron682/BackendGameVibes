@@ -2,7 +2,7 @@
 using BackendGameVibes.Models.DTOs.Account;
 using BackendGameVibes.Models.User;
 
-namespace BackendGameVibes.Services {
+namespace BackendGameVibes.IServices {
     public interface IAdministrationService {
         Task<bool> AddUserAsync(RegisterDTO newUserData);
         Task<bool> DeleteUserAsync(string userId);
@@ -16,5 +16,8 @@ namespace BackendGameVibes.Services {
         Task AddGameGenreAsync(ValueModel genreModel);
         Task<bool> UpdateGameGenreAsync(int genreId, ValueModel genreModel);
         Task<bool> RemoveGameGenreAsync(int genreId);
+        Task AddGamePlatformAsync(ValueModel platformModel);
+        Task<bool> UpdateGamePlatformAsync(int platformId, ValueModel platformModel);
+        Task<bool> RemoveGamePlatformAsync(int platformId);
     }
 }

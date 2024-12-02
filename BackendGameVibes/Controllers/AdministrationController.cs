@@ -334,35 +334,29 @@ public class AdministrationController : ControllerBase {
     [HttpPost("games/platforms")]
     [Authorize("admin")]
     public async Task<IActionResult> AddGamePlatform(ValueModel platformModel) {
-        _context.Platforms.Add(new Models.Games.Platform { Name = platformModel.Value });
-        await _context.SaveChangesAsync();
+        await _administrationService.AddGamePlatformAsync(platformModel);
         return Ok();
     }
 
     [HttpPatch("games/platforms/{platformId:int}")]
     [Authorize("admin")]
     public async Task<IActionResult> UpdateGamePlatform(int platformId, ValueModel platformModel) {
-        var platform = await _context.Platforms.FirstOrDefaultAsync(g => g.Id == platformId);
-        if (platform == null) {
+        var success = await _administrationService.UpdateGamePlatformAsync(platformId, platformModel);
+        if (!success) {
             return NotFound();
         }
 
-        platform.Name = platformModel.Value;
-        _context.Platforms.Update(platform);
-        await _context.SaveChangesAsync();
         return Ok();
     }
 
     [HttpDelete("games/platforms/{platformId:int}")]
     [Authorize("admin")]
     public async Task<IActionResult> RemoveGamePlatform(int platformId) {
-        var platform = await _context.Platforms.FirstOrDefaultAsync(g => g.Id == platformId);
-        if (platform == null) {
+        var success = await _administrationService.RemoveGamePlatformAsync(platformId);
+        if (!success) {
             return NotFound();
         }
 
-        _context.Platforms.Remove(platform);
-        await _context.SaveChangesAsync();
         return Ok();
     }
 }
