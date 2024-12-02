@@ -21,7 +21,6 @@ namespace BackendGameVibes.Services {
         private readonly UserManager<UserGameVibes> _userManager;
         private readonly SignInManager<UserGameVibes> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IConfiguration _configuration;
         private readonly MailService _mail_Service;
         private readonly HtmlTemplateService _htmlTemplateService;
         private readonly IForumExperienceService _forumExperienceService;
@@ -30,14 +29,13 @@ namespace BackendGameVibes.Services {
         private readonly HttpClient _httpClient;
 
         public AccountService(ApplicationDbContext context, UserManager<UserGameVibes> userManager,
-            SignInManager<UserGameVibes> signInManager, IConfiguration configuration, MailService mail_Service,
+            SignInManager<UserGameVibes> signInManager, MailService mail_Service,
             HtmlTemplateService htmlTemplateService, RoleManager<IdentityRole> roleManager,
             IForumExperienceService forumExperienceService, IActionCodesService actionCodesService,
             IJwtTokenService jwtTokenService, HttpClient httpClient) {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
-            _configuration = configuration;
             _mail_Service = mail_Service;
             _htmlTemplateService = htmlTemplateService;
             _roleManager = roleManager;
