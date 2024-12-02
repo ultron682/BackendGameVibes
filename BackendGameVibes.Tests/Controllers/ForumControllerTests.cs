@@ -72,5 +72,18 @@ public class ForumControllerTests {
         Assert.Equal(mockThread, okResult.Value);
     }
 
+    [Fact]
+    public async Task CreateThread_InvalidModelState_ReturnsBadRequest() {
+        // Arrange
+        _controller.ModelState.AddModelError("Title", "Required");
+
+        // Act
+        var result = await _controller.CreateThread(new NewForumThreadDTO());
+
+        // Assert
+        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+        Assert.Equal("Wrong ForumThreadDTO", badRequestResult.Value);
+    }
+
 
 }
