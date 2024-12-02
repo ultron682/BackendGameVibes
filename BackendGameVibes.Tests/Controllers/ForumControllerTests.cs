@@ -42,5 +42,19 @@ public class ForumControllerTests {
         Assert.Equal(mockThreads, okResult.Value);
     }
 
+    [Fact]
+    public async Task GetThreadWithPosts_ThreadNotFound_ReturnsNotFound() {
+        // Arrange
+        _mockThreadService
+            .Setup(s => s.GetThreadWithPostsAsync(It.IsAny<int>(), null, It.IsAny<int>(), It.IsAny<int>()))
+            .ReturnsAsync((object)null);
+
+        // Act
+        var result = await _controller.GetThreadWithPosts(1);
+
+        // Assert
+        Assert.IsType<NotFoundResult>(result);
+    }
+
 
 }
