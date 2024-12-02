@@ -3,13 +3,13 @@ using BackendGameVibes.Models.DTOs.Account;
 using BackendGameVibes.Models.User;
 using BackendGameVibes.IServices.Forum;
 using BackendGameVibes.Models.DTOs;
-using BackendGameVibes.Models.Forum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
+using BackendGameVibes.Models.DTOs.Forum;
 
 
 namespace BackendGameVibes.Controllers;
