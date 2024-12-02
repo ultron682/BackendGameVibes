@@ -85,5 +85,31 @@ public class ForumControllerTests {
         Assert.Equal("Wrong ForumThreadDTO", badRequestResult.Value);
     }
 
+    [Fact]
+    public async Task CreateThread_ValidModel_ReturnsOk() {
+        // Arrange
+        var newThread = new NewForumThreadDTO { Title = "Test Thread" };
+        var mockThread = new { Id = 1, Title = "Test Thread" };
+
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = new DefaultHttpContext {
+                User = new ClaimsPrincipal(new ClaimsIdentity([
+                        new Claim(ClaimTypes.NameIdentifier, "userid")
+                    ]))
+            }
+        };
+
+        _mockThreadService
+            .Setup(s => s.AddThreadAsync(It.IsAny<string>(), It.IsAny<NewForumThreadDTO>()))
+            .ReturnsAsync(mockThread);
+
+        // Act
+        var result = await _controller.CreateThread(newThread);
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(mockThread, okResult.Value);
+    }
+
 
 }
