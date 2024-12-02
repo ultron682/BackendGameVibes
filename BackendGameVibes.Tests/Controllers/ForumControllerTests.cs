@@ -26,5 +26,21 @@ public class ForumControllerTests {
         _controller = new ForumController(_mockPostService.Object, _mockThreadService.Object, _mockRoleService.Object);
     }
 
+    [Fact]
+    public async Task GetThreadsGroupBySections_ReturnsOkWithThreads() {
+        // Arrange
+        var mockThreads = new List<object> { new { Id = 1, Title = "Test Thread" } };
+        _mockThreadService
+            .Setup(s => s.GetThreadsGroupBySectionsAsync(It.IsAny<int>(), It.IsAny<int>()))
+            .ReturnsAsync(mockThreads);
+
+        // Act
+        var result = await _controller.GetThreadsGroupBySections();
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.Equal(mockThreads, okResult.Value);
+    }
+
 
 }
