@@ -1,5 +1,4 @@
-﻿using BackendGameVibes.Data;
-using BackendGameVibes.IServices;
+﻿using BackendGameVibes.IServices;
 using BackendGameVibes.Models.DTOs.Account;
 using BackendGameVibes.Models.User;
 using BackendGameVibes.IServices.Forum;
@@ -8,10 +7,8 @@ using BackendGameVibes.Models.Forum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
-using System.Data;
 using AutoMapper;
 
 
