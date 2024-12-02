@@ -12,12 +12,6 @@ namespace BackendGameVibes.Services {
         private readonly UserManager<UserGameVibes> _userManager;
         private readonly ApplicationDbContext _context;
         private readonly IAccountService _accountService;
-        private readonly IRoleService _roleService;
-        private readonly IForumPostService _forumPostService;
-        private readonly IForumThreadService _forumThreadService;
-        private readonly IReviewService _reviewService;
-        private readonly IGameService _gameService;
-        private readonly IForumRoleService _forumRoleService;
 
         public AdministrationService(ApplicationDbContext context,
             UserManager<UserGameVibes> userManager,
@@ -31,12 +25,6 @@ namespace BackendGameVibes.Services {
             _context = context;
             _accountService = accountService;
             _userManager = userManager;
-            _roleService = roleService;
-            _forumPostService = forumPostService;
-            _forumThreadService = forumThreadService;
-            _reviewService = reviewService;
-            _gameService = gameService;
-            _forumRoleService = forumRoleService;
         }
 
         public async Task<IEnumerable<object>> GetAllUsersWithRolesAsync() {
