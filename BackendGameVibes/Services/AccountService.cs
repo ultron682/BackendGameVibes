@@ -7,6 +7,7 @@ using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using Newtonsoft.Json.Linq;
 
 
 namespace BackendGameVibes.Services;
@@ -742,6 +743,12 @@ public class AccountService : IAccountService {
             user.ProfilePicture.ImageData,
             user.ProfilePicture.UploadedDate
         };
+    }
+
+    public async Task<string> GenerateEmailConfirmationTokenAsync(string userId) {
+        var user = await GetUserByIdAsync(userId);
+
+        return await _userManager.GenerateEmailConfirmationTokenAsync(user);
     }
 
     public void Dispose() {
