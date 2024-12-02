@@ -10,5 +10,7 @@ namespace BackendGameVibes.Services {
         Task<(UserGameVibes user, IList<string> roles)> UpdateUserAsync(UserGameVibesDTO userDTO);
         Task<bool> DeleteReviewAsync(int id);
         Task<bool> DeletePostAsync(int id);
+        Task<IEnumerable<object>> GetReportedReviewsAsync();
+        Task<IEnumerable<object>> GetReportedPostsAsync();
     }
 }

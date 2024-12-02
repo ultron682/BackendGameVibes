@@ -197,40 +197,16 @@ public class AdministrationController : ControllerBase {
     [Authorize(Policy = "modOrAdmin")]
     [SwaggerOperation("modOrAdmin")]
     public async Task<IActionResult> GetReportedReviews() {
-        return Ok(await _context.ReportedReviews
-            .Include(r => r.ReporterUser)
-            .Include(r => r.Review)
-            .Where(r => r.IsFinished == false)
-            .Select(r => new {
-                r.Id,
-                r.ReporterUserId,
-                ReporterUserName = r.ReporterUser!.UserName,
-                r.ReviewId,
-                r.Review!.Comment,
-                r.Reason,
-                r.IsFinished
-            })
-            .ToArrayAsync());
+        var reportedReviews = await _administrationService.GetReportedReviewsAsync();
+        return Ok(reportedReviews);
     }
 
     [HttpGet("posts/reported")]
     [Authorize(Policy = "modOrAdmin")]
     [SwaggerOperation("modOrAdmin")]
     public async Task<IActionResult> GetReportedPosts() {
-        return Ok(await _context.ReportedForumPosts
-            .Include(p => p.ReporterUser)
-            .Include(p => p.ForumPost)
-            .Where(r => r.IsFinished == false)
-            .Select(p => new {
-                p.Id,
-                p.ReporterUserId,
-                ReporterUserName = p.ReporterUser!.UserName,
-                p.ForumPostId,
-                p.ForumPost!.Content,
-                p.Reason,
-                p.IsFinished
-            })
-            .ToArrayAsync());
+        var reportedPosts = await _administrationService.GetReportedPostsAsync();
+        return Ok(reportedPosts);
     }
 
     [HttpPost("post/finish")]

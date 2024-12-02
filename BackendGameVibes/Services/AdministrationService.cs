@@ -175,5 +175,39 @@ namespace BackendGameVibes.Services {
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<IEnumerable<object>> GetReportedReviewsAsync() {
+            return await _context.ReportedReviews
+                .Include(r => r.ReporterUser)
+                .Include(r => r.Review)
+                .Where(r => r.IsFinished == false)
+                .Select(r => new {
+                    r.Id,
+                    r.ReporterUserId,
+                    ReporterUserName = r.ReporterUser!.UserName,
+                    r.ReviewId,
+                    r.Review!.Comment,
+                    r.Reason,
+                    r.IsFinished
+                })
+                .ToArrayAsync();
+        }
+
+        public async Task<IEnumerable<object>> GetReportedPostsAsync() {
+            return await _context.ReportedForumPosts
+                .Include(p => p.ReporterUser)
+                .Include(p => p.ForumPost)
+                .Where(p => p.IsFinished == false)
+                .Select(p => new {
+                    p.Id,
+                    p.ReporterUserId,
+                    ReporterUserName = p.ReporterUser!.UserName,
+                    p.ForumPostId,
+                    p.ForumPost!.Content,
+                    p.Reason,
+                    p.IsFinished
+                })
+                .ToArrayAsync();
+        }
     }
 }
