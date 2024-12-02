@@ -1,4 +1,4 @@
-using BackendGameVibes;
+using BackendGameVibes.BackgroundServices;
 using BackendGameVibes.Data;
 using BackendGameVibes.Helpers;
 using BackendGameVibes.IServices;
@@ -88,7 +88,7 @@ builder.Services.AddControllers()
 
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
-builder.Services.AddHostedService<BackgroundServiceRefresh>();
+builder.Services.AddHostedService<BackgroundServiceRefreshSteamData>();
 
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 builder.Services.AddSingleton<HtmlTemplateService>();
