@@ -13,7 +13,8 @@ namespace BackendGameVibes.Services {
         private readonly ApplicationDbContext _context;
         private readonly IAccountService _accountService;
 
-        public AdministrationService(ApplicationDbContext context,
+        public AdministrationService(
+            ApplicationDbContext context,
             UserManager<UserGameVibes> userManager,
             IAccountService accountService,
             IRoleService roleService,

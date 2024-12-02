@@ -84,8 +84,6 @@ namespace BackendGameVibes.Tests.Controllers {
             // Arrange
             var userId = "nonexistent-user-id";
 
-            _mockUserManager.Setup(m => m.FindByIdAsync(userId)).ReturnsAsync((UserGameVibes)null);
-
             // Act
             var result = await _controller.DeleteUser(userId);
 
@@ -112,14 +110,13 @@ namespace BackendGameVibes.Tests.Controllers {
         [Fact]
         public async Task GetAllUsersWithRoles_ShouldReturnUsersWithRoles() {
             // Arrange
-            var users = new List<UserGameVibes>
+            var users = new List<object>
             {
-                new UserGameVibes { Id = "1", Email = "user1@test.com", UserName = "User1", ForumRole = new ForumRole { Name = "Role1" }, ExperiencePoints = 100 },
-                new UserGameVibes { Id = "2", Email = "user2@test.com", UserName = "User2", ForumRole = new ForumRole { Name = "Role2" }, ExperiencePoints = 200 }
+                "user1 data",
+                "user2 data"
             };
 
-            _mockUserManager.Setup(um => um.FindByIdAsync(It.IsAny<string>())).ReturnsAsync((string id) => users.First(u => u.Id == id));
-            _mockUserManager.Setup(um => um.GetRolesAsync(It.IsAny<UserGameVibes>())).ReturnsAsync((UserGameVibes user) => new List<string> { user.ForumRole!.Name });
+            _mockAdministrationService.Setup(aservice => aservice.GetAllUsersWithRolesAsync()).ReturnsAsync(users);
 
             // Act
             var result = await _controller.GetAllUsersWithRoles();
