@@ -9,7 +9,7 @@ public interface IForumPostService : IDisposable {
     Task<object> GetPostsByThreadIdAsync(int idThread, string? userAccessToken, int pageNumber, int postsSize);
     Task<object> GetPostsByUserIdAsync(string userId, int pageNumber, int postsSize);
     Task<object?> GetPostByIdAsync(int postId);
-    Task<object?> GetPostsByPhraseAsync(string phrase, int pageNumber = 1, int postsSize = 10);
+    Task<object?> GetPostsByPhraseAsync(string phrase, string? userAccessToken, int pageNumber = 1, int postsSize = 10);
     Task<ForumPost?> AddForumPostAsync(ForumPostDTO forumPostDTO);
     Task<bool> DeletePostByIdAsync(int postId, string userId);
     Task<ReportedPost?> FinishReportPostAsync(int id, bool toRemovePost);
