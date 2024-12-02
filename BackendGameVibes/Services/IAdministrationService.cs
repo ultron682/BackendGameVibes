@@ -1,4 +1,5 @@
-﻿using BackendGameVibes.Models.DTOs.Account;
+﻿using BackendGameVibes.Models.DTOs;
+using BackendGameVibes.Models.DTOs.Account;
 using BackendGameVibes.Models.User;
 
 namespace BackendGameVibes.Services {
@@ -12,5 +13,8 @@ namespace BackendGameVibes.Services {
         Task<bool> DeletePostAsync(int id);
         Task<IEnumerable<object>> GetReportedReviewsAsync();
         Task<IEnumerable<object>> GetReportedPostsAsync();
+        Task AddGameGenreAsync(ValueModel genreModel);
+        Task<bool> UpdateGameGenreAsync(int genreId, ValueModel genreModel);
+        Task<bool> RemoveGameGenreAsync(int genreId);
     }
 }

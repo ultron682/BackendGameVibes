@@ -5,6 +5,7 @@ using BackendGameVibes.Models.DTOs.Account;
 using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using BackendGameVibes.Models.DTOs;
 
 namespace BackendGameVibes.Services {
     public class AdministrationService : IAdministrationService {
@@ -208,6 +209,34 @@ namespace BackendGameVibes.Services {
                     p.IsFinished
                 })
                 .ToArrayAsync();
+        }
+
+        public async Task AddGameGenreAsync(ValueModel genreModel) {
+            _context.Genres.Add(new Models.Games.Genre { Name = genreModel.Value });
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> UpdateGameGenreAsync(int genreId, ValueModel genreModel) {
+            var genre = await _context.Genres.FirstOrDefaultAsync(g => g.Id == genreId);
+            if (genre == null) {
+                return false;
+            }
+
+            genre.Name = genreModel.Value;
+            _context.Genres.Update(genre);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RemoveGameGenreAsync(int genreId) {
+            var genre = await _context.Genres.FirstOrDefaultAsync(g => g.Id == genreId);
+            if (genre == null) {
+                return false;
+            }
+
+            _context.Genres.Remove(genre);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

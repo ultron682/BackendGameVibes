@@ -305,35 +305,29 @@ public class AdministrationController : ControllerBase {
     [HttpPost("games/genres")]
     [Authorize("admin")]
     public async Task<IActionResult> AddGameGenre(ValueModel genreModel) {
-        _context.Genres.Add(new Models.Games.Genre { Name = genreModel.Value });
-        await _context.SaveChangesAsync();
+        await _administrationService.AddGameGenreAsync(genreModel);
         return Ok();
     }
 
     [HttpPatch("games/genres/{genreId:int}")]
     [Authorize("admin")]
     public async Task<IActionResult> UpdateGameGenre(int genreId, ValueModel genreModel) {
-        var genre = await _context.Genres.FirstOrDefaultAsync(g => g.Id == genreId);
-        if (genre == null) {
+        var success = await _administrationService.UpdateGameGenreAsync(genreId, genreModel);
+        if (!success) {
             return NotFound();
         }
 
-        genre.Name = genreModel.Value;
-        _context.Genres.Update(genre);
-        await _context.SaveChangesAsync();
         return Ok();
     }
 
     [HttpDelete("games/genres/{genreId:int}")]
     [Authorize("admin")]
     public async Task<IActionResult> RemoveGameGenre(int genreId) {
-        var genre = await _context.Genres.FirstOrDefaultAsync(g => g.Id == genreId);
-        if (genre == null) {
+        var success = await _administrationService.RemoveGameGenreAsync(genreId);
+        if (!success) {
             return NotFound();
         }
 
-        _context.Genres.Remove(genre);
-        await _context.SaveChangesAsync();
         return Ok();
     }
 
