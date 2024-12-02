@@ -111,5 +111,26 @@ public class ForumControllerTests {
         Assert.Equal(mockThread, okResult.Value);
     }
 
+    [Fact]
+    public async Task DeletePost_PostNotFound_ReturnsNotFound() {
+        // Arrange
+        _controller.ControllerContext = new ControllerContext {
+            HttpContext = new DefaultHttpContext {
+                User = new ClaimsPrincipal(new ClaimsIdentity([
+                new Claim(ClaimTypes.NameIdentifier, "userid")
+            ]))
+            }
+        };
+        _mockPostService
+            .Setup(s => s.DeletePostByIdAsync(It.IsAny<int>(), It.IsAny<string>()))
+            .ReturnsAsync(false);
+
+        // Act
+        var result = await _controller.DeletePost(1);
+
+        // Assert
+        Assert.IsType<NotFoundResult>(result);
+    }
+
 
 }
