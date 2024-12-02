@@ -1,10 +1,12 @@
 ﻿namespace BackendGameVibes.Tests.IntegrationTests;
 
 using BackendGameVibes.Data;
+using BackendGameVibes.Models.DTOs.Account;
+using BackendGameVibes.Models.DTOs.Responses;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http.Json;
 using Program = BackendGameVibes.Program;
 
 
@@ -29,5 +31,18 @@ public class IntegrationTestBase : IClassFixture<WebApplicationFactory<Program>>
         });
 
         _client = _factory.CreateClient();
+    }
+
+    protected async Task<string> GetJwtTokenAsync(string email, string password) {
+        var loginDto = new LoginDTO {
+            Email = email,
+            Password = password
+        };
+
+        var response = await _client.PostAsJsonAsync("/api/account/login", loginDto);
+        response.EnsureSuccessStatusCode();
+
+        var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
+        return loginResponse!.AccessToken!;
     }
 }
