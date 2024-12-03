@@ -151,94 +151,94 @@ public class AccountService : IAccountService {
 
         var userRoles = await _userManager.GetRolesAsync(userGameVibes);
 
-            var accountInfo = await _context.Users
-                .Where(u => u.Id == userGameVibes.Id)
-                .Include(u => u.UserReviews)
-                .Include(u => u.ForumRole)
-                .Include(u => u.UserReportedReviews)
-                .Include(u => u.UserFriendRequestsReceived)
-                .Include(u => u.UserFriendRequestsSent)
-                .Include(u => u.UserForumThreads)
-                .Include(u => u.UserForumPosts)
-                .Include(u => u.UserReportedPosts)
-                .Include(u => u.UserFollowedGames)
-                .Select(u => new {
-                    u.Id,
-                    Reviews = u.UserReviews.Select(r => new {
-                        r.Id,
-                        r.GeneralScore,
-                        r.GameplayScore,
-                        r.GraphicsScore,
-                        r.AudioScore,
-                        r.Comment,
-                        r.CreatedAt,
-                        r.UpdatedAt,
-                        r.GameId,
-                        GameTitle = r.Game != null ? r.Game.Title : "NoData",
-                        GameCoverImageUrl = r.Game != null ? r.Game.CoverImage : "NoData",
-                        UserForumRoleName = r.UserGameVibes != null ? r.UserGameVibes.ForumRole!.Name : "NoRank",
-                    }).ToArray(),
-                    UserReportedReviews = u.UserReportedReviews.Select(rr => new {
-                        rr.Id,
-                        rr.ReporterUserId,
-                        ReporterUserName = rr.ReporterUser!.UserName,
-                        rr.ReviewId,
-                        rr.Reason
-                    }).ToArray(),
-                    Friends = u.UserFriends.Select(f => new {
-                        f.FriendId,
-                        f.FriendUser!.UserName,
-                        f.FriendsSince
-                    }).ToArray(),
-                    FriendRequestsReceived = u.UserFriendRequestsReceived.Select(fr => new {
-                        fr.Id,
-                        SenderId = fr.SenderUserId,
-                        SenderName = fr.SenderUser!.UserName,
-                        fr.IsAccepted
-                    }).ToArray(),
-                    FriendRequestsSent = u.UserFriendRequestsSent.Select(fr => new {
-                        fr.Id,
-                        ReceiverId = fr.ReceiverUserId,
-                        ReceiverName = fr.ReceiverUser!.UserName,
-                        fr.IsAccepted
-                    }).ToArray(),
-                    UserForumThreads = u.UserForumThreads != null ? u.UserForumThreads.Select(t => new {
-                        t.Id,
-                        t.Title,
-                        t.CreatedDateTime,
-                        t.LastUpdatedDateTime,
-                        t.UserOwnerId,
-                        Section = t.Section!.Name,
-                        sectionId = t.SectionId,
-                        sectionColor = t.Section != null ? t.Section.HexColor : "#ffffff",
-                    })
-                    .ToArray()
-                    : Array.Empty<object>(),
-                    UserForumPosts = u.UserForumPosts!
-                        .Select(p => new {
-                            p.Id,
-                            p.Content,
-                            p.CreatedDateTime,
-                            p.LastUpdatedDateTime,
-                            p.LikesCount,
-                            p.DisLikesCount,
-                            p.ThreadId,
-                            p.UserOwnerId,
-                            threadTitle = p.Thread != null ? p.Thread.Title : "NoData"
-                        }).ToArray(),
-                    UserReportedPosts = u.UserReportedPosts.Select(rp => new {
-                        rp.Id,
-                        rp.ReporterUserId,
-                        ReporterUserName = rp.ReporterUser!.UserName,
-                        rp.ForumPostId,
-                        rp.Reason
-                    }).ToArray(),
-                    UserFollowedGames = u.UserFollowedGames != null ? u.UserFollowedGames.Select(g => new {
-                        g.Id,
-                        g.Title
-                    }).ToArray() : Array.Empty<object>(),
+        var accountInfo = await _context.Users
+            .Where(u => u.Id == userGameVibes.Id)
+            .Include(u => u.UserReviews)
+            .Include(u => u.ForumRole)
+            .Include(u => u.UserReportedReviews)
+            .Include(u => u.UserFriendRequestsReceived)
+            .Include(u => u.UserFriendRequestsSent)
+            .Include(u => u.UserForumThreads)
+            .Include(u => u.UserForumPosts)
+            .Include(u => u.UserReportedPosts)
+            .Include(u => u.UserFollowedGames)
+            .Select(u => new {
+                u.Id,
+                Reviews = u.UserReviews.Select(r => new {
+                    r.Id,
+                    r.GeneralScore,
+                    r.GameplayScore,
+                    r.GraphicsScore,
+                    r.AudioScore,
+                    r.Comment,
+                    r.CreatedAt,
+                    r.UpdatedAt,
+                    r.GameId,
+                    GameTitle = r.Game != null ? r.Game.Title : "NoData",
+                    GameCoverImageUrl = r.Game != null ? r.Game.CoverImage : "NoData",
+                    UserForumRoleName = r.UserGameVibes != null ? r.UserGameVibes.ForumRole!.Name : "NoRank",
+                }).ToArray(),
+                UserReportedReviews = u.UserReportedReviews.Select(rr => new {
+                    rr.Id,
+                    rr.ReporterUserId,
+                    ReporterUserName = rr.ReporterUser!.UserName,
+                    rr.ReviewId,
+                    rr.Reason
+                }).ToArray(),
+                Friends = u.UserFriends.Select(f => new {
+                    f.FriendId,
+                    f.FriendUser!.UserName,
+                    f.FriendsSince
+                }).ToArray(),
+                FriendRequestsReceived = u.UserFriendRequestsReceived.Select(fr => new {
+                    fr.Id,
+                    SenderId = fr.SenderUserId,
+                    SenderName = fr.SenderUser!.UserName,
+                    fr.IsAccepted
+                }).ToArray(),
+                FriendRequestsSent = u.UserFriendRequestsSent.Select(fr => new {
+                    fr.Id,
+                    ReceiverId = fr.ReceiverUserId,
+                    ReceiverName = fr.ReceiverUser!.UserName,
+                    fr.IsAccepted
+                }).ToArray(),
+                UserForumThreads = u.UserForumThreads != null ? u.UserForumThreads.Select(t => new {
+                    t.Id,
+                    t.Title,
+                    t.CreatedDateTime,
+                    t.LastUpdatedDateTime,
+                    t.UserOwnerId,
+                    Section = t.Section!.Name,
+                    sectionId = t.SectionId,
+                    sectionColor = t.Section != null ? t.Section.HexColor : "#ffffff",
                 })
-                .FirstOrDefaultAsync();
+                .ToArray()
+                : Array.Empty<object>(),
+                UserForumPosts = u.UserForumPosts!
+                    .Select(p => new {
+                        p.Id,
+                        p.Content,
+                        p.CreatedDateTime,
+                        p.LastUpdatedDateTime,
+                        p.LikesCount,
+                        p.DisLikesCount,
+                        p.ThreadId,
+                        p.UserOwnerId,
+                        threadTitle = p.Thread != null ? p.Thread.Title : "NoData"
+                    }).ToArray(),
+                UserReportedPosts = u.UserReportedPosts.Select(rp => new {
+                    rp.Id,
+                    rp.ReporterUserId,
+                    ReporterUserName = rp.ReporterUser!.UserName,
+                    rp.ForumPostId,
+                    rp.Reason
+                }).ToArray(),
+                UserFollowedGames = u.UserFollowedGames != null ? u.UserFollowedGames.Select(g => new {
+                    g.Id,
+                    g.Title
+                }).ToArray() : Array.Empty<object>(),
+            })
+            .FirstOrDefaultAsync();
 
         return accountInfo!;
     }
@@ -250,65 +250,65 @@ public class AccountService : IAccountService {
 
         var roles = await _userManager.GetRolesAsync(userGameVibes);
 
-            var accountInfo = await _context.Users
-                .Where(u => u.Id == userId)
-                .Include(u => u.UserReviews)
-                .Include(u => u.ForumRole)
-                .Include(u => u.ProfilePicture)
-                .Select(u => new {
-                    u.Id,
-                    u.UserName,
-                    ProfilePictureBlob = u.ProfilePicture != null ? u.ProfilePicture.ImageData : null,
-                    ForumRole = new { u.ForumRole!.Id, u.ForumRole.Name, u.ForumRole.Threshold },
-                    u.ExperiencePoints,
-                    u.Description,
-                    u.LastActivityDate,
-                    Reviews = u.UserReviews.Select(r => new {
-                        r.Id,
-                        r.GeneralScore,
-                        r.GameplayScore,
-                        r.GraphicsScore,
-                        r.AudioScore,
-                        r.Comment,
-                        r.CreatedAt,
-                        r.UpdatedAt,
-                        r.GameId,
-                        GameTitle = r.Game != null ? r.Game.Title : "NoData",
-                        GameCoverImageUrl = r.Game != null ? r.Game.CoverImage : "NoData",
-                        UserForumRoleName = r.UserGameVibes != null ? r.UserGameVibes.ForumRole!.Name : "NoRank",
-                    }).ToArray(),
-                    Friends = u.UserFriends.Select(f => new {
-                        f.FriendId,
-                        f.FriendUser!.UserName,
-                        f.FriendsSince
-                    }).ToArray(),
-                    UserForumThreads = u.UserForumThreads != null ? u.UserForumThreads.Select(t => new {
+        var accountInfo = await _context.Users
+            .Where(u => u.Id == userId)
+            .Include(u => u.UserReviews)
+            .Include(u => u.ForumRole)
+            .Include(u => u.ProfilePicture)
+            .Select(u => new {
+                u.Id,
+                u.UserName,
+                ProfilePictureBlob = u.ProfilePicture != null ? u.ProfilePicture.ImageData : null,
+                ForumRole = new { u.ForumRole!.Id, u.ForumRole.Name, u.ForumRole.Threshold },
+                u.ExperiencePoints,
+                u.Description,
+                u.LastActivityDate,
+                Reviews = u.UserReviews.Select(r => new {
+                    r.Id,
+                    r.GeneralScore,
+                    r.GameplayScore,
+                    r.GraphicsScore,
+                    r.AudioScore,
+                    r.Comment,
+                    r.CreatedAt,
+                    r.UpdatedAt,
+                    r.GameId,
+                    GameTitle = r.Game != null ? r.Game.Title : "NoData",
+                    GameCoverImageUrl = r.Game != null ? r.Game.CoverImage : "NoData",
+                    UserForumRoleName = r.UserGameVibes != null ? r.UserGameVibes.ForumRole!.Name : "NoRank",
+                }).ToArray(),
+                Friends = u.UserFriends.Select(f => new {
+                    f.FriendId,
+                    f.FriendUser!.UserName,
+                    f.FriendsSince
+                }).ToArray(),
+                UserForumThreads = u.UserForumThreads != null ? u.UserForumThreads.Select(t => new {
 
-                        t.Id,
-                        t.Title,
-                        t.CreatedDateTime,
-                        t.LastUpdatedDateTime,
-                        sectionId = t.SectionId,
-                        sectionColor = t.Section != null ? t.Section.HexColor : "#ffffff",
-                    }).OrderByDescending(p => p.LastUpdatedDateTime).Take(5).ToArray() : Array.Empty<object>(),
-                    UserForumPosts = u.UserForumPosts!
-                        .Select(p => new {
-                            p.Id,
-                            p.Content,
-                            p.CreatedDateTime,
-                            p.LastUpdatedDateTime,
-                            p.LikesCount,
-                            p.DisLikesCount,
-                            p.ThreadId,
-                            p.UserOwnerId,
-                            threadTitle = p.Thread != null ? p.Thread.Title : "NoData"
-                        }).ToArray(),
-                    UserFollowedGames = u.UserFollowedGames != null ? u.UserFollowedGames.Select(g => new {
-                        g.Id,
-                        g.Title
-                    }).ToArray() : Array.Empty<object>(),
-                })
-                .FirstOrDefaultAsync();
+                    t.Id,
+                    t.Title,
+                    t.CreatedDateTime,
+                    t.LastUpdatedDateTime,
+                    sectionId = t.SectionId,
+                    sectionColor = t.Section != null ? t.Section.HexColor : "#ffffff",
+                }).OrderByDescending(p => p.LastUpdatedDateTime).Take(5).ToArray() : Array.Empty<object>(),
+                UserForumPosts = u.UserForumPosts!
+                    .Select(p => new {
+                        p.Id,
+                        p.Content,
+                        p.CreatedDateTime,
+                        p.LastUpdatedDateTime,
+                        p.LikesCount,
+                        p.DisLikesCount,
+                        p.ThreadId,
+                        p.UserOwnerId,
+                        threadTitle = p.Thread != null ? p.Thread.Title : "NoData"
+                    }).ToArray(),
+                UserFollowedGames = u.UserFollowedGames != null ? u.UserFollowedGames.Select(g => new {
+                    g.Id,
+                    g.Title
+                }).ToArray() : Array.Empty<object>(),
+            })
+            .FirstOrDefaultAsync();
 
         return accountInfo!;
     }
@@ -330,7 +330,7 @@ public class AccountService : IAccountService {
 
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         token = Uri.EscapeDataString(token);
-        var ConfirmationLink = $"http://localhost:5556/account/confirm?userId={user.Id}&token={token}";
+        var ConfirmationLink = $"http://localhost:2137/account/confirm?userId={user.Id}&token={token}";
 
         Console.WriteLine($"Please confirm your account by <a href='{ConfirmationLink!}'>clicking here</a>.");
 
@@ -408,7 +408,7 @@ public class AccountService : IAccountService {
             return (false, "Error while generating reset token");
 
         resetToken = Uri.EscapeDataString(resetToken);
-        var ConfirmationLink = $"http://localhost:3000/account/reset?userId={user.Id}&token={resetToken}";
+        var ConfirmationLink = $"http://localhost:2137/account/reset?userId={user.Id}&token={resetToken}";
 
         Console.WriteLine($"Reset password link: <a href='{ConfirmationLink!}'>clicking here</a>.");
 

@@ -173,8 +173,8 @@ namespace BackendGameVibes.Controllers {
                     await profilePicture.CopyToAsync(ms);
                     var imageData = ms.ToArray();
 
-                    var result = await _accountService.UpdateProfilePictureAsync(userId, imageData);
-                    return result ? Ok("ProfilePictureUpdated") : BadRequest("FailedToUpdateProfilePicture");
+                    bool isSuccess = await _accountService.UpdateProfilePictureAsync(userId, imageData);
+                    return isSuccess ? Ok("ProfilePictureUpdated") : BadRequest("FailedToUpdateProfilePicture");
                 }
             }
             else {
