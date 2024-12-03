@@ -56,7 +56,6 @@ public class DbInitializer {
                 await roleManager.CreateAsync(role);
 
                 //Admin           
-                var newProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultProfileImagePath) };
                 var newUser = new UserGameVibes {
                     UserName = "admin",
                     Email = "admin@admin.com",
@@ -80,7 +79,6 @@ public class DbInitializer {
                 await roleManager.CreateAsync(role);
 
                 //Mod         
-                var newProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultProfileImagePath) };
                 var newUser = new UserGameVibes {
                     UserName = "mod",
                     Email = "mod@mod.com",
