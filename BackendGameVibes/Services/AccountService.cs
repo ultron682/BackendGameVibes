@@ -748,7 +748,7 @@ public class AccountService : IAccountService {
     public async Task<string> GenerateEmailConfirmationTokenAsync(string userId) {
         var user = await GetUserByIdAsync(userId);
 
-        return await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        return await _userManager.GenerateEmailConfirmationTokenAsync(user!);
     }
 
     public void Dispose() {
