@@ -39,7 +39,7 @@ public class IntegrationTestBase : IClassFixture<WebApplicationFactory<Program>>
             Password = password
         };
 
-        var response = await _client.PostAsJsonAsync("/api/account/login", loginDto);
+        var response = await _client.PostAsJsonAsync("/account/login", loginDto);
         response.EnsureSuccessStatusCode();
 
         var loginResponse = await response.Content.ReadFromJsonAsync<LoginResponse>();
