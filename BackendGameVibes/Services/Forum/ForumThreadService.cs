@@ -109,6 +109,7 @@ public class ForumThreadService : IForumThreadService {
         var postsOfThread = await _postService.GetPostsByThreadIdAsync(threadId, userAccessToken, pageNumber, postsSize);
 
         return new GetThreadWithPostsResponse() {
+            NewForumThreadId = thread.Id,
             Thread = thread,
             PostsOfThread = postsOfThread
         };
