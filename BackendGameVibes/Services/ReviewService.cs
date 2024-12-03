@@ -116,6 +116,8 @@ public class ReviewService : IReviewService {
 
         if (foundGame != null) {
             review.AverageRating = (review.GeneralScore + review.GraphicsScore + review.AudioScore + review.GameplayScore) / 4;
+            review.CreatedAt = DateTime.Now;
+            review.UpdatedAt = DateTime.Now;
             _context.Reviews.Add(review);
             await _context.SaveChangesAsync();
 

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Security.Principal;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using BackendGameVibes.Models.DTOs.Responses;
 
 public class ForumControllerTests {
     private readonly Mock<IForumPostService> _mockPostService;
@@ -47,7 +48,7 @@ public class ForumControllerTests {
         // Arrange
         _mockThreadService
             .Setup(s => s.GetThreadWithPostsAsync(It.IsAny<int>(), null, It.IsAny<int>(), It.IsAny<int>()))
-            .ReturnsAsync((object)null);
+            .ReturnsAsync((GetThreadWithPostsResponse)null);
 
         // Act
         var result = await _controller.GetThreadWithPosts(1);
@@ -59,7 +60,7 @@ public class ForumControllerTests {
     [Fact]
     public async Task GetThreadWithPosts_ThreadExists_ReturnsOk() {
         // Arrange
-        var mockThread = new { Id = 1, Title = "Test Thread", Posts = new List<object>() };
+        GetThreadWithPostsResponse mockThread = new GetThreadWithPostsResponse() { Thread = 1, PostsOfThread = new List<object>() };
         _mockThreadService
             .Setup(s => s.GetThreadWithPostsAsync(It.IsAny<int>(), null, It.IsAny<int>(), It.IsAny<int>()))
             .ReturnsAsync(mockThread);
