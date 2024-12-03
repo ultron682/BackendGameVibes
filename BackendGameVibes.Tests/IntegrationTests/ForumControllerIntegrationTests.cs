@@ -14,33 +14,9 @@ using System.Net.Http.Json;
 using Program = BackendGameVibes.Program;
 
 
-public class ForumControllerTests : IntegrationTestBase {
-    public ForumControllerTests(WebApplicationFactory<Program> factory) : base(factory) {
+public class ForumControllerIntegrationTests : IntegrationTestBase {
+    public ForumControllerIntegrationTests(WebApplicationFactory<Program> factory) : base(factory) {
 
-    }
-
-
-    private async Task TryRegisterAndConfirmTestUser() {
-        using (var scope = _factory.Services.CreateScope()) {
-            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            if (!await roleManager.RoleExistsAsync("user")) {
-                await roleManager.CreateAsync(new IdentityRole("user"));
-            }
-
-            var accountService = scope.ServiceProvider.GetRequiredService<IAccountService>();
-            var registerDto = new RegisterDTO {
-                Email = "test999@test.com",
-                Password = "Test123.",
-                UserName = "Test999"
-            };
-
-            var registerResponse = await _client.PostAsJsonAsync("/account/register", registerDto);
-            //registerResponse.EnsureSuccessStatusCode();
-
-            var user = await accountService.GetUserByEmailAsync(registerDto.Email);
-            var token = await accountService.GenerateEmailConfirmationTokenAsync(user!.Id);
-            await accountService.ConfirmEmailAsync(user.Id, token);
-        }
     }
 
     [Fact]
@@ -90,9 +66,6 @@ public class ForumControllerTests : IntegrationTestBase {
             SectionId = 1,
             FirstForumPostContent = "This is an existing post.",
         };
-
-        Console.WriteLine($"\n {token} \n");
-        Debug.WriteLine($"\n {token} \n");
 
         var createResponse = await _client.PostAsJsonAsync("/api/forum/threads", newThread);
 
