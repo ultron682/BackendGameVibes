@@ -151,10 +151,14 @@ public class Program {
         _ = steamService!.InitSteamApi();
 
         using (var scope = app.Services.CreateAsyncScope()) {
+            Console.WriteLine($"Current Environment: {app.Environment.EnvironmentName}");
+
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             await dbContext.Database.EnsureCreatedAsync();
-            //await dbContext.Database.MigrateAsync();
-            await DbInitializer.InitializeAsync(scope, dbContext);
+
+            if (!app.Environment.IsEnvironment("IntegrationTest")) {
+                await DbInitializer.InitializeAsync(scope, dbContext);
+            }
         }
 
         app.Run();
