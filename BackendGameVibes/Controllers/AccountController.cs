@@ -10,6 +10,7 @@ using System.ComponentModel.DataAnnotations;
 using BackendGameVibes.Models;
 using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
+using BackendGameVibes.Models.DTOs.Responses;
 
 
 namespace BackendGameVibes.Controllers {
@@ -69,7 +70,7 @@ namespace BackendGameVibes.Controllers {
                 if (loginResult != null && loginResult.Succeeded) {
                     (string accessToken, string[] userRoles) = await _accountService.GenerateJwtTokenAsync(user);
 
-                    return Ok(new { accessToken, userRoles });
+                    return Ok(new LoginResponse() { AccessToken = accessToken, UserRoles = userRoles });
                 }
                 else if (loginResult!.IsLockedOut) {
                     var timeToEndLockout = user.LockoutEnd!.Value.Subtract(DateTime.Now);

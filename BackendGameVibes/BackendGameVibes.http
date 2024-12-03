@@ -1,6 +1,0 @@
-@BackendGameVibes_HostAddress = http://localhost:5556
-
-GET {{BackendGameVibes_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

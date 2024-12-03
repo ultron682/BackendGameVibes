@@ -8,6 +8,7 @@ using BackendGameVibes.Models.Reviews;
 using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.Models.DTOs;
 using BackendGameVibes.Extensions;
+using BackendGameVibes.Models.DTOs.Responses;
 
 namespace BackendGameVibes.Services;
 
@@ -23,7 +24,7 @@ public class ReviewService : IReviewService {
         _forumExperienceService = forumExperienceService;
     }
 
-    public async Task<object?> GetAllReviewsAsync(int pageNumber = 1, int resultSize = 10) {
+    public async Task<GetAllReviewsResponse?> GetAllReviewsAsync(int pageNumber = 1, int resultSize = 10) {
         var query = await _context.Reviews
             .OrderByDescending(t => t.CreatedAt)
             .Skip((pageNumber - 1) * resultSize)
@@ -34,7 +35,7 @@ public class ReviewService : IReviewService {
 
         int totalResults = await _context.Reviews.CountAsync();
 
-        return new {
+        return new GetAllReviewsResponse() {
             TotalResults = totalResults,
             PageSize = resultSize,
             CurrentPage = pageNumber,
@@ -115,6 +116,8 @@ public class ReviewService : IReviewService {
 
         if (foundGame != null) {
             review.AverageRating = (review.GeneralScore + review.GraphicsScore + review.AudioScore + review.GameplayScore) / 4;
+            review.CreatedAt = DateTime.Now;
+            review.UpdatedAt = DateTime.Now;
             _context.Reviews.Add(review);
             await _context.SaveChangesAsync();
 
@@ -127,7 +130,6 @@ public class ReviewService : IReviewService {
         else {
             return null;
         }
-
     }
 
     public async Task<bool> DeleteReviewAsync(string userId, int id) {

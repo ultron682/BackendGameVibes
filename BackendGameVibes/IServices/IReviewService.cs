@@ -2,10 +2,11 @@
 using BackendGameVibes.Models.DTOs.Reported;
 using BackendGameVibes.Models.Reviews;
 using BackendGameVibes.Models.DTOs;
+using BackendGameVibes.Models.DTOs.Responses;
 
 namespace BackendGameVibes.IServices;
 public interface IReviewService : IDisposable {
-    Task<object?> GetAllReviewsAsync(int pageNumber = 1, int resultSize = 10);
+    Task<GetAllReviewsResponse?> GetAllReviewsAsync(int pageNumber = 1, int resultSize = 10);
     Task<object?> GetFilteredReviewsAsync(string searchPhrase, int pageNumber = 1, int resultSize = 10);
     Task<object?> GetReviewByIdAsync(int id);
     Task<Review?> AddReviewAsync(Review review);

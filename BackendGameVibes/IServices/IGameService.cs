@@ -2,10 +2,11 @@
 using BackendGameVibes.Models.DTOs;
 using BackendGameVibes.Models.Steam;
 using BackendGameVibes.Data;
+using BackendGameVibes.Models.DTOs.Responses;
 
 namespace BackendGameVibes.IServices;
 public interface IGameService : IDisposable {
-    Task<object?> GetFilteredGamesAsync(FiltersGamesDTO filtersGamesDTO, int pageNumber = 1, int resultSize = 10);
+    Task<FilteredGamesResponse?> GetFilteredGamesAsync(FiltersGamesDTO filtersGamesDTO, int pageNumber = 1, int resultSize = 10);
     Task<(Game?, bool)> AddGameAsync(int steamGameId);
     SteamApp[] FindSteamAppByName(string searchingName);
     Task<object?> GetGameDetailsAsync(int id);

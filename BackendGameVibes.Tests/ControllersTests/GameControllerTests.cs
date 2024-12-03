@@ -5,6 +5,7 @@ using BackendGameVibes.IServices;
 using BackendGameVibes.Models.DTOs;
 using BackendGameVibes.Models.Steam;
 using BackendGameVibes.Models.Games;
+using BackendGameVibes.Models.DTOs.Responses;
 
 namespace BackendGameVibes.Tests.Controllers;
 
@@ -88,13 +89,23 @@ public class GameControllerTests {
     }
 
     [Fact]
-    public async Task GetFilteredGames_ReturnsOK_WhenGamesFound()
-    {
+    public async Task GetFilteredGames_ReturnsOK_WhenGamesFound() {
         // Arrange
         var filters = new FiltersGamesDTO();
         _gameServiceMock
             .Setup(service => service.GetFilteredGamesAsync(filters, 1, 10))
-            .ReturnsAsync(new Game[] { new Game() { Title = "test", Description = "test" }, new Game() { Title = "test2", Description = "test2" } });
+            .ReturnsAsync(new FilteredGamesResponse() {
+                CurrentPage = 1,
+                IsSortedAscending = true,
+                PageSize = 1,
+                SortedBy = "something",
+                TotalPages = 1,
+                TotalResults = 2,
+                Data = new object[] {
+                    new Game() { Title = "test", Description = "test" },
+                    new Game() { Title = "test2", Description = "test2" }
+                }
+            });
 
         // Act
         var result = await _controller.GetFilteredGames(filters);

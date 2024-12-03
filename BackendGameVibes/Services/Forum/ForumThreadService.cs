@@ -5,6 +5,7 @@ using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.DTOs.Forum;
 using Microsoft.EntityFrameworkCore;
 using BackendGameVibes.IServices.Forum;
+using BackendGameVibes.Models.DTOs.Responses;
 
 
 namespace BackendGameVibes.Services.Forum;
@@ -90,7 +91,7 @@ public class ForumThreadService : IForumThreadService {
 
     }
 
-    public async Task<object?> GetThreadWithPostsAsync(int threadId, string? userAccessToken = null, int pageNumber = 1, int postsSize = 10) {
+    public async Task<GetThreadWithPostsResponse?> GetThreadWithPostsAsync(int threadId, string? userAccessToken = null, int pageNumber = 1, int postsSize = 10) {
         var thread = await _context.ForumThreads
             .Select(t => new {
                 t.Id,
@@ -109,9 +110,10 @@ public class ForumThreadService : IForumThreadService {
 
         var postsOfThread = await _postService.GetPostsByThreadIdAsync(threadId, userAccessToken, pageNumber, postsSize);
 
-        return new {
-            thread,
-            postsOfThread
+        return new GetThreadWithPostsResponse() {
+            NewForumThreadId = thread.Id,
+            Thread = thread,
+            PostsOfThread = postsOfThread
         };
     }
 

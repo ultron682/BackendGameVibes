@@ -202,6 +202,7 @@ namespace BackendGameVibes.Data {
                     .HasPrecision(3, 2);
 
                 ent.Property(r => r.Comment)
+                    .IsRequired()
                     .HasMaxLength(1000);
 
                 ent.Property(r => r.CreatedAt)

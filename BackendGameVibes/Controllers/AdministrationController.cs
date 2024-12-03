@@ -1,23 +1,15 @@
-﻿using AutoMapper;
-using BackendGameVibes.Data;
-using BackendGameVibes.IServices;
+﻿using BackendGameVibes.IServices;
 using BackendGameVibes.Models.DTOs.Account;
 using BackendGameVibes.Models.User;
+using BackendGameVibes.IServices.Forum;
+using BackendGameVibes.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.IdentityModel.Tokens;
-using BackendGameVibes.IServices.Forum;
-using BackendGameVibes.Models.DTOs;
-using BackendGameVibes.Models.Forum;
-using System.Data;
-using BackendGameVibes.Services.Forum;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using System;
+using AutoMapper;
+using BackendGameVibes.Models.DTOs.Forum;
 
 
 namespace BackendGameVibes.Controllers;
@@ -26,18 +18,16 @@ namespace BackendGameVibes.Controllers;
 [Route("api/administration")]
 public class AdministrationController : ControllerBase {
     private readonly UserManager<UserGameVibes> _userManager;
-    private readonly ApplicationDbContext _context;
-    private readonly IMapper _mapper;
     private readonly IAccountService _accountService;
-    private readonly IHostApplicationLifetime _applicationLifetime;
     private readonly IRoleService _roleService;
     private readonly IForumPostService _forumPostService;
     private readonly IForumThreadService _forumThreadService;
     private readonly IReviewService _reviewService;
     private readonly IGameService _gameService;
     private readonly IForumRoleService _forumRoleService;
+    private readonly IAdministrationService _administrationService;
 
-    public AdministrationController(ApplicationDbContext context,
+    public AdministrationController(
         UserManager<UserGameVibes> userManager,
         IHostApplicationLifetime applicationLifetime,
         IMapper mapper,
@@ -47,62 +37,23 @@ public class AdministrationController : ControllerBase {
         IForumThreadService forumThreadService,
         IReviewService reviewService,
         IGameService gameService,
-        IForumRoleService forumRoleService) {
-        _context = context;
-        _mapper = mapper;
+        IForumRoleService forumRoleService,
+        IAdministrationService administrationService) {
         _accountService = accountService;
         _userManager = userManager;
-        _applicationLifetime = applicationLifetime;
         _roleService = roleService;
         _forumPostService = forumPostService;
         _forumThreadService = forumThreadService;
         _reviewService = reviewService;
         _gameService = gameService;
         _forumRoleService = forumRoleService;
+        _administrationService = administrationService;
     }
 
-    // dane logowania konta admina w DbInitializer.cs
     [HttpGet("users")]
     [Authorize("admin")]
     public async Task<IActionResult> GetAllUsersWithRoles() {
-        //var userRoles = await _userManager.GetRolesAsync(_userManager.FindByIdAsync());
-
-        var users = await _context.Users
-            .Select(u => new {
-                u.Id,
-                u.Email,
-                u.EmailConfirmed,
-                u.UserName,
-                ForumRoleName = u.ForumRole!.Name,
-                u.ExperiencePoints,
-                u.PhoneNumber,
-                u.PhoneNumberConfirmed,
-                u.AccessFailedCount,
-                u.Description
-            }).ToArrayAsync();
-
-
-        var usersWithRoles = new List<object>();
-
-        foreach (var user in users) {
-            var userGameVibes = await _userManager.FindByIdAsync(user!.Id)!;
-            var roles = await _userManager.GetRolesAsync(userGameVibes!);
-
-            usersWithRoles.Add(new {
-                user.Id,
-                user.Email,
-                user.EmailConfirmed,
-                user.UserName,
-                user.ForumRoleName,
-                user.ExperiencePoints,
-                user.PhoneNumber,
-                user.PhoneNumberConfirmed,
-                user.AccessFailedCount,
-                user.Description,
-                roles = roles.ToArray()
-            });
-        }
-
+        var usersWithRoles = await _administrationService.GetAllUsersWithRolesAsync();
         return Ok(usersWithRoles);
     }
 
@@ -152,73 +103,13 @@ public class AdministrationController : ControllerBase {
     [Authorize(Policy = "modOrAdmin")]
     [SwaggerOperation("modOrAdmin")]
     public async Task<IActionResult> UpdateUser(UserGameVibesDTO userDTO) {
-        UserGameVibes? userGameVibes = await _userManager.FindByIdAsync(userDTO.Id);
-        if (userGameVibes == null) {
-            return NotFound();
+        try {
+            var (user, roles) = await _administrationService.UpdateUserAsync(userDTO);
+            return Ok(new { user, roles });
         }
-
-        IList<string> userRoles = await _userManager.GetRolesAsync(userGameVibes);
-
-        if (userDTO.UserName != null)
-            userGameVibes.UserName = userDTO.UserName;
-        if (userDTO.Description != null)
-            userGameVibes.Description = userDTO.Description;
-        if (userDTO.ExperiencePoints != null)
-            userGameVibes.ExperiencePoints = userDTO.ExperiencePoints;
-        if (userDTO.ForumRoleId != null)
-            userGameVibes.ForumRoleId = userDTO.ForumRoleId;
-        if (userDTO.Email != null) {
-            var emailChangeToken = await _userManager.GenerateChangeEmailTokenAsync(userGameVibes, userDTO.Email);
-
-            var changeEmailResult = await _userManager.ChangeEmailAsync(userGameVibes, userDTO.Email, emailChangeToken);
-
-            if (!changeEmailResult.Succeeded) {
-                return BadRequest(changeEmailResult.Errors.ToArray());
-            }
+        catch (Exception ex) {
+            return BadRequest(ex.Message);
         }
-        if (userDTO.Password != null) {
-            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(userGameVibes);
-
-            var resetPasswordResult = await _userManager.ResetPasswordAsync(userGameVibes, resetToken, userDTO.Password);
-
-            if (!resetPasswordResult.Succeeded) {
-                return BadRequest(resetPasswordResult.Errors.ToArray());
-            }
-        }
-        if (string.IsNullOrEmpty(userDTO.PhoneNumber) == false) {
-            await _userManager.SetPhoneNumberAsync(userGameVibes, userDTO.PhoneNumber);
-        }
-        if (userDTO.PhoneNumberConfirmed != null) {
-            userGameVibes.PhoneNumberConfirmed = userDTO.PhoneNumberConfirmed ?? false;
-        }
-
-        if (string.IsNullOrEmpty(userDTO.RoleName) == false) {
-            foreach (string role in userRoles) {
-                await _userManager.RemoveFromRoleAsync(userGameVibes, role);
-            }
-
-            await _userManager.AddToRoleAsync(userGameVibes, userDTO.RoleName!);
-        }
-        if (userDTO.LockoutEnabled != null) {
-            await _userManager.SetLockoutEnabledAsync(userGameVibes, (userDTO.LockoutEnabled != null && userDTO.LockoutEnabled == true));
-        }
-
-        if (userDTO.LockoutEnd != null) {
-            await _userManager.SetLockoutEndDateAsync(userGameVibes, userDTO.LockoutEnd);
-        }
-
-        if (userDTO.AccessFailedCount != null) {
-            userGameVibes.AccessFailedCount = (int)userDTO.AccessFailedCount;
-        }
-
-        await _userManager.UpdateAsync(userGameVibes);
-
-        var currentRoles = await _userManager.GetRolesAsync(userGameVibes);
-
-        return Ok(new {
-            userGameVibes,
-            roles = currentRoles.ToArray()
-        });
     }
 
 
@@ -260,13 +151,11 @@ public class AdministrationController : ControllerBase {
     [Authorize(Policy = "modOrAdmin")]
     [SwaggerOperation("modOrAdmin")]
     public async Task<IActionResult> DeleteReview(int id) {
-        var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == id);
-        if (review == null) {
+        var success = await _administrationService.DeleteReviewAsync(id);
+        if (!success) {
             return NotFound();
         }
 
-        _context.Reviews.Remove(review);
-        await _context.SaveChangesAsync();
         return Ok("removed");
     }
 
@@ -274,13 +163,11 @@ public class AdministrationController : ControllerBase {
     [Authorize(Policy = "modOrAdmin")]
     [SwaggerOperation("modOrAdmin")]
     public async Task<IActionResult> DeletePost(int id) {
-        var post = await _context.ForumPosts.FirstOrDefaultAsync(p => p.Id == id);
-        if (post == null) {
+        var success = await _administrationService.DeletePostAsync(id);
+        if (!success) {
             return NotFound();
         }
 
-        _context.ForumPosts.Remove(post);
-        await _context.SaveChangesAsync();
         return Ok("removed");
     }
 
@@ -306,40 +193,16 @@ public class AdministrationController : ControllerBase {
     [Authorize(Policy = "modOrAdmin")]
     [SwaggerOperation("modOrAdmin")]
     public async Task<IActionResult> GetReportedReviews() {
-        return Ok(await _context.ReportedReviews
-            .Include(r => r.ReporterUser)
-            .Include(r => r.Review)
-            .Where(r => r.IsFinished == false)
-            .Select(r => new {
-                r.Id,
-                r.ReporterUserId,
-                ReporterUserName = r.ReporterUser!.UserName,
-                r.ReviewId,
-                r.Review!.Comment,
-                r.Reason,
-                r.IsFinished
-            })
-            .ToArrayAsync());
+        var reportedReviews = await _administrationService.GetReportedReviewsAsync();
+        return Ok(reportedReviews);
     }
 
     [HttpGet("posts/reported")]
     [Authorize(Policy = "modOrAdmin")]
     [SwaggerOperation("modOrAdmin")]
     public async Task<IActionResult> GetReportedPosts() {
-        return Ok(await _context.ReportedForumPosts
-            .Include(p => p.ReporterUser)
-            .Include(p => p.ForumPost)
-            .Where(r => r.IsFinished == false)
-            .Select(p => new {
-                p.Id,
-                p.ReporterUserId,
-                ReporterUserName = p.ReporterUser!.UserName,
-                p.ForumPostId,
-                p.ForumPost!.Content,
-                p.Reason,
-                p.IsFinished
-            })
-            .ToArrayAsync());
+        var reportedPosts = await _administrationService.GetReportedPostsAsync();
+        return Ok(reportedPosts);
     }
 
     [HttpPost("post/finish")]
@@ -438,70 +301,58 @@ public class AdministrationController : ControllerBase {
     [HttpPost("games/genres")]
     [Authorize("admin")]
     public async Task<IActionResult> AddGameGenre(ValueModel genreModel) {
-        _context.Genres.Add(new Models.Games.Genre { Name = genreModel.Value });
-        await _context.SaveChangesAsync();
+        await _administrationService.AddGameGenreAsync(genreModel);
         return Ok();
     }
 
     [HttpPatch("games/genres/{genreId:int}")]
     [Authorize("admin")]
     public async Task<IActionResult> UpdateGameGenre(int genreId, ValueModel genreModel) {
-        var genre = await _context.Genres.FirstOrDefaultAsync(g => g.Id == genreId);
-        if (genre == null) {
+        var success = await _administrationService.UpdateGameGenreAsync(genreId, genreModel);
+        if (!success) {
             return NotFound();
         }
 
-        genre.Name = genreModel.Value;
-        _context.Genres.Update(genre);
-        await _context.SaveChangesAsync();
         return Ok();
     }
 
     [HttpDelete("games/genres/{genreId:int}")]
     [Authorize("admin")]
     public async Task<IActionResult> RemoveGameGenre(int genreId) {
-        var genre = await _context.Genres.FirstOrDefaultAsync(g => g.Id == genreId);
-        if (genre == null) {
+        var success = await _administrationService.RemoveGameGenreAsync(genreId);
+        if (!success) {
             return NotFound();
         }
 
-        _context.Genres.Remove(genre);
-        await _context.SaveChangesAsync();
         return Ok();
     }
 
     [HttpPost("games/platforms")]
     [Authorize("admin")]
     public async Task<IActionResult> AddGamePlatform(ValueModel platformModel) {
-        _context.Platforms.Add(new Models.Games.Platform { Name = platformModel.Value });
-        await _context.SaveChangesAsync();
+        await _administrationService.AddGamePlatformAsync(platformModel);
         return Ok();
     }
 
     [HttpPatch("games/platforms/{platformId:int}")]
     [Authorize("admin")]
     public async Task<IActionResult> UpdateGamePlatform(int platformId, ValueModel platformModel) {
-        var platform = await _context.Platforms.FirstOrDefaultAsync(g => g.Id == platformId);
-        if (platform == null) {
+        var success = await _administrationService.UpdateGamePlatformAsync(platformId, platformModel);
+        if (!success) {
             return NotFound();
         }
 
-        platform.Name = platformModel.Value;
-        _context.Platforms.Update(platform);
-        await _context.SaveChangesAsync();
         return Ok();
     }
 
     [HttpDelete("games/platforms/{platformId:int}")]
     [Authorize("admin")]
     public async Task<IActionResult> RemoveGamePlatform(int platformId) {
-        var platform = await _context.Platforms.FirstOrDefaultAsync(g => g.Id == platformId);
-        if (platform == null) {
+        var success = await _administrationService.RemoveGamePlatformAsync(platformId);
+        if (!success) {
             return NotFound();
         }
 
-        _context.Platforms.Remove(platform);
-        await _context.SaveChangesAsync();
         return Ok();
     }
 }
