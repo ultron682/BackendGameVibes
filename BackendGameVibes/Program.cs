@@ -22,7 +22,6 @@ public class Program {
     private static async Task Main(string[] args) {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Services to the container
         builder.Services.AddCors(options => {
             options.AddDefaultPolicy(
                 builder => {
@@ -32,19 +31,7 @@ public class Program {
                 });
         });
 
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(c => {
-            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
-                In = ParameterLocation.Header,
-                Description = "Please enter token",
-                Name = "Authorization",
-                Type = SecuritySchemeType.Http,
-                BearerFormat = "JWT",
-                Scheme = "bearer"
-            });
-            c.OperationFilter<AuthorizeCheckOperationFilter>();
-            c.EnableAnnotations();
-        });
+        SetupSwagger(builder);
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseMySql(
@@ -64,23 +51,7 @@ public class Program {
 
         builder.Services.AddMemoryCache();
 
-        builder.Services.Configure<IdentityOptions>(options => {
-            // Password settings.
-            options.Password.RequireDigit = true;
-            options.Password.RequireLowercase = true;
-            options.Password.RequireNonAlphanumeric = true;
-            options.Password.RequireUppercase = true;
-            options.Password.RequiredLength = 6;
-
-            // Lockout settings.
-            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-            options.Lockout.MaxFailedAccessAttempts = 5;
-            options.Lockout.AllowedForNewUsers = true;
-
-            // User settings.
-            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._";
-            options.User.RequireUniqueEmail = true;
-        });
+        SetupIdentityOptions(builder);
 
         builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
         builder.Services.Configure<ExperiencePointsSettings>(builder.Configuration.GetSection("ExperiencePointsSettings"));
@@ -94,24 +65,7 @@ public class Program {
 
         builder.Services.AddHostedService<BackgroundServiceRefreshSteamData>();
 
-        builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
-        builder.Services.AddSingleton<HtmlTemplateService>();
-        builder.Services.AddSingleton<ISteamService, SteamService>();
-
-        builder.Services.AddScoped<IAccountService, AccountService>();
-        builder.Services.AddScoped<IReviewService, ReviewService>();
-        builder.Services.AddScoped<IGameService, GameService>();
-        builder.Services.AddScoped<IRoleService, RoleService>();
-        builder.Services.AddScoped<IForumRoleService, ForumRoleService>();
-        builder.Services.AddScoped<IForumThreadService, ForumThreadService>();
-        builder.Services.AddScoped<IForumPostService, ForumPostService>();
-        builder.Services.AddScoped<IAdministrationService, AdministrationService>();
-        builder.Services.AddScoped<IActionCodesService, ActionCodesService>();
-
-        builder.Services.AddTransient<IForumExperienceService, ForumExperienceService>();
-        builder.Services.AddTransient<MailService>();
-
-        builder.Services.AddHttpClient();
+        SetupServices(builder);
 
         builder.Services.AddHealthChecks()
             .AddCheck<GameVibesHealthDbCheck>("game_vibes_db_health", tags: ["db"])
@@ -162,5 +116,62 @@ public class Program {
         }
 
         app.Run();
+    }
+
+    private static void SetupSwagger(WebApplicationBuilder builder) {
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(c => {
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
+                In = ParameterLocation.Header,
+                Description = "Please enter token",
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                BearerFormat = "JWT",
+                Scheme = "bearer"
+            });
+            c.OperationFilter<AuthorizeCheckOperationFilter>();
+            c.EnableAnnotations();
+        });
+    }
+
+    private static void SetupIdentityOptions(WebApplicationBuilder builder) {
+        builder.Services.Configure<IdentityOptions>(options => {
+            // Password settings.
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequiredLength = 6;
+
+            // Lockout settings.
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+            options.Lockout.MaxFailedAccessAttempts = 5;
+            options.Lockout.AllowedForNewUsers = true;
+
+            // User settings.
+            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._";
+            options.User.RequireUniqueEmail = true;
+        });
+    }
+
+    private static void SetupServices(WebApplicationBuilder builder) {
+        builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
+        builder.Services.AddSingleton<HtmlTemplateService>();
+        builder.Services.AddSingleton<ISteamService, SteamService>();
+
+        builder.Services.AddScoped<IAccountService, AccountService>();
+        builder.Services.AddScoped<IReviewService, ReviewService>();
+        builder.Services.AddScoped<IGameService, GameService>();
+        builder.Services.AddScoped<IRoleService, RoleService>();
+        builder.Services.AddScoped<IForumRoleService, ForumRoleService>();
+        builder.Services.AddScoped<IForumThreadService, ForumThreadService>();
+        builder.Services.AddScoped<IForumPostService, ForumPostService>();
+        builder.Services.AddScoped<IAdministrationService, AdministrationService>();
+        builder.Services.AddScoped<IActionCodesService, ActionCodesService>();
+
+        builder.Services.AddTransient<IForumExperienceService, ForumExperienceService>();
+        builder.Services.AddTransient<MailService>();
+
+        builder.Services.AddHttpClient();
     }
 }

@@ -11,16 +11,15 @@ namespace BackendGameVibes.Controllers {
         private readonly IGameService _gameService;
         private readonly IReviewService _reviewService;
         private readonly IForumThreadService _forumThreadService;
-        private readonly IMapper _mapper;
         private readonly IMemoryCache _cache;
 
 
-        public LandingController(IMemoryCache cache, IGameService gameService, IReviewService reviewService, IForumThreadService forumThreadService, IMapper mapper) {
+        public LandingController(IMemoryCache cache, IGameService gameService,
+            IReviewService reviewService, IForumThreadService forumThreadService) {
             _cache = cache;
             _gameService = gameService;
             _reviewService = reviewService;
             _forumThreadService = forumThreadService;
-            _mapper = mapper;
         }
 
         [HttpGet]

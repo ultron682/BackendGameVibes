@@ -8,448 +8,445 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
 using BackendGameVibes.Models;
-using BackendGameVibes.Models.User;
-using Microsoft.AspNetCore.Identity;
 using BackendGameVibes.Models.DTOs.Responses;
 
 
-namespace BackendGameVibes.Controllers {
-    [ApiController]
-    [Route("account")]
-    public class AccountController : ControllerBase {
-        private readonly IAccountService _accountService;
+namespace BackendGameVibes.Controllers;
 
-        public AccountController(IAccountService accountService) {
-            _accountService = accountService;
-        }
 
-        [AllowAnonymous]
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDTO model) {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+[ApiController]
+[Route("account")]
+public class AccountController : ControllerBase {
+    private readonly IAccountService _accountService;
 
-            var result = await _accountService.RegisterUserAsync(model);
+    public AccountController(IAccountService accountService) {
+        _accountService = accountService;
+    }
 
-            if (result.Succeeded) {
-                var user = await _accountService.GetUserByEmailAsync(model.Email);
-                if (user != null) {
-                    await _accountService.SendConfirmationEmailAsync(model.Email, user!);
-                    return Ok("UserRegisteredSuccessfully");
-                }
-                else {
-                    return Ok("UserRegisteredFailed user not created");
-                }
-            }
-
-            foreach (var error in result.Errors) {
-                return error.Code switch {
-                    "DuplicateUserName" => StatusCode(450, "Username already taken"),
-                    "DuplicateEmail" => StatusCode(452, "Email already taken"),
-                    _ => StatusCode(454, error.Code)
-                };
-            }
-
+    [AllowAnonymous]
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterDTO model) {
+        if (!ModelState.IsValid)
             return BadRequest(ModelState);
-        }
 
-        [AllowAnonymous]
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDTO model) {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+        var result = await _accountService.RegisterUserAsync(model);
 
+        if (result.Succeeded) {
             var user = await _accountService.GetUserByEmailAsync(model.Email);
-
             if (user != null) {
-                if (!user.EmailConfirmed) {
-                    return StatusCode(470, "Email unconfirmed");
-                }
-
-                var loginResult = await _accountService.LoginUserAsync(user, model.Password);
-                if (loginResult != null && loginResult.Succeeded) {
-                    (string accessToken, string[] userRoles) = await _accountService.GenerateJwtTokenAsync(user);
-
-                    return Ok(new LoginResponse() { AccessToken = accessToken, UserRoles = userRoles });
-                }
-                else if (loginResult!.IsLockedOut) {
-                    var timeToEndLockout = user.LockoutEnd!.Value.Subtract(DateTime.Now);
-
-                    await _accountService.SendLockedOutAccountEmailAsync(model.Email, user!);
-                    return StatusCode(471, timeToEndLockout.TotalMinutes);
-                }
-            }
-
-            return Unauthorized("Invalid login attempt");
-        }
-
-        [HttpGet("basic")]
-        [Authorize]
-        [SwaggerOperation("Zwraca podstawowe informacje o uzytkowniku")]
-        public async Task<IActionResult> GetBasicAccountInfo() {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User not authenticated, claim not found");
-
-            var accountInfo = await _accountService.GetBasicAccountInfoAsync(userId);
-            if (accountInfo != null)
-                return Ok(accountInfo);
-            else
-                return BadRequest("User not found");
-        }
-
-        [HttpGet("detailed")]
-        [Authorize]
-        [SwaggerOperation("Zwraca wszystkie powiązane dane o uzytkowniku")]
-        public async Task<IActionResult> GetDetailedAccountInfo() {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User not authenticated, claim not found");
-
-            var accountInfo = await _accountService.GetDetailedAccountInfoAsync(userId);
-            if (accountInfo != null)
-                return Ok(accountInfo);
-            else
-                return BadRequest("User not found");
-        }
-
-        [HttpPatch("change-username")]
-        [Authorize]
-        [SwaggerOperation("Require authorization")]
-        public async Task<IActionResult> ChangeNickname([FromBody] ValueModel valueModel) {
-            string newUsername = valueModel.Value!;
-            if (string.IsNullOrWhiteSpace(newUsername))
-                return BadRequest("Invalid username");
-
-            var email = User.FindFirstValue(ClaimTypes.Email);
-            if (email == null)
-                return Unauthorized("User not authenticated");
-
-            var user = await _accountService.GetUserByEmailAsync(email);
-            if (user == null)
-                return NotFound("User not found");
-
-            var isUpdated = await _accountService.UpdateUserNameAsync(user.Id, newUsername);
-            return isUpdated ? Ok() : BadRequest("Failed to update username");
-        }
-
-        [HttpPost("change-password")]
-        [Authorize]
-        [SwaggerOperation("Require authorization")]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO model) {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            if (model.NewPassword != model.ConfirmNewPassword)
-                return BadRequest("New password and confirmation do not match");
-
-            //Console.WriteLine(JsonDocument.Parse(User).ToString());
-
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return NotFound("User not found");
-
-            var (succeeded, errors) = await _accountService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
-
-            if (!succeeded) {
-                return BadRequest(new { Errors = errors });
-            }
-
-            return Ok("Password changed successfully");
-        }
-
-        [HttpPost("change-profile-picture")]
-        [Authorize]
-        public async Task<IActionResult> UpdateProfilePicture(IFormFile profilePicture) {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User not authenticated");
-
-            if (profilePicture == null || profilePicture.Length == 0)
-                return BadRequest("InvalidProfilePicture");
-
-            if (profilePicture.FileName.EndsWith("png") || profilePicture.FileName.EndsWith("jpg")) {
-                using (var ms = new MemoryStream()) {
-                    await profilePicture.CopyToAsync(ms);
-                    var imageData = ms.ToArray();
-
-                    bool isSuccess = await _accountService.UpdateProfilePictureAsync(userId, imageData);
-                    return isSuccess ? Ok("ProfilePictureUpdated") : BadRequest("FailedToUpdateProfilePicture");
-                }
+                await _accountService.SendConfirmationEmailAsync(model.Email, user!);
+                return Ok("UserRegisteredSuccessfully");
             }
             else {
-                return BadRequest("InvalidProfilePictureType");
+                return Ok("UserRegisteredFailed user not created");
             }
         }
 
-        [HttpPost("change-profile-desc")]
-        [Authorize]
-        public async Task<IActionResult> UpdateProfileDescription([FromBody] ValueModel valueModel) {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User not authenticated");
-
-            if (string.IsNullOrWhiteSpace(valueModel.Value))
-                return BadRequest("InvalidNewDescription");
-
-            var result = await _accountService.UpdateProfileDescriptionAsync(userId, valueModel.Value);
-            return result ? Ok("ProfileDescriptionUpdated") : BadRequest("FailedToUpdateProfileDescription");
-
+        foreach (var error in result.Errors) {
+            return error.Code switch {
+                "DuplicateUserName" => StatusCode(450, "Username already taken"),
+                "DuplicateEmail" => StatusCode(452, "Email already taken"),
+                _ => StatusCode(454, error.Code)
+            };
         }
 
-        [HttpPost("send-confirmation-email")]
-        [AllowAnonymous]
-        public async Task<IActionResult> SendConfirmationEmail([FromForm] string email) {
-            var user = await _accountService.GetUserByEmailAsync(email);
-            if (user == null)
-                return NotFound("User not found");
+        return BadRequest(ModelState);
+    }
 
-            var isSent = await _accountService.SendConfirmationEmailAsync(email, user);
-            return isSent ? Ok("Mail sent") : BadRequest("Failed to send confirmation email");
-        }
+    [AllowAnonymous]
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginDTO model) {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
-        [HttpGet("confirm")]
-        [AllowAnonymous]
-        public async Task<IActionResult> ConfirmEmail(string userId, string token) {
-            if (token == null) {
-                return BadRequest("token == null");
+        var user = await _accountService.GetUserByEmailAsync(model.Email);
+
+        if (user != null) {
+            if (!user.EmailConfirmed) {
+                return StatusCode(470, "Email unconfirmed");
             }
 
-            var user = await _accountService.GetUserByIdAsync(userId);
-            if (user == null) {
-                return NotFound("Not found user");
+            var loginResult = await _accountService.LoginUserAsync(user, model.Password);
+            if (loginResult != null && loginResult.Succeeded) {
+                (string accessToken, string[] userRoles) = await _accountService.GenerateJwtTokenAsync(user);
+
+                return Ok(new LoginResponse() { AccessToken = accessToken, UserRoles = userRoles });
             }
+            else if (loginResult!.IsLockedOut) {
+                var timeToEndLockout = user.LockoutEnd!.Value.Subtract(DateTime.Now);
 
-            var result = await _accountService.ConfirmEmailAsync(userId, token);
-
-            if (result.Succeeded) {
-                return Redirect("http://localhost:3000/account/confirmedEmail/");
-            }
-            else {
-                foreach (var error in result.Errors) {
-                    Console.WriteLine(error.Description);
-                }
-
-                return BadRequest("Error");
+                await _accountService.SendLockedOutAccountEmailAsync(model.Email, user!);
+                return StatusCode(471, timeToEndLockout.TotalMinutes);
             }
         }
 
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("reset-password")]
-        public async Task<IActionResult> StartResetPassword([FromBody] ValueModel valueModel) {
-            var email = valueModel.Value!;
-            var (success, message) = await _accountService.StartResetPasswordAsync(email);
-            return success ? Ok("Reset password email sent") : BadRequest(message);
+        return Unauthorized("Invalid login attempt");
+    }
+
+    [HttpGet("basic")]
+    [Authorize]
+    [SwaggerOperation("Zwraca podstawowe informacje o uzytkowniku")]
+    public async Task<IActionResult> GetBasicAccountInfo() {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            return Unauthorized("User not authenticated, claim not found");
+
+        var accountInfo = await _accountService.GetBasicAccountInfoAsync(userId);
+        if (accountInfo != null)
+            return Ok(accountInfo);
+        else
+            return BadRequest("User not found");
+    }
+
+    [HttpGet("detailed")]
+    [Authorize]
+    [SwaggerOperation("Zwraca wszystkie powiązane dane o uzytkowniku")]
+    public async Task<IActionResult> GetDetailedAccountInfo() {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            return Unauthorized("User not authenticated, claim not found");
+
+        var accountInfo = await _accountService.GetDetailedAccountInfoAsync(userId);
+        if (accountInfo != null)
+            return Ok(accountInfo);
+        else
+            return BadRequest("User not found");
+    }
+
+    [HttpPatch("change-username")]
+    [Authorize]
+    [SwaggerOperation("Require authorization")]
+    public async Task<IActionResult> ChangeNickname([FromBody] ValueModel valueModel) {
+        string newUsername = valueModel.Value!;
+        if (string.IsNullOrWhiteSpace(newUsername))
+            return BadRequest("Invalid username");
+
+        var email = User.FindFirstValue(ClaimTypes.Email);
+        if (email == null)
+            return Unauthorized("User not authenticated");
+
+        var user = await _accountService.GetUserByEmailAsync(email);
+        if (user == null)
+            return NotFound("User not found");
+
+        var isUpdated = await _accountService.UpdateUserNameAsync(user.Id, newUsername);
+        return isUpdated ? Ok() : BadRequest("Failed to update username");
+    }
+
+    [HttpPost("change-password")]
+    [Authorize]
+    [SwaggerOperation("Require authorization")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO model) {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        if (model.NewPassword != model.ConfirmNewPassword)
+            return BadRequest("New password and confirmation do not match");
+
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            return NotFound("User not found");
+
+        var (succeeded, errors) = await _accountService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
+
+        if (!succeeded) {
+            return BadRequest(new { Errors = errors });
         }
 
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("confirm-reset-password")]
-        public async Task<IActionResult> ConfirmResetPassword(string email, string token, string newPassword) {
-            var result = await _accountService.ConfirmResetPasswordAsync(email, token, newPassword);
-            return result.Succeeded ? Ok("Password reset successfully") : BadRequest("Failed to reset password");
-        }
+        return Ok("Password changed successfully");
+    }
 
-        [HttpGet("user/{userId}")]
-        [AllowAnonymous]
-        [SwaggerOperation("publiczne dane o profilu gracza")]
-        public async Task<ActionResult<object>> GetUserAsync(string userId) {
-            var user = await _accountService.GetUserByIdAsync(userId);
-            if (user == null) {
-                return NotFound();
-            }
-            else {
-                var accountInfo = await _accountService.GetPublicAccountInfoAsync(user.Id);
-                return Ok(accountInfo);
-            }
-        }
+    [HttpPost("change-profile-picture")]
+    [Authorize]
+    public async Task<IActionResult> UpdateProfilePicture(IFormFile profilePicture) {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            return Unauthorized("User not authenticated");
 
-        [HttpGet("user/search:nick")]
-        [SwaggerOperation("Require authorization >=user. Wyszukiwanie mozliwych uzytkownikow do dodania znajomych po nicku, (bez modów i adminów)")]
-        [Authorize]
-        public async Task<ActionResult<object>> SearchUserAsync(string nick) {
-            string myNickname = User.Identity!.Name!;
-            string myUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        if (profilePicture == null || profilePicture.Length == 0)
+            return BadRequest("InvalidProfilePicture");
 
-            var users = await _accountService.FindUsersNickAndIdsByNickname(myUserId, myNickname, nick);
-            if (users == null) {
-                return NotFound();
-            }
-            else {
-                return Ok(users);
-            }
-        }
+        if (profilePicture.FileName.EndsWith("png") || profilePicture.FileName.EndsWith("jpg")) {
+            using (var ms = new MemoryStream()) {
+                await profilePicture.CopyToAsync(ms);
+                var imageData = ms.ToArray();
 
-        [HttpGet]
-        [Authorize]
-        [Route("user/friends")]
-        [SwaggerOperation("Require authorization >=user. Zwraca liste znajomych uzytkownika")]
-        public async Task<ActionResult<object>> GetAllFriendsOfUser() {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User not authenticated, claim not found");
-
-            var friends = await _accountService.GetAllFriendsOfUser(userId);
-            return Ok(friends);
-        }
-
-        [HttpGet]
-        [Authorize]
-        [Route("user/friend-requests")]
-        [SwaggerOperation("Require authorization >=user. Zwraca liste zaproszen do znajomych")]
-        public async Task<ActionResult<object>> GetFriendRequests() {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User not authenticated, claim not found");
-
-            var friendRequests = await _accountService.GetFriendRequestsForUser(userId);
-            return Ok(friendRequests);
-        }
-
-        [HttpPost("user/send-friend-request:{receiverUserId}")]
-        [Authorize]
-        [SwaggerOperation("autoryzowany uzytkownik wysyla zaproszenie. 200 - wyslano, 201 - zaproszenie wyslane wczesniej i oczekuje na odpowiedz, 202 - Juz sa znajomymi")]
-        public async Task<IActionResult> SendFriendRequestAsync(string receiverUserId) {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User not authenticated, claim not found");
-
-            (bool success, bool? isExistingFriend, FriendRequest? friendRequest) = await _accountService.SendFriendRequestAsync(userId, receiverUserId);
-            if (success && isExistingFriend == false)
-                return StatusCode(200, "Zaproszenie wysłane");
-            else if (success == false && isExistingFriend == false && friendRequest != null && friendRequest!.IsAccepted == null)
-                return StatusCode(201, "Zaproszenie pomiedzy uzytkonwikami wyslane juz wczesniej. nie sa aktualnie znajomymi");
-            else if (success == false && isExistingFriend == true)
-                return StatusCode(202, "Juz sa znajomymi");
-            else if (success == false && friendRequest != null && friendRequest!.IsAccepted == false)
-                return StatusCode(203, "Zaproszony znajomy odrzucil zaproszenie. uwaga: uzytkownik nadal moze zaakceptowac zaproszenie");
-            else
-                return BadRequest("error");
-        }
-
-        [HttpPost("user/confirm-friend-request:{receiverUserId}")]
-        [SwaggerOperation("autoryzowany uzytkownik akceptuje zaproszenie")]
-        [Authorize]
-        public async Task<IActionResult> ConfirmFriendRequestAsync(string receiverUserId) {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User not authenticated, claim not found");
-
-            bool success = await _accountService.ConfirmFriendRequestAsync(userId, receiverUserId);
-            if (success)
-                return Ok("Zaproszenie zaakceptowane");
-            else
-                return BadRequest("Brak aktualnego zaproszenia");
-        }
-
-        [HttpPost("user/revoke-friend-request:{receiverUserId}")]
-        [SwaggerOperation("autoryzowany uzytkownik odrzuca zaproszenie")]
-        [Authorize]
-        public async Task<IActionResult> RevokeFriendRequestAsync(string receiverUserId) {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User not authenticated, claim not found");
-
-            bool success = await _accountService.RevokeFriendRequestAsync(userId, receiverUserId);
-            if (success)
-                return Ok("Zaproszenie odrzucone");
-            else
-                return BadRequest("Brak aktualnego zaproszenia");
-        }
-
-        [HttpDelete("user/remove-friend:{friendId}")]
-        [SwaggerOperation("autoryzowany uzytkownik usuwa znajomego")]
-        [Authorize]
-        public async Task<IActionResult> RemoveFriendAsync(string friendId) {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User not authenticated, claim not found");
-
-            bool success = await _accountService.RemoveFriendAsync(userId, friendId);
-            if (success)
-                return Ok("Usunięto znajomego");
-            else
-                return BadRequest("Brak znajomego");
-        }
-
-        [HttpGet("user/picture/{userId}")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetUserProfilePicture(string userId) {
-            var userProfilePicture = await _accountService.GetUserProfilePicture(userId);
-            if (userProfilePicture == null)
-                return NotFound("User not found");
-
-            return Ok(userProfilePicture);
-        }
-
-        [HttpPost("send-close-account-request")]
-        [Authorize]
-        [SwaggerResponse(200, "git")]
-        [SwaggerResponse(400, "already sent and valid for <1 hour")]
-        [SwaggerResponse(401, "not authenticated")]
-        [SwaggerResponse(404, "no user")]
-        public async Task<IActionResult> SendCloseAccountRequest() {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User not authenticated, claim not found");
-
-            (ActionCode? actionCode, bool isAlreadyExistValidExpiryDate) = await _accountService.SendCloseAccountRequestAsync(userId);
-            if (isAlreadyExistValidExpiryDate == false && actionCode != null)
-                return Ok(actionCode);
-            else if (isAlreadyExistValidExpiryDate && actionCode != null)
-                return BadRequest("Already sent and valid for <1 hour");
-            else {
-                return NotFound();
+                bool isSuccess = await _accountService.UpdateProfilePictureAsync(userId, imageData);
+                return isSuccess ? Ok("ProfilePictureUpdated") : BadRequest("FailedToUpdateProfilePicture");
             }
         }
+        else {
+            return BadRequest("InvalidProfilePictureType");
+        }
+    }
 
-        [HttpPost("confirm-close-account-request")]
-        [Authorize]
-        [SwaggerResponse(200, "account deleted")]
-        [SwaggerResponse(400, "invalid code or user doesnt already exist")]
-        public async Task<IActionResult> ConfirmCloseAccountRequest([Required] ValueModel confirmationCode) {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User not authenticated, claim not found");
+    [HttpPost("change-profile-desc")]
+    [Authorize]
+    public async Task<IActionResult> UpdateProfileDescription([FromBody] ValueModel valueModel) {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            return Unauthorized("User not authenticated");
 
-            bool isSuccess = await _accountService.ConfirmCloseAccountRequest(userId, confirmationCode.Value!);
-            if (isSuccess)
-                return Ok();
-            else
-                return BadRequest("Invalid code or user doesnt already exist");
+        if (string.IsNullOrWhiteSpace(valueModel.Value))
+            return BadRequest("InvalidNewDescription");
+
+        var result = await _accountService.UpdateProfileDescriptionAsync(userId, valueModel.Value);
+        return result ? Ok("ProfileDescriptionUpdated") : BadRequest("FailedToUpdateProfileDescription");
+
+    }
+
+    [HttpPost("send-confirmation-email")]
+    [AllowAnonymous]
+    public async Task<IActionResult> SendConfirmationEmail([FromForm] string email) {
+        var user = await _accountService.GetUserByEmailAsync(email);
+        if (user == null)
+            return NotFound("User not found");
+
+        var isSent = await _accountService.SendConfirmationEmailAsync(email, user);
+        return isSent ? Ok("Mail sent") : BadRequest("Failed to send confirmation email");
+    }
+
+    [HttpGet("confirm")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ConfirmEmail(string userId, string token) {
+        if (token == null) {
+            return BadRequest("token == null");
         }
 
-        [HttpPost("follow/{gameId}")]
-        [Authorize]
-        [SwaggerResponse(200, "game added or already to followed game")]
-        [SwaggerResponse(404, "no game exist or user doesnt exist")]
-        public async Task<IActionResult> FollowGame([Required] int gameId) {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User not authenticated, claim not found");
-
-            bool isSuccess = await _accountService.FollowGameAsync(userId, gameId);
-            if (isSuccess)
-                return Ok();
-            else
-                return NotFound("No game exist or user doesnt exist");
+        var user = await _accountService.GetUserByIdAsync(userId);
+        if (user == null) {
+            return NotFound("Not found user");
         }
 
-        [HttpPost("unfollow/{gameId}")]
-        [Authorize]
-        [SwaggerResponse(200, "game unfollowed or already unfollowed game")]
-        [SwaggerResponse(404, "no game exist or user doesnt exist")]
-        public async Task<IActionResult> UnfollowGame([Required] int gameId) {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-                return Unauthorized("User not authenticated, claim not found");
+        var result = await _accountService.ConfirmEmailAsync(userId, token);
 
-            bool isSuccess = await _accountService.UnfollowGameAsync(userId, gameId);
-            if (isSuccess)
-                return Ok();
-            else
-                return NotFound("No game exist or user doesnt exist");
+        if (result.Succeeded) {
+            return Redirect("http://localhost:3000/account/confirmedEmail/");
         }
+        else {
+            foreach (var error in result.Errors) {
+                Console.WriteLine(error.Description);
+            }
+
+            return BadRequest("Error");
+        }
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    [Route("reset-password")]
+    public async Task<IActionResult> StartResetPassword([FromBody] ValueModel valueModel) {
+        var email = valueModel.Value!;
+        var (success, message) = await _accountService.StartResetPasswordAsync(email);
+        return success ? Ok("Reset password email sent") : BadRequest(message);
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    [Route("confirm-reset-password")]
+    public async Task<IActionResult> ConfirmResetPassword(string email, string token, string newPassword) {
+        var result = await _accountService.ConfirmResetPasswordAsync(email, token, newPassword);
+        return result.Succeeded ? Ok("Password reset successfully") : BadRequest("Failed to reset password");
+    }
+
+    [HttpGet("user/{userId}")]
+    [AllowAnonymous]
+    [SwaggerOperation("publiczne dane o profilu gracza")]
+    public async Task<ActionResult<object>> GetUserAsync(string userId) {
+        var user = await _accountService.GetUserByIdAsync(userId);
+        if (user == null) {
+            return NotFound();
+        }
+        else {
+            var accountInfo = await _accountService.GetPublicAccountInfoAsync(user.Id);
+            return Ok(accountInfo);
+        }
+    }
+
+    [HttpGet("user/search:nick")]
+    [SwaggerOperation("Require authorization >=user. Wyszukiwanie mozliwych uzytkownikow do dodania znajomych po nicku, (bez modów i adminów)")]
+    [Authorize]
+    public async Task<ActionResult<object>> SearchUserAsync(string nick) {
+        string myNickname = User.Identity!.Name!;
+        string myUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+        var users = await _accountService.FindUsersNickAndIdsByNickname(myUserId, myNickname, nick);
+        if (users == null) {
+            return NotFound();
+        }
+        else {
+            return Ok(users);
+        }
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("user/friends")]
+    [SwaggerOperation("Require authorization >=user. Zwraca liste znajomych uzytkownika")]
+    public async Task<ActionResult<object>> GetAllFriendsOfUser() {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            return Unauthorized("User not authenticated, claim not found");
+
+        var friends = await _accountService.GetAllFriendsOfUser(userId);
+        return Ok(friends);
+    }
+
+    [HttpGet]
+    [Authorize]
+    [Route("user/friend-requests")]
+    [SwaggerOperation("Require authorization >=user. Zwraca liste zaproszen do znajomych")]
+    public async Task<ActionResult<object>> GetFriendRequests() {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            return Unauthorized("User not authenticated, claim not found");
+
+        var friendRequests = await _accountService.GetFriendRequestsForUser(userId);
+        return Ok(friendRequests);
+    }
+
+    [HttpPost("user/send-friend-request:{receiverUserId}")]
+    [Authorize]
+    [SwaggerOperation("autoryzowany uzytkownik wysyla zaproszenie. 200 - wyslano, 201 - zaproszenie wyslane wczesniej i oczekuje na odpowiedz, 202 - Juz sa znajomymi")]
+    public async Task<IActionResult> SendFriendRequestAsync(string receiverUserId) {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            return Unauthorized("User not authenticated, claim not found");
+
+        (bool success, bool? isExistingFriend, FriendRequest? friendRequest) = await _accountService.SendFriendRequestAsync(userId, receiverUserId);
+        if (success && isExistingFriend == false)
+            return StatusCode(200, "Zaproszenie wysłane");
+        else if (success == false && isExistingFriend == false && friendRequest != null && friendRequest!.IsAccepted == null)
+            return StatusCode(201, "Zaproszenie pomiedzy uzytkonwikami wyslane juz wczesniej. nie sa aktualnie znajomymi");
+        else if (success == false && isExistingFriend == true)
+            return StatusCode(202, "Juz sa znajomymi");
+        else if (success == false && friendRequest != null && friendRequest!.IsAccepted == false)
+            return StatusCode(203, "Zaproszony znajomy odrzucil zaproszenie. uwaga: uzytkownik nadal moze zaakceptowac zaproszenie");
+        else
+            return BadRequest("error");
+    }
+
+    [HttpPost("user/confirm-friend-request:{receiverUserId}")]
+    [SwaggerOperation("autoryzowany uzytkownik akceptuje zaproszenie")]
+    [Authorize]
+    public async Task<IActionResult> ConfirmFriendRequestAsync(string receiverUserId) {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            return Unauthorized("User not authenticated, claim not found");
+
+        bool success = await _accountService.ConfirmFriendRequestAsync(userId, receiverUserId);
+        if (success)
+            return Ok("Zaproszenie zaakceptowane");
+        else
+            return BadRequest("Brak aktualnego zaproszenia");
+    }
+
+    [HttpPost("user/revoke-friend-request:{receiverUserId}")]
+    [SwaggerOperation("autoryzowany uzytkownik odrzuca zaproszenie")]
+    [Authorize]
+    public async Task<IActionResult> RevokeFriendRequestAsync(string receiverUserId) {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            return Unauthorized("User not authenticated, claim not found");
+
+        bool success = await _accountService.RevokeFriendRequestAsync(userId, receiverUserId);
+        if (success)
+            return Ok("Zaproszenie odrzucone");
+        else
+            return BadRequest("Brak aktualnego zaproszenia");
+    }
+
+    [HttpDelete("user/remove-friend:{friendId}")]
+    [SwaggerOperation("autoryzowany uzytkownik usuwa znajomego")]
+    [Authorize]
+    public async Task<IActionResult> RemoveFriendAsync(string friendId) {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            return Unauthorized("User not authenticated, claim not found");
+
+        bool success = await _accountService.RemoveFriendAsync(userId, friendId);
+        if (success)
+            return Ok("Usunięto znajomego");
+        else
+            return BadRequest("Brak znajomego");
+    }
+
+    [HttpGet("user/picture/{userId}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetUserProfilePicture(string userId) {
+        var userProfilePicture = await _accountService.GetUserProfilePicture(userId);
+        if (userProfilePicture == null)
+            return NotFound("User not found");
+
+        return Ok(userProfilePicture);
+    }
+
+    [HttpPost("send-close-account-request")]
+    [Authorize]
+    [SwaggerResponse(200, "git")]
+    [SwaggerResponse(400, "already sent and valid for <1 hour")]
+    [SwaggerResponse(401, "not authenticated")]
+    [SwaggerResponse(404, "no user")]
+    public async Task<IActionResult> SendCloseAccountRequest() {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            return Unauthorized("User not authenticated, claim not found");
+
+        (ActionCode? actionCode, bool isAlreadyExistValidExpiryDate) = await _accountService.SendCloseAccountRequestAsync(userId);
+        if (isAlreadyExistValidExpiryDate == false && actionCode != null)
+            return Ok(actionCode);
+        else if (isAlreadyExistValidExpiryDate && actionCode != null)
+            return BadRequest("Already sent and valid for <1 hour");
+        else {
+            return NotFound();
+        }
+    }
+
+    [HttpPost("confirm-close-account-request")]
+    [Authorize]
+    [SwaggerResponse(200, "account deleted")]
+    [SwaggerResponse(400, "invalid code or user doesnt already exist")]
+    public async Task<IActionResult> ConfirmCloseAccountRequest([Required] ValueModel confirmationCode) {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            return Unauthorized("User not authenticated, claim not found");
+
+        bool isSuccess = await _accountService.ConfirmCloseAccountRequest(userId, confirmationCode.Value!);
+        if (isSuccess)
+            return Ok();
+        else
+            return BadRequest("Invalid code or user doesnt already exist");
+    }
+
+    [HttpPost("follow/{gameId}")]
+    [Authorize]
+    [SwaggerResponse(200, "game added or already to followed game")]
+    [SwaggerResponse(404, "no game exist or user doesnt exist")]
+    public async Task<IActionResult> FollowGame([Required] int gameId) {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            return Unauthorized("User not authenticated, claim not found");
+
+        bool isSuccess = await _accountService.FollowGameAsync(userId, gameId);
+        if (isSuccess)
+            return Ok();
+        else
+            return NotFound("No game exist or user doesnt exist");
+    }
+
+    [HttpPost("unfollow/{gameId}")]
+    [Authorize]
+    [SwaggerResponse(200, "game unfollowed or already unfollowed game")]
+    [SwaggerResponse(404, "no game exist or user doesnt exist")]
+    public async Task<IActionResult> UnfollowGame([Required] int gameId) {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null)
+            return Unauthorized("User not authenticated, claim not found");
+
+        bool isSuccess = await _accountService.UnfollowGameAsync(userId, gameId);
+        if (isSuccess)
+            return Ok();
+        else
+            return NotFound("No game exist or user doesnt exist");
     }
 }

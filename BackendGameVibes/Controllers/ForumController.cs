@@ -201,8 +201,7 @@ public class ForumController : ControllerBase {
     }
 
     [HttpGet("threads/search-phrase")]
-    public async Task<ActionResult> SearchThreadsByPhrase([Required, MinLength(3)] string phrase, int pageNumber = 1, int resultSize = 10)
-    {
+    public async Task<ActionResult> SearchThreadsByPhrase([Required, MinLength(3)] string phrase, int pageNumber = 1, int resultSize = 10) {
         phrase = phrase.ToLower();
 
         var threads = await _threadService.GetThreadsByPhraseAsync(phrase, pageNumber, resultSize);
@@ -211,8 +210,7 @@ public class ForumController : ControllerBase {
     }
 
     [HttpGet("posts/search-phrase")]
-    public async Task<ActionResult> SearchPostsByPhrase([Required, MinLength(3)] string phrase, string? userAccessToken = null, int pageNumber = 1, int resultSize = 10)
-    {
+    public async Task<ActionResult> SearchPostsByPhrase([Required, MinLength(3)] string phrase, string? userAccessToken = null, int pageNumber = 1, int resultSize = 10) {
         phrase = phrase.ToLower();
 
         var posts = await _postService.GetPostsByPhraseAsync(phrase, userAccessToken, pageNumber, resultSize);
@@ -239,7 +237,8 @@ public class ForumController : ControllerBase {
 
     [HttpPost("interact/{postId:int}")]
     [Authorize]
-    [SwaggerOperation("isLike = true,false,  null - noInteraction(remove Like/Dislike) zwracana tablica postInteractions pokazuje tylko aktualnego uzytkownika")]
+    [SwaggerOperation("isLike = true,false, null - noInteraction(remove Like/Dislike) " +
+        "zwracana tablica postInteractions pokazuje tylko aktualnego uzytkownika")]
     public async Task<ActionResult> InteractPost(int postId, bool? isLike) {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId == null)

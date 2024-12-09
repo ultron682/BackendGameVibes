@@ -12,6 +12,8 @@ using System.ComponentModel.DataAnnotations;
 
 
 namespace BackendGameVibes.Controllers;
+
+
 [ApiController]
 [Route("api/reviews")]
 public class ReviewController : ControllerBase {
@@ -35,7 +37,8 @@ public class ReviewController : ControllerBase {
     }
 
     [HttpPost("search-phrase")]
-    public async Task<IActionResult> GetFilteredReviews([Required] ValueModel searchPhrase, int pageNumber = 1, int resultSize = 10) {
+    public async Task<IActionResult> GetFilteredReviews([Required] ValueModel searchPhrase,
+        int pageNumber = 1, int resultSize = 10) {
         var reviews = await _reviewService.GetFilteredReviewsAsync(searchPhrase.Value!, pageNumber, resultSize);
 
         if (reviews == null) {
