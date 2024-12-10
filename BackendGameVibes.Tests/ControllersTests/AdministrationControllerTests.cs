@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿namespace BackendGameVibes.Tests.Controllers;
+
+using AutoMapper;
 using BackendGameVibes.Controllers;
 using BackendGameVibes.IServices;
 using BackendGameVibes.IServices.Forum;
@@ -8,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Moq;
 
-namespace BackendGameVibes.Tests.Controllers;
 
 public class AdministrationControllerTests {
     private readonly Mock<UserManager<UserGameVibes>> _mockUserManager;

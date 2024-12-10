@@ -1,3 +1,5 @@
+namespace BackendGameVibes.Tests.Controllers;
+
 using Moq;
 using Microsoft.AspNetCore.Mvc;
 using BackendGameVibes.Controllers;
@@ -7,7 +9,6 @@ using BackendGameVibes.Models.Steam;
 using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.DTOs.Responses;
 
-namespace BackendGameVibes.Tests.Controllers;
 
 public class GameControllerTests {
     private readonly GameController _controller;

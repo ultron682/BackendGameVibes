@@ -8,10 +8,10 @@ using BackendGameVibes.Models.DTOs.Forum;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Security.Principal;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using BackendGameVibes.Models.DTOs.Responses;
+
 
 public class ForumControllerTests {
     private readonly Mock<IForumPostService> _mockPostService;
