@@ -367,3 +367,4 @@ FodyWeavers.xsd
 /BackendGameVibes/Migrations/*
 /BackendGameVibes/Migrations/ApplicationDbContextModelSnapshot.cs
 /db-data
+/BackendGameVibes/steam_games.json
