@@ -1,4 +1,6 @@
-﻿using BackendGameVibes.Data;
+﻿namespace BackendGameVibes.Tests.Services;
+
+using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.Friends;
 using BackendGameVibes.Models.User;
@@ -9,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Moq.EntityFrameworkCore;
 
-namespace BackendGameVibes.Tests.Services;
 
 public class AccountServiceTests {
     private readonly Mock<ApplicationDbContext> _mockContext;

@@ -24,9 +24,9 @@ public class ReviewControllerTests {
         _controller = new ReviewController(_reviewServiceMock.Object, _mapperMock.Object);
 
         _controller.ControllerContext.HttpContext = new DefaultHttpContext();
-        _controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
+        _controller.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity([
             new Claim(ClaimTypes.NameIdentifier, "user1")
-        }));
+        ]));
     }
 
     [Fact]
@@ -40,7 +40,8 @@ public class ReviewControllerTests {
             TotalResults = 2
         };
 
-        _reviewServiceMock.Setup(s => s.GetAllReviewsAsync(1, 10)).ReturnsAsync(getAllReviewsResponse);
+        _reviewServiceMock.Setup(s => s.GetAllReviewsAsync(1, 10))
+            .ReturnsAsync(getAllReviewsResponse);
 
         // Act
         var result = await _controller.GetAllReviews(1, 10);

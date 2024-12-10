@@ -1,4 +1,6 @@
-﻿using BackendGameVibes.Data;
+﻿namespace BackendGameVibes.Tests.Services;
+
+using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models.DTOs;
 using BackendGameVibes.Models.Games;
@@ -6,14 +8,7 @@ using BackendGameVibes.Models.Steam;
 using BackendGameVibes.Services;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace BackendGameVibes.Tests.Services;
 
 public class GameServiceTests {
     private readonly ApplicationDbContext _context;
@@ -42,7 +37,8 @@ public class GameServiceTests {
         var searchResult = new[] {
             new SteamApp { Name = "Test Game" }
         };
-        _steamServiceMock.Setup(s => s.FindSteamApp(It.IsAny<string>())).Returns(searchResult);
+        _steamServiceMock.Setup(s => s.FindSteamApp(It.IsAny<string>()))
+            .Returns(searchResult);
 
         // Act
         var result = _gameService.FindSteamAppByName("Test");
@@ -96,7 +92,9 @@ public class GameServiceTests {
         // Arrange
         var steamGameId = 292030; // The Witcher 3
 
-        _steamServiceMock.Setup(s => s.GetInfoGame(It.IsAny<int>())).ReturnsAsync(new GameData() { name = "The Witcher 3" });
+        _steamServiceMock.Setup(s => s.GetInfoGame(It.IsAny<int>())).ReturnsAsync(
+            new GameData() { name = "The Witcher 3" }
+         );
 
         // Act
         (Game? game, bool isCreated) = await _gameService.AddGameAsync(steamGameId);

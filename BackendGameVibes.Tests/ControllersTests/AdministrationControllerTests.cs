@@ -110,7 +110,8 @@ public class AdministrationControllerTests {
             "user2 data"
         };
 
-        _mockAdministrationService.Setup(aservice => aservice.GetAllUsersWithRolesAsync()).ReturnsAsync(users);
+        _mockAdministrationService.Setup(aservice => aservice.GetAllUsersWithRolesAsync())
+            .ReturnsAsync(users);
 
         // Act
         var result = await _controller.GetAllUsersWithRoles();

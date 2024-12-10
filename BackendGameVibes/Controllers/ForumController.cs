@@ -30,10 +30,11 @@ public class ForumController : ControllerBase {
         return Ok(await _threadService.GetThreadsGroupBySectionsAsync(pageNumber, threadsInSectionSize));
     }
 
-    [SwaggerOperation("zwraca wątek z postami. jesli podamy userAccessToken to jeszcze będzie info o interakcji danego uzytkownika z postem (optional)")]
     [HttpGet("threads/{threadId:int}")]
-    public async Task<IActionResult> GetThreadWithPosts(int threadId, string? userAccessToken = null, int pageNumber = 1, int postsSize = 10) {
-        object? thread = await _threadService.GetThreadWithPostsAsync(threadId, userAccessToken, pageNumber, postsSize);
+    public async Task<IActionResult> GetThreadWithPosts(int threadId,
+        string? userAccessToken = null, int pageNumber = 1, int postsSize = 10) {
+        object? thread =
+            await _threadService.GetThreadWithPostsAsync(threadId, userAccessToken, pageNumber, postsSize);
 
         if (thread == null) {
             return NotFound();
