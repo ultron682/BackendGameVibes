@@ -1,22 +1,17 @@
-﻿using AutoMapper;
-using BackendGameVibes.Data;
+﻿using BackendGameVibes.Data;
 using BackendGameVibes.IServices.Forum;
-using BackendGameVibes.IServices;
 using BackendGameVibes.Models.DTOs;
 using BackendGameVibes.Models.Forum;
 using Microsoft.EntityFrameworkCore;
+
 
 namespace BackendGameVibes.Services.Forum;
 
 public class ForumRoleService : IForumRoleService {
     private readonly ApplicationDbContext _context;
-    private readonly IMapper _mapper;
-    private readonly IForumExperienceService _forumExperienceService;
 
-    public ForumRoleService(ApplicationDbContext context, IMapper mapper, IForumExperienceService forumExperienceService, IForumPostService postService) {
+    public ForumRoleService(ApplicationDbContext context, IForumPostService postService) {
         _context = context;
-        _mapper = mapper;
-        _forumExperienceService = forumExperienceService;
     }
 
     public async Task<IEnumerable<object>> GetForumRolesAsync() {

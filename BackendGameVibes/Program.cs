@@ -19,9 +19,7 @@ using System.Text.Json.Serialization;
 
 
 public class Program {
-    private static async Task Main(string[] args) {
-        var builder = WebApplication.CreateBuilder(args);
-
+    private static async Task Main(string[] args, WebApplicationBuilder builder) {
         builder.Services.AddCors(options => {
             options.AddDefaultPolicy(
                 builder => {

@@ -1,5 +1,4 @@
 ﻿using BackendGameVibes.IServices;
-using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,11 +7,9 @@ namespace BackendGameVibes.Services;
 
 public class RoleService : IRoleService {
     private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly UserManager<UserGameVibes> _userManager;
 
-    public RoleService(RoleManager<IdentityRole> roleManager, UserManager<UserGameVibes> userManager) {
+    public RoleService(RoleManager<IdentityRole> roleManager) {
         _roleManager = roleManager;
-        _userManager = userManager;
     }
 
     public async Task<IdentityResult> CreateNewRole(string name) {

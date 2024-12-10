@@ -16,6 +16,7 @@ public class BackgroundServiceRefreshSteamData : IDisposable, IHostedService {
     }
 
     private void RefreshSteamGames(object? state) {
+        _steamService.RemoveLocalFileSteamGames();
         _steamService.InitSteamApi();
     }
 

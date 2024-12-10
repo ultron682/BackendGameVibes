@@ -1,17 +1,14 @@
-﻿namespace BackendGameVibes.Services
-{
-    public class HtmlTemplateService
-    {
-        public async Task<string> GetEmailTemplateAsync(string templatePath, Dictionary<string, string> placeholders)
-        {
-            string templateContent = await File.ReadAllTextAsync(templatePath);
+﻿namespace BackendGameVibes.Services;
 
-            foreach (var placeholder in placeholders)
-            {
-                templateContent = templateContent.Replace($"{{{{{placeholder.Key}}}}}", placeholder.Value);
-            }
 
-            return templateContent;
+public class HtmlTemplateService {
+    public async Task<string> GetEmailTemplateAsync(string templatePath, Dictionary<string, string> placeholders) {
+        string templateContent = await File.ReadAllTextAsync(templatePath);
+
+        foreach (var placeholder in placeholders) {
+            templateContent = templateContent.Replace($"{{{{{placeholder.Key}}}}}", placeholder.Value);
         }
+
+        return templateContent;
     }
 }

@@ -1,4 +1,6 @@
-﻿using BackendGameVibes.Data;
+﻿namespace BackendGameVibes.Services;
+
+using BackendGameVibes.Data;
 using BackendGameVibes.IServices;
 using BackendGameVibes.Models;
 using BackendGameVibes.Models.Friends;
@@ -7,10 +9,8 @@ using BackendGameVibes.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using Newtonsoft.Json.Linq;
 
 
-namespace BackendGameVibes.Services;
 
 public class AccountService : IAccountService {
     private readonly ApplicationDbContext _context;
@@ -47,7 +47,8 @@ public class AccountService : IAccountService {
         if (user.ProfilePicture == null) {
             try {
                 string randomColorHex = new Random().Next(0, 16777215).ToString("X");
-                var defaultProfilePictureUrl = $"https://ui-avatars.com/api/?background={randomColorHex}&bold=true&size=128&color=fff&name=" + model.UserName;
+                var defaultProfilePictureUrl = $"https://ui-avatars.com/api/?background={randomColorHex}" +
+                    $"&bold=true&size=128&color=fff&name=" + model.UserName;
                 var defaultProfilePicture = await _httpClient.GetAsync(defaultProfilePictureUrl, CancellationToken.None);
                 var profilePictureBlob = await defaultProfilePicture.Content.ReadAsByteArrayAsync();
 
@@ -100,15 +101,8 @@ public class AccountService : IAccountService {
         return _jwtTokenService.GetTokenClaims(accessToken);
     }
 
-
     public async Task<SignInResult?> LoginUserAsync(UserGameVibes user, string password) {
         return await _signInManager.PasswordSignInAsync(user.UserName!, password, true, true);
-    }
-
-    // unused method todo: remove?
-    public async Task SaveTokenToDbAsync(IdentityUserToken<string> identityUserToken) {
-        _context.UserTokens.Add(identityUserToken);
-        await _context.SaveChangesAsync();
     }
 
     public async Task<object?> GetBasicAccountInfoAsync(string userId) {
@@ -334,7 +328,9 @@ public class AccountService : IAccountService {
 
         Console.WriteLine($"Please confirm your account by <a href='{ConfirmationLink!}'>clicking here</a>.");
 
-        string emailBody = await _htmlTemplateService.GetEmailTemplateAsync("wwwroot/EmailTemplates/confirm_email_template.html", new Dictionary<string, string>
+        string emailBody =
+            await _htmlTemplateService.GetEmailTemplateAsync("wwwroot/EmailTemplates/confirm_email_template.html",
+            new Dictionary<string, string>
         {
             { "ConfirmationLink", ConfirmationLink! },
             { "UserName", user.UserName! }
@@ -378,7 +374,8 @@ public class AccountService : IAccountService {
         return await _userManager.ConfirmEmailAsync(user, token);
     }
 
-    public async Task<(bool Succeeded, IEnumerable<string> Errors)> ChangePasswordAsync(string userId, string currentPassword, string newPassword) {
+    public async Task<(bool Succeeded, IEnumerable<string> Errors)> ChangePasswordAsync(string userId,
+        string currentPassword, string newPassword) {
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null) {
             return (false, new[] { "User not found" });
@@ -528,7 +525,9 @@ public class AccountService : IAccountService {
 
     public async Task<bool> ConfirmFriendRequestAsync(string userId, string friendId) {
         var friendRequest = await _context.FriendRequests
-            .FirstOrDefaultAsync(fr => fr.SenderUserId == friendId && fr.ReceiverUserId == userId && (fr.IsAccepted == null || fr.IsAccepted == false));
+            .FirstOrDefaultAsync(fr => fr.SenderUserId == friendId
+            && fr.ReceiverUserId == userId
+            && (fr.IsAccepted == null || fr.IsAccepted == false));
 
         if (friendRequest != null) {
             friendRequest.IsAccepted = true;

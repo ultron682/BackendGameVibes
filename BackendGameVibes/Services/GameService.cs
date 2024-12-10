@@ -4,7 +4,6 @@ using BackendGameVibes.Models.Games;
 using BackendGameVibes.Models.DTOs;
 using BackendGameVibes.Models.Steam;
 using Microsoft.EntityFrameworkCore;
-using BackendGameVibes.Extensions;
 using BackendGameVibes.Models.DTOs.Responses;
 
 namespace BackendGameVibes.Services;
@@ -24,15 +23,18 @@ public class GameService : IGameService {
         return _steamService.FindSteamApp(searchingName) ?? [];
     }
 
-    public async Task<FilteredGamesResponse?> GetFilteredGamesAsync(FiltersGamesDTO filtersGamesDTO, int pageNumber = 1, int resultSize = 10) {
+    public async Task<FilteredGamesResponse?> GetFilteredGamesAsync(FiltersGamesDTO filtersGamesDTO,
+        int pageNumber = 1, int resultSize = 10) {
         var query = _context.Games
             .Include(g => g.Genres)
             .Include(g => g.Platforms)
             .Where(g =>
-                (filtersGamesDTO.GenresIds == null || !filtersGamesDTO.GenresIds.Any() || g.Genres!.Any(genre => filtersGamesDTO.GenresIds.Contains(genre.Id))) &&
+                (filtersGamesDTO.GenresIds == null || !filtersGamesDTO.GenresIds.Any()
+                || g.Genres!.Any(genre => filtersGamesDTO.GenresIds.Contains(genre.Id))) &&
                 g.LastCalculatedRatingFromReviews >= filtersGamesDTO.RatingMin &&
                 g.LastCalculatedRatingFromReviews <= filtersGamesDTO.RatingMax &&
-                (string.IsNullOrEmpty(filtersGamesDTO.Title) || g.Title != null && g.Title.ToLower().Contains(filtersGamesDTO.Title.ToLower()))
+                (string.IsNullOrEmpty(filtersGamesDTO.Title) || g.Title != null
+                && g.Title.ToLower().Contains(filtersGamesDTO.Title.ToLower()))
             );
 
 
@@ -108,7 +110,8 @@ public class GameService : IGameService {
             .FirstOrDefaultAsync();
     }
 
-    public async Task<(Game?, bool)[]> InitGamesBySteamIdsAsync(ApplicationDbContext applicationDbContext, HashSet<int> steamGamesToInitID) {
+    public async Task<(Game?, bool)[]> InitGamesBySteamIdsAsync(ApplicationDbContext applicationDbContext,
+        HashSet<int> steamGamesToInitID) {
         var tasks = steamGamesToInitID
             .Select(_steamService.GetInfoGame)
             .ToArray();
@@ -136,7 +139,7 @@ public class GameService : IGameService {
                 Title = steamGameData?.name ?? "Brak tytułu",
                 Description = steamGameData?.detailed_description ?? "Brak opisu",
                 CoverImage = @$"https://steamcdn-a.akamaihd.net/steam/apps/{steamGameId}/library_600x900_2x.jpg",
-                ReleaseDate = ParseReleaseDate(steamGameData?.release_date.Date),
+                ReleaseDate = ParseReleaseDate(steamGameData!.release_date.Date),
                 GameImages = steamGameData?.screenshots?.Select(s => new GameImage { ImagePath = s.path_full }).ToList() ?? new List<GameImage>(),
                 Genres = [],
             };
@@ -159,7 +162,7 @@ public class GameService : IGameService {
             }
 
             // Przypisanie platform - dodaj tylko istniejące platformy
-            var platformIds = GetPlatformIds(steamGameData?.platforms);
+            var platformIds = GetPlatformIds(steamGameData!.platforms);
             var existingPlatforms = applicationDbContext.Platforms.Where(p => platformIds.Contains(p.Id)).ToList();
             newGame.Platforms = existingPlatforms;
 

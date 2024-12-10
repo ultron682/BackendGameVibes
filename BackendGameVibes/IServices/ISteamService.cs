@@ -6,5 +6,6 @@ namespace BackendGameVibes.IServices {
         Task<SteamApp[]?> GetAllGameIds();
         Task<GameData?> GetInfoGame(int id);
         Task InitSteamApi();
+        void RemoveLocalFileSteamGames();
     }
 }

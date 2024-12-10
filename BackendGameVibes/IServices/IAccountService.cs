@@ -14,7 +14,6 @@ namespace BackendGameVibes.IServices {
         Task<UserGameVibes?> GetUserByIdAsync(string userId);
         Task<SignInResult?> LoginUserAsync(UserGameVibes user, string password);
         Task<IdentityResult> RegisterUserAsync(RegisterDTO model);
-        Task SaveTokenToDbAsync(IdentityUserToken<string> userToken);
         Task<bool> SendConfirmationEmailAsync(string email, UserGameVibes user);
         Task<bool> UpdateUserNameAsync(string userId, string newUsername);
         Task<(bool Succeeded, IEnumerable<string> Errors)> ChangePasswordAsync(string userId, string currentPassword, string newPassword);

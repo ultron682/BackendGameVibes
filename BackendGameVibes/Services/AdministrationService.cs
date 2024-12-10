@@ -47,7 +47,7 @@ public class AdministrationService : IAdministrationService {
         var usersWithRoles = new List<object>();
         foreach (var user in users) {
             var userGameVibes = await _userManager.FindByIdAsync(user.Id);
-            var roles = await _userManager.GetRolesAsync(userGameVibes);
+            var roles = await _userManager.GetRolesAsync(userGameVibes!);
             usersWithRoles.Add(new {
                 user.Id,
                 user.Email,

@@ -91,7 +91,8 @@ public class ForumThreadService : IForumThreadService {
 
     }
 
-    public async Task<GetThreadWithPostsResponse?> GetThreadWithPostsAsync(int threadId, string? userAccessToken = null, int pageNumber = 1, int postsSize = 10) {
+    public async Task<GetThreadWithPostsResponse?> GetThreadWithPostsAsync(int threadId, string? userAccessToken = null,
+        int pageNumber = 1, int postsSize = 10) {
         var thread = await _context.ForumThreads
             .Select(t => new {
                 t.Id,

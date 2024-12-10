@@ -8,6 +8,7 @@ namespace BackendGameVibes.Services;
 public class SteamService : ISteamService {
     public SteamApp[]? steamGames = null; // only steamID and name!!!
     private readonly HttpClient _httpClient;
+    private const string filePath = "steam_games.json";
 
 
     public SteamService(HttpClient httpClient) {
@@ -31,9 +32,13 @@ public class SteamService : ISteamService {
         }
     }
 
+    public void RemoveLocalFileSteamGames() {
+        File.Delete(filePath);
+    }
+
     public async Task<SteamApp[]?> GetAllGameIds() {
         try {
-            string filePath = "steam_games.json";
+
             if (File.Exists(filePath)) {
                 var jsonString = await File.ReadAllTextAsync(filePath);
                 var options = new JsonSerializerOptions {
@@ -43,7 +48,8 @@ public class SteamService : ISteamService {
                 return appListWrapper!.Applist.Apps;
             }
             else {
-                var response = await _httpClient.GetAsync("https://api.steampowered.com/ISteamApps/GetAppList/v0002/?key=STEAMKEY&format=json");
+                var response = await _httpClient
+                    .GetAsync("https://api.steampowered.com/ISteamApps/GetAppList/v0002/?key=STEAMKEY&format=json");
                 if (response.IsSuccessStatusCode) {
                     var jsonString = await response.Content.ReadAsStringAsync();
                     var options = new JsonSerializerOptions {
