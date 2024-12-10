@@ -76,7 +76,6 @@ public class IntegrationTestBase : IClassFixture<WebApplicationFactory<Program>>
             }
 
 
-
             if (!await roleManager.RoleExistsAsync("admin")) {
                 await roleManager.CreateAsync(new IdentityRole("admin"));
 
@@ -95,10 +94,6 @@ public class IntegrationTestBase : IClassFixture<WebApplicationFactory<Program>>
                 newUser = await userManager.FindByEmailAsync(newUser.Email);
                 var result1 = await userManager.AddToRoleAsync(newUser!, "admin");
             }
-
-
-
         }
-
     }
 }

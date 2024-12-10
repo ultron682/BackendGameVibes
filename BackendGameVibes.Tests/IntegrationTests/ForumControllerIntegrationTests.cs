@@ -1,13 +1,8 @@
 ﻿namespace BackendGameVibes.Tests.IntegrationTests;
 
-using BackendGameVibes.IServices;
-using BackendGameVibes.Models.DTOs.Account;
 using BackendGameVibes.Models.DTOs.Forum;
 using BackendGameVibes.Models.DTOs.Responses;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;

@@ -210,7 +210,8 @@ public class ForumController : ControllerBase {
     }
 
     [HttpGet("posts/search-phrase")]
-    public async Task<ActionResult> SearchPostsByPhrase([Required, MinLength(3)] string phrase, string? userAccessToken = null, int pageNumber = 1, int resultSize = 10) {
+    public async Task<ActionResult> SearchPostsByPhrase([Required, MinLength(3)] string phrase,
+        string? userAccessToken = null, int pageNumber = 1, int resultSize = 10) {
         phrase = phrase.ToLower();
 
         var posts = await _postService.GetPostsByPhraseAsync(phrase, userAccessToken, pageNumber, resultSize);

@@ -3,7 +3,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 public static class GameVibesAuthService {
-    public static void AddAuthenticationGameVibesJwt(this IServiceCollection services, IConfiguration configuration) {
+    public static void AddAuthenticationGameVibesJwt(this IServiceCollection services,
+        IConfiguration configuration) {
         services
             .AddAuthentication(options => {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -21,7 +22,8 @@ public static class GameVibesAuthService {
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = configuration["Jwt:Issuer"],
                     ValidAudience = configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!))
+                    IssuerSigningKey
+                        = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!))
                 };
             });
     }
@@ -32,7 +34,6 @@ public static class GameVibesAuthService {
                 options.AddPolicy("admin", policy => policy.RequireRole("admin"));
                 options.AddPolicy("mod", policy => policy.RequireRole("mod"));
                 options.AddPolicy("user", policy => policy.RequireRole("user"));
-                options.AddPolicy("guest", policy => policy.RequireRole("guest"));
                 options.AddPolicy("modOrAdmin", policy => policy.RequireRole("mod", "admin"));
             });
     }

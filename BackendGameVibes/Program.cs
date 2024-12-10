@@ -37,7 +37,10 @@ public class Program {
             options.UseMySql(
                 builder.Configuration.GetConnectionString("GameVibesDbConnection"),
                 new MySqlServerVersion(new Version(8, 0, 26)),
-                mySqlOptions => { mySqlOptions.EnableRetryOnFailure(); mySqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery); }));
+                mySqlOptions => {
+                    mySqlOptions.EnableRetryOnFailure();
+                    mySqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                }));
 
         builder.Services
             .AddIdentity<UserGameVibes, IdentityRole>()
@@ -68,8 +71,10 @@ public class Program {
         SetupServices(builder);
 
         builder.Services.AddHealthChecks()
-            .AddCheck<GameVibesHealthDbCheck>("game_vibes_db_health", tags: ["db"])
-            .AddCheck<GameVibesHealthInternetCheck>("game_vibes_internet_health", tags: ["internet"]);
+            .AddCheck<GameVibesHealthDbCheck>("game_vibes_db_health",
+            tags: ["db"])
+            .AddCheck<GameVibesHealthInternetCheck>("game_vibes_internet_health",
+            tags: ["internet"]);
 
 
         var app = builder.Build();
@@ -99,14 +104,10 @@ public class Program {
 
         app.MapControllers();
 
-
-
-        ISteamService? steamService = app.Services.GetService<ISteamService>(); // on start backend download steam games IDs
+        ISteamService? steamService = app.Services.GetService<ISteamService>();
         _ = steamService!.InitSteamApi();
 
         using (var scope = app.Services.CreateAsyncScope()) {
-            Console.WriteLine($"Current Environment: {app.Environment.EnvironmentName}");
-
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             await dbContext.Database.EnsureCreatedAsync();
 

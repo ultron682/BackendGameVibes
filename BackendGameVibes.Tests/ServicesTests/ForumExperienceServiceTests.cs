@@ -1,4 +1,6 @@
-﻿using BackendGameVibes.Data;
+﻿namespace BackendGameVibes.Tests.Services;
+
+using BackendGameVibes.Data;
 using BackendGameVibes.Models.Forum;
 using BackendGameVibes.Models.Points;
 using BackendGameVibes.Models.User;
@@ -7,8 +9,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moq;
-
-namespace BackendGameVibes.Tests.Services;
 
 public class ForumExperienceServiceTests {
     private readonly Mock<IOptions<ExperiencePointsSettings>> _pointsSettingsMock;
@@ -42,7 +42,7 @@ public class ForumExperienceServiceTests {
         _dbContext.ForumRoles.Add(newRole);
         await _dbContext.SaveChangesAsync();
 
-        var service = new ForumExperienceService(_pointsSettingsMock.Object, _userManagerMock.Object, _dbContext);
+        var service = new ForumExperienceService(_pointsSettingsMock.Object, _dbContext);
 
         // Act
         var newExperience = await service.AddThreadPoints(userId);
@@ -67,7 +67,7 @@ public class ForumExperienceServiceTests {
         _dbContext.Users.Add(user);
         await _dbContext.SaveChangesAsync();
 
-        var service = new ForumExperienceService(_pointsSettingsMock.Object, _userManagerMock.Object, _dbContext);
+        var service = new ForumExperienceService(_pointsSettingsMock.Object, _dbContext);
 
         // Act
         var newExperience = await service.AddPostPoints(userId);
@@ -83,7 +83,7 @@ public class ForumExperienceServiceTests {
         const string nonExistentUserId = "non-existent-user";
         _pointsSettingsMock.Setup(p => p.Value).Returns(new ExperiencePointsSettings { OnAddReviewPoints = 15 });
 
-        var service = new ForumExperienceService(_pointsSettingsMock.Object, _userManagerMock.Object, _dbContext);
+        var service = new ForumExperienceService(_pointsSettingsMock.Object, _dbContext);
 
         // Act
         var result = await service.AddReviewPoints(nonExistentUserId);
@@ -110,7 +110,7 @@ public class ForumExperienceServiceTests {
         _dbContext.ForumRoles.Add(advancedRole);
         await _dbContext.SaveChangesAsync();
 
-        var service = new ForumExperienceService(_pointsSettingsMock.Object, _userManagerMock.Object, _dbContext);
+        var service = new ForumExperienceService(_pointsSettingsMock.Object, _dbContext);
 
         // Act
         var newExperience = await service.AddNewFriendPoints(userId);

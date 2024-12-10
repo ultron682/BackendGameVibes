@@ -33,7 +33,13 @@ public class SteamService : ISteamService {
     }
 
     public void RemoveLocalFileSteamGames() {
-        File.Delete(filePath);
+        try {
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+        }
+        catch (Exception ex) {
+            Console.WriteLine(ex.Message);
+        }
     }
 
     public async Task<SteamApp[]?> GetAllGameIds() {
