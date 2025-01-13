@@ -4,6 +4,10 @@
 Ten backend to kompleksowy system stworzony dla 2 aplikacji klienckich (Flutter i React) który zapewnienia poprawność działania dla całego serwisu gier komputerowych. Łączy funkcjonalności społecznościowe z zarządzaniem bazą gier.
 
 ### Pokaz możliwości aplikacji klienckich (flutter - mobile app, react - website for managing app) korzystających z tego backendu
+![image](https://github.com/user-attachments/assets/bbd43c03-0166-4c59-b301-39043911c541)
+![image](https://github.com/user-attachments/assets/9c8b4285-55d5-43c8-be65-8969216ce75c)
+![image](https://github.com/user-attachments/assets/f7d936eb-4586-4848-a9da-726224dd3ce5)
+![image](https://github.com/user-attachments/assets/98969b01-6005-4183-883c-f1e0b67d184b)
 
 TODO: zrzuty ekranu
 
