@@ -1,16 +1,20 @@
 ## Projekt: Backend dla serwisu społecznościowego poświęconego grą komputerowych
 
 ### Opis
-Ten projekt to kompleksowy system stworzony z myślą o miłośnikach gier komputerowych, który łączy funkcjonalności społecznościowe z zarządzaniem bazą gier. Aplikacja umożliwia użytkownikom przeglądanie, ocenianie i recenzowanie gier.
+Ten backend to kompleksowy system stworzony dla 2 aplikacji klienckich (Flutter i React) który zapewnienia poprawność działania dla całego serwisu gier komputerowych. Łączy funkcjonalności społecznościowe z zarządzaniem bazą gier.
+
+### Pokaz możliwości aplikacji klienckich (flutter - mobile app, react - website for managing app) korzystających z tego backendu
+
+TODO: zrzuty ekranu
+
 
 ### Cele Projektu
 - **Zbudowanie społeczności**: Umożliwienie graczom dzielenia się swoimi doświadczeniami i opiniami na temat gier.
 - **Zarządzanie danymi o grach**: Umożliwienie użytkownikom przeglądania, oceniania i recenzowania gier.
-- **Intuicyjny interfejs**: Zapewnienie prostego i przyjaznego interfejsu, który ułatwia nawigację i korzystanie z aplikacji.
 
 ### Funkcjonalności Backend
 1. **Zarządzanie Użytkownikami**
-   - Rejestracja: Użytkownicy mogą tworzyć konta, podając swoje dane osobowe, takie jak imię, nazwisko, adres e-mail oraz hasło. System weryfikuje unikalność adresu e-mail.
+   - Rejestracja: Użytkownicy mogą tworzyć konta, podając swoje dane osobowe, takie jak imię, nazwisko, adres e-mail oraz hasło. System weryfikuje istnienie adresu e-mail.
    - Logowanie: Umożliwia użytkownikom dostęp do swojego konta z wykorzystaniem bezpiecznego mechanizmu autoryzacji, w tym obsługę błędów logowania.
    - Zarządzanie Sesjami: Obsługuje sesje użytkowników, zapewniając ich bezpieczeństwo i prywatność. Użytkownicy mogą wylogować się z systemu, co kończy ich sesję.
 
@@ -31,8 +35,17 @@ Ten projekt to kompleksowy system stworzony z myślą o miłośnikach gier kompu
    - Dokumentacja API: Użycie middleware UseSwagger do generowania dokumentacji API, co ułatwia integrację z frontendem oraz testowanie funkcji.
 
 6. **Middleware**
-   - CORS: Obsługuje politykę CORS, co pozwala na bezpieczne połączenia z różnych domen. Umożliwia to korzystanie z aplikacji w różnych środowiskach.
    - Aktualizacja Aktywności: Middleware aktualizuje ostatnią aktywność użytkownika przy każdym żądaniu, co pozwala na lepsze zarządzanie sesjami i monitorowanie aktywności.
+
+
+### Baza danych
+![image](https://github.com/user-attachments/assets/91938e3e-63ae-45b4-ad41-bd977d69a2fa)
+
+
+### Swagger
+![image](https://github.com/user-attachments/assets/b543afa8-2045-40a0-9ce0-4d197b8d0872)
+
+
 
 ### Technologie
 - **C#**: Język programowania użyty do implementacji logiki backendu, zapewniający wysoką wydajność i bezpieczeństwo.
@@ -52,6 +65,7 @@ Ten projekt to kompleksowy system stworzony z myślą o miłośnikach gier kompu
 3. **Skonfiguruj bazę danych**: Upewnij się, że masz zainstalowany MySQL i skonfiguruj połączenie w pliku konfiguracyjnym.
 4. **Uruchom migracje**: Aby utworzyć bazę danych i tabele, uruchom:
    ```bash
+   dotnet ef migrations add InitialCreate
    dotnet ef database update
    ```
 5. **Uruchom aplikację**
@@ -60,11 +74,10 @@ Ten projekt to kompleksowy system stworzony z myślą o miłośnikach gier kompu
    ```
 
 ### Wymagania
-- **.NET Core**: Wersja 5.0 lub nowsza. Upewnij się, że masz zainstalowane odpowiednie SDK.
-- **MySQL**: Zainstalowany i skonfigurowany system zarządzania bazą danych. Upewnij się, że masz utworzoną bazę danych przed uruchomieniem migracji.
+- **.NET Core**: Wersja 8.0 lub nowsza.
+- **MySQL**: Zainstalowany i skonfigurowany przed uruchomieniem migracji.
+- **Docker**: Projekt można uruchomić przez docker compose, który automatycznie wszystko uruchomi wraz z bazą danych mysql. 
 
 ### Testowanie
-- **Testy jednostkowe**: Projekt zawiera testy jednostkowe dla kluczowych funkcji backendu, co zapewnia stabilność i niezawodność aplikacji.
-- **Testy integracyjne**: Umożliwiają sprawdzenie interakcji między różnymi komponentami systemu, co jest kluczowe dla zapewnienia poprawności działania aplikacji.
-
-Czy chcesz dodać jeszcze jakieś informacje lub zmiany?
+- **Testy jednostkowe**: 
+- **Testy integracyjne**: 
