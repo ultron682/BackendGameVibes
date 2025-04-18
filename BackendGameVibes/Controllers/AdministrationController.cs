@@ -51,14 +51,16 @@ public class AdministrationController : ControllerBase {
     }
 
     [HttpGet("users")]
-    [Authorize("admin")]
+    [Authorize(Policy = "modOrAdmin")]
+    [SwaggerOperation("modOrAdmin")]
     public async Task<IActionResult> GetAllUsersWithRoles() {
         var usersWithRoles = await _administrationService.GetAllUsersWithRolesAsync();
         return Ok(usersWithRoles);
     }
 
     [HttpGet("users/{userId}")]
-    [Authorize("admin")]
+    [Authorize(Policy = "modOrAdmin")]
+    [SwaggerOperation("modOrAdmin")]
     public async Task<IActionResult> GetUser(string userId) {
         var accountInfo = await _accountService.GetBasicAccountInfoAsync(userId);
 

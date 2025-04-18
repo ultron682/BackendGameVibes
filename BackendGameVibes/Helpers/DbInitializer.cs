@@ -13,18 +13,6 @@ using BackendGameVibes.IServices.Forum;
 namespace BackendGameVibes.Helpers;
 
 public class DbInitializer {
-    public static string GenerateRandomSentence(int wordCount) {
-        Random random = new Random();
-        var words = new List<string>();
-
-        for (int i = 0; i < wordCount; i++) {
-            var word = DbInitializerData.LoremIpsumWords[random.Next(DbInitializerData.LoremIpsumWords.Length)];
-            words.Add(word);
-        }
-
-        return string.Join(" ", words) + ".";
-    }
-
     public static async Task InitializeAsync(AsyncServiceScope scope, ApplicationDbContext applicationDbContext) {
         try {
             using var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserGameVibes>>();
@@ -60,7 +48,9 @@ public class DbInitializer {
                     UserName = "admin",
                     Email = "admin@admin.com",
                     EmailConfirmed = true,
-                    ProfilePicture = new ProfilePicture { ImageData = await File.ReadAllBytesAsync(defaultProfileImagePath) }
+                    ProfilePicture = new ProfilePicture {
+                        ImageData = await File.ReadAllBytesAsync(defaultProfileImagePath)
+                    }
                 };
                 string userPWD = "Test123.";
 
@@ -176,15 +166,12 @@ public class DbInitializer {
             };
             applicationDbContext.FriendRequests.Add(friendRequest2);
 
-
             var friendRequest3 = new FriendRequest {
                 SenderUserId = testUsers[0]!.Id,
                 ReceiverUserId = testUsers[3]!.Id,
                 IsAccepted = true
             };
             applicationDbContext.FriendRequests.Add(friendRequest3);
-
-
 
             var friend1 = new Friend { UserId = testUsers[0]!.Id, FriendId = testUsers[1]!.Id };
             var friend2 = new Friend { UserId = testUsers[1]!.Id, FriendId = testUsers[0]!.Id };
@@ -331,13 +318,15 @@ public class DbInitializer {
                 await postService!.ReportPostAsync(testUsers[random.Next(testUsers.Count)]!.Id!,
                     new ReportPostDTO {
                         ForumPostId = forumPosts[random.Next(0, forumPosts.Count)].Id,
-                        Reason = DbInitializerData.SpamSuspicionContent[random.Next(0, DbInitializerData.SpamSuspicionContent.Length)]
+                        Reason = DbInitializerData.SpamSuspicionContent[random.Next(0,
+                        DbInitializerData.SpamSuspicionContent.Length)]
                     });
 
                 await reviewService.ReportReviewAsync(testUsers[random.Next(testUsers.Count)]!.Id!,
                     new ReportReviewDTO {
                         ReviewId = reviews[random.Next(0, reviews.Count)].Id,
-                        Reason = DbInitializerData.SpamSuspicionContent[random.Next(0, DbInitializerData.SpamSuspicionContent.Length)]
+                        Reason = DbInitializerData.SpamSuspicionContent[random.Next(0,
+                        DbInitializerData.SpamSuspicionContent.Length)]
                     });
 
                 Console.Write(".");
