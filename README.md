@@ -3,7 +3,7 @@
 ### Opis
 Ten backend to kompleksowy system stworzony dla 2 aplikacji klienckich (Flutter i React) który zapewnienia poprawność działania dla całego serwisu gier komputerowych. Łączy funkcjonalności społecznościowe z zarządzaniem bazą gier.
 
-### Pokaz możliwości aplikacji klienckich (flutter - mobile app, react - website for managing app) korzystających z tego backendu
+### Pokaz możliwości aplikacji klienckiej korzystających z tego backendu.
 ![image](https://github.com/user-attachments/assets/bbd43c03-0166-4c59-b301-39043911c541)
 ![image](https://github.com/user-attachments/assets/9c8b4285-55d5-43c8-be65-8969216ce75c)
 ![image](https://github.com/user-attachments/assets/f7d936eb-4586-4848-a9da-726224dd3ce5)
@@ -15,15 +15,15 @@ Ten backend to kompleksowy system stworzony dla 2 aplikacji klienckich (Flutter 
 - **Zbudowanie społeczności**: Umożliwienie graczom dzielenia się swoimi doświadczeniami i opiniami na temat gier.
 - **Zarządzanie danymi o grach**: Umożliwienie użytkownikom przeglądania, oceniania i recenzowania gier.
 
-### Funkcjonalności Backend
+### Funkcjonalności Backendu
 1. **Zarządzanie Użytkownikami**
-   - Rejestracja: Użytkownicy mogą tworzyć konta, podając swoje dane osobowe, takie jak imię, nazwisko, adres e-mail oraz hasło. System weryfikuje istnienie adresu e-mail.
+   - Rejestracja: Użytkownicy mogą tworzyć konta, podając swoje dane osobowe, takie jak imię, nazwisko, adres e-mail oraz hasło.
    - Logowanie: Umożliwia użytkownikom dostęp do swojego konta z wykorzystaniem bezpiecznego mechanizmu autoryzacji, w tym obsługę błędów logowania.
-   - Zarządzanie Sesjami: Obsługuje sesje użytkowników, zapewniając ich bezpieczeństwo i prywatność. Użytkownicy mogą wylogować się z systemu, co kończy ich sesję.
+   - Zarządzanie kontem: Usuwanie danych użytkownika, zmiana emaila itd.
 
 2. **Zarządzanie Grami**
    - CRUD dla Gier: Umożliwia dodawanie, edytowanie i usuwanie gier z bazy danych. Administratorzy mają pełne uprawnienia do zarządzania danymi o grach.
-   - Informacje o Gra: Przechowuje szczegółowe informacje o grach, takie jak tytuł, opis, gatunek, data wydania, oceny i recenzje. Użytkownicy mogą przeszukiwać gry według różnych kryteriów.
+   - Informacje o grze: Przechowuje szczegółowe informacje o grach, takie jak tytuł, opis, gatunek, data wydania, oceny i recenzje. Użytkownicy mogą przeszukiwać gry według różnych kryteriów.
 
 3. **Recenzje i Oceny**
    - Dodawanie Recenzji: Użytkownicy mogą dodawać recenzje do gier, które obejmują tekst oraz ocenę w skali 1-10. Recenzje są powiązane z kontem użytkownika.
@@ -34,8 +34,8 @@ Ten backend to kompleksowy system stworzony dla 2 aplikacji klienckich (Flutter 
    - Posty: Umożliwia dodawanie postów do wątków, z opcją oceniania postów przez innych użytkowników. Użytkownicy mogą również odpowiadać na posty, co sprzyja interakcji.
 
 5. **API**
-   - RESTful API: Aplikacja udostępnia API do komunikacji z frontendem, umożliwiając operacje CRUD na użytkownikach, grach, recenzjach i postach. API jest dobrze udokumentowane, co ułatwia integrację z frontendem oraz testowanie funkcji.
-   - Dokumentacja API: Użycie middleware UseSwagger do generowania dokumentacji API, co ułatwia integrację z frontendem oraz testowanie funkcji.
+   - RESTful API: Aplikacja udostępnia API do komunikacji z frontendem, umożliwiając operacje CRUD na użytkownikach, grach, recenzjach i postach.
+   - API jest dobrze udokumentowane, co ułatwia integrację z frontendem oraz testowanie funkcji.
 
 6. **Middleware**
    - Aktualizacja Aktywności: Middleware aktualizuje ostatnią aktywność użytkownika przy każdym żądaniu, co pozwala na lepsze zarządzanie sesjami i monitorowanie aktywności.
@@ -77,7 +77,7 @@ Ten backend to kompleksowy system stworzony dla 2 aplikacji klienckich (Flutter 
    ```
 
 ### Wymagania
-- **.NET Core**: Wersja 8.0 lub nowsza.
+- **.NET Core**: Wersja 8.0.
 - **MySQL**: Zainstalowany i skonfigurowany przed uruchomieniem migracji.
 - **Docker**: Projekt można uruchomić przez docker compose, który automatycznie wszystko uruchomi wraz z bazą danych mysql. 
 
