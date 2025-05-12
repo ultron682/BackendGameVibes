@@ -9,7 +9,6 @@ Ten backend to kompleksowy system stworzony dla 2 aplikacji klienckich (Flutter 
 ![image](https://github.com/user-attachments/assets/f7d936eb-4586-4848-a9da-726224dd3ce5)
 ![image](https://github.com/user-attachments/assets/98969b01-6005-4183-883c-f1e0b67d184b)
 
-TODO: zrzuty ekranu
 
 
 ### Cele Projektu
